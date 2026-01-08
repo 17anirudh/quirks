@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as OnboardIndexRouteImport } from './routes/onboard/index'
 import { Route as OnboardSignupRouteImport } from './routes/onboard/signup'
+import { Route as OnboardOnboardRouteImport } from './routes/onboard/onboard'
+import { Route as OnboardLoginRouteImport } from './routes/onboard/login'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,33 +30,67 @@ const OnboardSignupRoute = OnboardSignupRouteImport.update({
   path: '/onboard/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardOnboardRoute = OnboardOnboardRouteImport.update({
+  id: '/onboard/onboard',
+  path: '/onboard/onboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardLoginRoute = OnboardLoginRouteImport.update({
+  id: '/onboard/login',
+  path: '/onboard/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/onboard/login': typeof OnboardLoginRoute
+  '/onboard/onboard': typeof OnboardOnboardRoute
   '/onboard/signup': typeof OnboardSignupRoute
   '/onboard': typeof OnboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/onboard/login': typeof OnboardLoginRoute
+  '/onboard/onboard': typeof OnboardOnboardRoute
   '/onboard/signup': typeof OnboardSignupRoute
   '/onboard': typeof OnboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/onboard/login': typeof OnboardLoginRoute
+  '/onboard/onboard': typeof OnboardOnboardRoute
   '/onboard/signup': typeof OnboardSignupRoute
   '/onboard/': typeof OnboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/onboard/signup' | '/onboard'
+  fullPaths:
+    | '/'
+    | '/onboard/login'
+    | '/onboard/onboard'
+    | '/onboard/signup'
+    | '/onboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/onboard/signup' | '/onboard'
-  id: '__root__' | '/' | '/onboard/signup' | '/onboard/'
+  to:
+    | '/'
+    | '/onboard/login'
+    | '/onboard/onboard'
+    | '/onboard/signup'
+    | '/onboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/onboard/login'
+    | '/onboard/onboard'
+    | '/onboard/signup'
+    | '/onboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  OnboardLoginRoute: typeof OnboardLoginRoute
+  OnboardOnboardRoute: typeof OnboardOnboardRoute
   OnboardSignupRoute: typeof OnboardSignupRoute
   OnboardIndexRoute: typeof OnboardIndexRoute
 }
@@ -82,11 +118,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardSignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboard/onboard': {
+      id: '/onboard/onboard'
+      path: '/onboard/onboard'
+      fullPath: '/onboard/onboard'
+      preLoaderRoute: typeof OnboardOnboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboard/login': {
+      id: '/onboard/login'
+      path: '/onboard/login'
+      fullPath: '/onboard/login'
+      preLoaderRoute: typeof OnboardLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  OnboardLoginRoute: OnboardLoginRoute,
+  OnboardOnboardRoute: OnboardOnboardRoute,
   OnboardSignupRoute: OnboardSignupRoute,
   OnboardIndexRoute: OnboardIndexRoute,
 }

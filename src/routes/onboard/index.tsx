@@ -17,7 +17,10 @@ function Onboard() {
         <pre>onboard/index.tsx</pre>
         <div className='flex gap-5'>
           <Button asChild>
-            <Link to='/onboard/signup' className='p-5 underline animate-pulse'>Signup</Link>
+            <Link to='/onboard/signup' className='p-5 underline animate-pulse'>Sign Up</Link>
+          </Button>
+          <Button asChild>
+            <Link to='/onboard/login' className='p-5 underline animate-pulse'>Log In</Link>
           </Button>
         </div>
       </Vortex>
