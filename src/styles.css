@@ -125,6 +125,13 @@ code {
 
 body {
   letter-spacing: var(--tracking-normal);
+  overflow: hidden;
+  scroll-behavior: smooth;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.body::-webkit-scrollbar {
+    display: none;
 }
 
 @layer base {

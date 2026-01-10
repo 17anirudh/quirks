@@ -17,7 +17,7 @@ export function QueryLogin() {
       }
       else {
         toast.success("Welcome back 🦆")
-        throw redirect({ to: '/' })
+        throw redirect({ to: '/home' })
       }
     },
   })

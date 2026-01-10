@@ -33,7 +33,7 @@ export function QuerySignup() {
       if (authError) throw authError
 
       toast.success("Welcome to quirks 🦆🦆")
-      throw redirect({ to: "/" })
+      throw redirect({ to: "/home" })
     }
   })
 }

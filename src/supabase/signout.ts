@@ -8,7 +8,7 @@ export function useSignOutAccount() {
     mutationFn: async () => {
       await supabase.auth.signOut();
       toast.info("Let's meet again, stay safe 🙂");
-      throw redirect({ to: '/onboard' });
+      throw redirect({ to: '/' });
     },
   });
 }

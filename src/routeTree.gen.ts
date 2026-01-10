@@ -9,18 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as OnboardRouteImport } from './routes/onboard'
+import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
+import { Route as ProtectedPostsRouteImport } from './routes/_protected/posts'
+import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
+import { Route as ProtectedChatsRouteImport } from './routes/_protected/chats'
 
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardRoute = OnboardRouteImport.update({
-  id: '/onboard',
-  path: '/onboard',
+const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -28,51 +25,77 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedPostsRoute = ProtectedPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedHomeRoute = ProtectedHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedChatsRoute = ProtectedChatsRouteImport.update({
+  id: '/chats',
+  path: '/chats',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/onboard': typeof OnboardRoute
-  '/profile': typeof ProfileRoute
+  '/chats': typeof ProtectedChatsRoute
+  '/home': typeof ProtectedHomeRoute
+  '/posts': typeof ProtectedPostsRoute
+  '/profile': typeof ProtectedProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/onboard': typeof OnboardRoute
-  '/profile': typeof ProfileRoute
+  '/chats': typeof ProtectedChatsRoute
+  '/home': typeof ProtectedHomeRoute
+  '/posts': typeof ProtectedPostsRoute
+  '/profile': typeof ProtectedProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/onboard': typeof OnboardRoute
-  '/profile': typeof ProfileRoute
+  '/_protected': typeof ProtectedRouteRouteWithChildren
+  '/_protected/chats': typeof ProtectedChatsRoute
+  '/_protected/home': typeof ProtectedHomeRoute
+  '/_protected/posts': typeof ProtectedPostsRoute
+  '/_protected/profile': typeof ProtectedProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/onboard' | '/profile'
+  fullPaths: '/' | '/chats' | '/home' | '/posts' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/onboard' | '/profile'
-  id: '__root__' | '/' | '/onboard' | '/profile'
+  to: '/' | '/chats' | '/home' | '/posts' | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/_protected'
+    | '/_protected/chats'
+    | '/_protected/home'
+    | '/_protected/posts'
+    | '/_protected/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  OnboardRoute: typeof OnboardRoute
-  ProfileRoute: typeof ProfileRoute
+  ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboard': {
-      id: '/onboard'
-      path: '/onboard'
-      fullPath: '/onboard'
-      preLoaderRoute: typeof OnboardRouteImport
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof ProtectedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -82,13 +105,58 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected/profile': {
+      id: '/_protected/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedProfileRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/posts': {
+      id: '/_protected/posts'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof ProtectedPostsRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/home': {
+      id: '/_protected/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof ProtectedHomeRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/chats': {
+      id: '/_protected/chats'
+      path: '/chats'
+      fullPath: '/chats'
+      preLoaderRoute: typeof ProtectedChatsRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
   }
 }
 
+interface ProtectedRouteRouteChildren {
+  ProtectedChatsRoute: typeof ProtectedChatsRoute
+  ProtectedHomeRoute: typeof ProtectedHomeRoute
+  ProtectedPostsRoute: typeof ProtectedPostsRoute
+  ProtectedProfileRoute: typeof ProtectedProfileRoute
+}
+
+const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
+  ProtectedChatsRoute: ProtectedChatsRoute,
+  ProtectedHomeRoute: ProtectedHomeRoute,
+  ProtectedPostsRoute: ProtectedPostsRoute,
+  ProtectedProfileRoute: ProtectedProfileRoute,
+}
+
+const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
+  ProtectedRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  OnboardRoute: OnboardRoute,
-  ProfileRoute: ProfileRoute,
+  ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

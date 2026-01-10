@@ -78,7 +78,7 @@ export default function SignupModal() {
                         field.state.meta.isTouched && !field.state.meta.isValid
                         return (
                         <Field data-invalid={isInvalid}>
-                            <FieldLabel htmlFor={field.name}>Mail</FieldLabel>
+                            <FieldLabel htmlFor={field.name}>Name</FieldLabel>
                             <Input
                                 id={field.name}
                                 name={field.name}
@@ -89,7 +89,7 @@ export default function SignupModal() {
                                 required
                             />
                             <FieldDescription>
-                            Enter your mail.
+                            Enter your name.
                             </FieldDescription>
                             {isInvalid && (
                             <FieldError errors={field.state.meta.errors} />
@@ -105,7 +105,7 @@ export default function SignupModal() {
                         field.state.meta.isTouched && !field.state.meta.isValid
                         return (
                         <Field data-invalid={isInvalid}>
-                            <FieldLabel htmlFor={field.name}>Mail</FieldLabel>
+                            <FieldLabel htmlFor={field.name}>QID</FieldLabel>
                             <Input
                                 id={field.name}
                                 name={field.name}
