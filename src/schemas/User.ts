@@ -1,33 +1,40 @@
 import { z } from 'zod';
 
+const id = z.uuid();
+const qid = z.string().min(2).max(50).regex(/^[a-zA-Z0-9_]+$/).trim();
+const name = z.string().min(2).max(50).regex(/^[a-zA-Z\s_]+$/).trim();
+const timestamp = z.date().default(() => new Date());
+
 export const UserSchema = z.object({
-  uid: z.uuid(),
-  mail: z.email(),
-  full_name: z.string().min(2).max(50).regex(/^[a-zA-Z\s_]+$/).trim(),
-  u_id: z.string().min(2).max(50).regex(/^[a-zA-Z0-9]+$/).trim(),
-  created_at: z.date().default(() => new Date()),
-  updated_at: z.date().default(() => new Date()),
-  bio: z.string().min(5).max(400).trim().optional(),
-  pfp: z.url().optional(),
-  friends: z.array(z.uuid()).default([]),
-  posts: z.array(z.uuid()).default([]),
+  u_id: id,
+  u_mail: z.email(),
+  u_created_at: timestamp,
+  u_updated_at: timestamp,
+  u_name: name,
+  u_qid: qid,
+  u_bio: z.string().min(5).max(400).trim().optional(),
+  u_pfp: z.url().optional(), 
+  u_friends: z.array(id).default([]), 
+  u_posts: z.array(id).default([]),   
 });
 
-export const EnterUserSchema = z.object({
-  mail: z.email(),
-  pass: z.string().min(10),
-})
 
-export const FriendshipSchema = z.object({
-  f_id: z.uuid(),
-  user_id: z.uuid(),
-  friend_id: z.uuid(),
-  status: z.enum(['pending', 'accepted', 'blocked']),
-  created_at: z.date().default(() => new Date()),
+export const SignUserSchema = UserSchema.pick({
+  u_qid: true,
+  u_name: true,
+  u_mail: true,
+}).extend({ u_pass: z.string().min(8, "Password must be at least 8 characters"), });
+
+export const LogUserSchema = z.object({
+  u_mail: z.email(),
+}).extend({ u_pass: z.string().min(8, "Password must be at least 8 characters"), });
+
+export const OnboardUser = UserSchema.pick({
+  u_name: true,
+  u_qid: true,
 });
 
-export const OnboardUserSchema = UserSchema.pick({ full_name: true, u_id: true });
-export type User = z.infer<typeof UserSchema>;
-export type EnterUser = z.infer<typeof EnterUserSchema>;
-export type OnboardUser = z.infer<typeof OnboardUserSchema>;
-export type Friendship = z.infer<typeof FriendshipSchema>;
+export type UserSchemaType = z.infer<typeof UserSchema>;
+export type LogUserSchemaType = z.infer<typeof LogUserSchema>;
+export type SignUserSchemaType = z.infer<typeof SignUserSchema>;
+export type OnboardUserType = z.infer<typeof OnboardUser>;

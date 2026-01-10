@@ -1,6 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useForm } from "@tanstack/react-form"
-import { Button } from "@/components/ui/button"
 import {
   Field,
   FieldDescription,
@@ -9,34 +16,52 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { QuerySignup } from "@/auth/signup"
-import { EnterUserSchema } from '@/schemas/User'
+import { QueryLogin } from "@/supabase/login"
+import { LogUserSchema } from '@/schemas/User'
 
-export const Route = createFileRoute('/onboard/signup')({
-  component: App,
-})
-
-function App() {
-    const QueryFunction = QuerySignup();
-    const form = useForm({
-        defaultValues: {
-            mail: '',
-            pass: ''
-        },
-        validators: {
-            onSubmit: EnterUserSchema,
-        },
-        onSubmit: async ({ value }) => {
-            QueryFunction.mutate(value)
-        },
-    })
-    return (
-        <div className='flex flex-col min-h-screen w-screen justify-center items-center gap-9'>
-            <pre>routes/signup.tsx</pre>
-            {/* Signup form */}
-            <div className="w-11/12 sm:w-8/12 p-10 border border-amber-300">
+export default function LoginModal() {
+  const QueryFunction = QueryLogin();
+      const form = useForm({
+          defaultValues: {
+              u_mail: '',
+              u_pass: ''
+          },
+          validators: {
+              onSubmit: LogUserSchema,
+          },
+          onSubmit: async ({ value }) => {
+              QueryFunction.mutate(value)
+          },
+      })
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className='cursor-pointer'>Log in</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <div className="flex flex-col items-center gap-2">
+          <div
+            className="flex size-11 shrink-0 items-center justify-center rounded-full"
+            aria-hidden="true"
+          >
+            <img
+              src="./duck.gif"
+              alt="logo"
+              className="h-8 w-8 rounded-full"
+            />
+          </div>
+          <DialogHeader>
+            <DialogTitle className="sm:text-center">Welcome back</DialogTitle>
+            <DialogDescription className="sm:text-center">
+              Welcome back, enter your credentials to log in.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
+        <div className='flex flex-col justify-center items-center gap-9'>
+            {/* login form */}
+            <div className="w-full p-10">
                 <form
-                id="signup-form"
+                id="login-form"
                 onSubmit={(e) => {
                     e.preventDefault()
                     form.handleSubmit()
@@ -44,7 +69,7 @@ function App() {
                 >
                 <FieldGroup>
                     <form.Field
-                    name="mail"
+                    name="u_mail"
                     children={(field) => {
                         const isInvalid =
                         field.state.meta.isTouched && !field.state.meta.isValid
@@ -57,7 +82,6 @@ function App() {
                                 value={field.state.value}
                                 onBlur={field.handleBlur}
                                 onChange={(e) => field.handleChange(e.target.value)}
-                                placeholder="johndoe@yahoo.co.in"                        
                                 aria-invalid={isInvalid}
                                 required
                             />
@@ -72,7 +96,7 @@ function App() {
                     }}
                     />
                     <form.Field
-                    name="pass"
+                    name="u_pass"
                     children={(field) => {
                         const isInvalid =
                         field.state.meta.isTouched && !field.state.meta.isValid
@@ -112,21 +136,17 @@ function App() {
                         <Button
                             className="cursor-pointer"
                             type="submit"
-                            form="signup-form"
+                            form="login-form"
                             disabled={QueryFunction.isPending} // Disable while loading
                         >
-                            {QueryFunction.isPending ? "Creating Account..." : "Submit"}
+                            {QueryFunction.isPending ? "Logining in..." : "Submit"}
                         </Button>
                     </Field>
                 </FieldGroup>
                 </form>
             </div>
-            {/* Error message */}
-            {QueryFunction.isError && (
-                <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
-                    <pre>{JSON.stringify(QueryFunction.error, null, 2)}</pre> 
-                </div>
-            )}
         </div>
-    )
+      </DialogContent>
+    </Dialog>
+  );
 }
