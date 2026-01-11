@@ -1,35 +1,22 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Scroller } from '@/lib/ui/scroller';
 
 export default function TocDialog() {
-  const [hasReadToBottom, setHasReadToBottom] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const handleScroll = () => {
-    const content = contentRef.current;
-    if (!content) return;
-
-    const scrollPercentage =
-      content.scrollTop / (content.scrollHeight - content.clientHeight);
-    if (scrollPercentage >= 0.99 && !hasReadToBottom) {
-      setHasReadToBottom(true);
-    }
-  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <h4>Terms & Conditions</h4>
+        <Button variant='ghost' className='bg-transparent w-fit underline hover:bg-transparent cursor-pointer'>Terms & Conditions</Button>
       </DialogTrigger>
       <DialogContent className="flex flex-col gap-0 p-0 sm:max-h-[min(640px,80vh)] sm:max-w-lg [&>button:last-child]:top-3.5">
         <DialogHeader className="contents space-y-0 text-left">
@@ -38,12 +25,11 @@ export default function TocDialog() {
           </DialogTitle>
           <div
             ref={contentRef}
-            onScroll={handleScroll}
             className="overflow-y-auto"
           >
             <DialogDescription asChild>
               <div className="px-6 py-4">
-                <div className="[&_strong]:text-foreground space-y-4 [&_strong]:font-semibold">
+                <Scroller className="[&_strong]:text-foreground space-y-4 [&_strong]:font-semibold" hideScrollbar>
                   <div className="space-y-4">
                     <div className="space-y-1">
                       <p>
@@ -147,12 +133,12 @@ export default function TocDialog() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </Scroller>
               </div>
             </DialogDescription>
           </div>
         </DialogHeader>
-        <DialogFooter className="border-t px-6 py-4 sm:items-center">
+        {/* <DialogFooter className="border-t px-6 py-4 sm:items-center">
           {!hasReadToBottom && (
             <span className="text-muted-foreground grow text-xs max-sm:text-center">
               Read all terms before accepting.
@@ -168,7 +154,7 @@ export default function TocDialog() {
               I agree
             </Button>
           </DialogClose>
-        </DialogFooter>
+        </DialogFooter> */}
       </DialogContent>
     </Dialog>
   );

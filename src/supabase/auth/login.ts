@@ -13,7 +13,7 @@ export function QueryLogin() {
       })
       if (error) {
         toast.error("Account doesn't exist, maybe you have to sign up 🙂")
-        throw error.message
+        throw new Error(error.message)
       }
       else {
         toast.success("Welcome back 🦆")

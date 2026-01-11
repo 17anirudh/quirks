@@ -16,10 +16,10 @@ type ctxResponse = {
 }
 
 export const Route = createFileRoute('/_protected/profile')({
-  // beforeLoad: async () => {
-  //   const user = (await SUPABASE_CLIENT.auth.getUser()).data.user?.user_metadata
-  //   return user as ctxResponse ?? null;
-  // },
+  beforeLoad: async () => {
+    const user = (await SUPABASE_CLIENT.auth.getUser()).data.user?.user_metadata
+    return user as ctxResponse ?? null;
+  },
   component: RouteComponent,
 })
 

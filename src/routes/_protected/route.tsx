@@ -1,5 +1,4 @@
-import { createFileRoute, redirect, Outlet, Link } from '@tanstack/react-router'
-import { SUPABASE_CLIENT } from '@/hooks/variables'
+import { createFileRoute, Outlet, Link, redirect } from '@tanstack/react-router'
 import MusicDynamicIsland from '@/components/music-dymanic'
 import Settings from '@/components/settings'
 import type { ReactNode } from 'react'
@@ -9,18 +8,22 @@ import {
     MessageCircle,
     UserCircle2Icon,
 } from 'lucide-react'
+import { SUPABASE_CLIENT } from '@/hooks/variables'
+import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/_protected')({
     beforeLoad: async () => {
-        const { data: { session }, error } = await SUPABASE_CLIENT.auth.getSession()
-        if (!session && error) {
+        const { data: { session } } = await SUPABASE_CLIENT.auth.getSession()
+        // If there is no session, redirect immediately. No error needed.
+        if (!session) { 
             throw redirect({ 
                 to: '/', 
                 replace: true,
             })
         }
     },
-  component: RouteComponent,
+    pendingComponent: () => <Loader />,
+    component: RouteComponent,
 })
 
 type navType = {

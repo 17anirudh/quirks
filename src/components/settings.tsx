@@ -35,17 +35,14 @@ export default function Settings() {
           <span>Click to change Theme</span>
         </div>
         <div className='flex gap-5 justify-center items-center'> 
-          <DialogClose>
-            <div>
-              <Button 
+          <DialogClose asChild>
+            <Button 
                 onClick={() => signOut()} 
                 disabled={isPending}
                 className='cursor-pointer'
               >
-                <LogOutIcon />
+                <LogOutIcon /> <span>Log Out</span>
               </Button>
-              <span>Log Out</span>
-            </div>
           </DialogClose>
         </div>
       </DialogContent>

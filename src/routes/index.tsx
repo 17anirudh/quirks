@@ -1,10 +1,22 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { Vortex } from '@/lib/ui/vortex'
 import { ConfettiFireworks } from '@/components/fireworks'
 import { Highlighter } from '@/lib/ui/highlighter'
 import LoginModal from '@/components/login-modal'
+import { SUPABASE_CLIENT } from '@/hooks/variables'
+import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/')({
+    beforeLoad: async () => {
+        const { data: { session } } = await SUPABASE_CLIENT.auth.getSession()
+        if (session) {
+            throw redirect({ 
+                to: '/home', 
+                replace: true,
+            })
+        }
+    },
+    pendingComponent: () => <Loader />,
     component: AppComponent,
 })
 

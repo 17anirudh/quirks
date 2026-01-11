@@ -13,6 +13,7 @@ import { QuerySignup } from "@/supabase/auth/signup"
 import { SignUserSchema } from '@/schemas/User'
 import { Button } from '@/lib/ui/button'
 import TocDialog from '@/components/toc-dialog'
+import { Scroller } from '@/lib/ui/scroller'
 
 export const Route = createFileRoute('/signup')({
   component: RouteComponent,
@@ -35,9 +36,9 @@ function RouteComponent() {
         },
     })
   return (
-    <div className='flex flex-col justify-center items-center gap-9'>
+    <Scroller className='flex flex-col justify-center items-center gap-9'>
         {/* Signup form */}
-        <div className="w-10/12 sm:w-8/12 p-10">
+        <div className="w-10/12 sm:w-7/12 p-10">
             <div className="flex flex-col items-center justify-center rounded-full">
                 <img
                 src="./duck.gif"
@@ -165,6 +166,7 @@ function RouteComponent() {
                     )
                 }}
                 />
+                <TocDialog />
                 <Field orientation="horizontal">
                     <Button
                         className="cursor-pointer"
@@ -187,13 +189,12 @@ function RouteComponent() {
             </FieldGroup>
             </form>
         </div>
-        <TocDialog />
         {/* Error message */}
         {QueryFunction.isError && (
             <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
                 <pre>{JSON.stringify(QueryFunction.error, null, 2)}</pre> 
             </div>
         )}
-    </div>
+    </Scroller>
   )
 }

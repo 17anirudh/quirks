@@ -125,7 +125,8 @@ code {
 
 body {
   letter-spacing: var(--tracking-normal);
-  overflow: hidden;
+  overflow: scroll;
+  overflow-x: hidden;
   scroll-behavior: smooth;
   -ms-overflow-style: none;
   scrollbar-width: none;
