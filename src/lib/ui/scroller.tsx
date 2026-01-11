@@ -9,8 +9,8 @@ import {
   ChevronUp,
 } from "lucide-react";
 import * as React from "react";
-import { useComposedRefs } from "@/lib/compose-refs";
-import { cn } from "@/lib/utils";
+import { useComposedRefs } from "@/hooks/compose-refs";
+import { cn } from "@/hooks/utils";
 
 const DATA_TOP_SCROLL = "data-top-scroll";
 const DATA_BOTTOM_SCROLL = "data-bottom-scroll";

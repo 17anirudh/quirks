@@ -1,8 +1,8 @@
-import { supabase } from '@/supabase/variables'
+import { SUPABASE_CLIENT } from '@/hooks/variables'
 import type { QueryClient } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { Button } from '@/components/ui/button'
-import { Scroller } from '@/components/ui/scroller'
+import { Button } from '@/lib/ui/button'
+import { Scroller } from '@/lib/ui/scroller'
 
 type ctxResponse = {
   queryClient: QueryClient,
@@ -17,7 +17,7 @@ type ctxResponse = {
 
 export const Route = createFileRoute('/_protected/profile')({
   // beforeLoad: async () => {
-  //   const user = (await supabase.auth.getUser()).data.user?.user_metadata
+  //   const user = (await SUPABASE_CLIENT.auth.getUser()).data.user?.user_metadata
   //   return user as ctxResponse ?? null;
   // },
   component: RouteComponent,

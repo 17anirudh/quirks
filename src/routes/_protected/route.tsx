@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, Outlet, Link } from '@tanstack/react-router'
-import { supabase } from '@/supabase/variables'
+import { SUPABASE_CLIENT } from '@/hooks/variables'
 import MusicDynamicIsland from '@/components/music-dymanic'
 import Settings from '@/components/settings'
 import type { ReactNode } from 'react'
@@ -12,9 +12,12 @@ import {
 
 export const Route = createFileRoute('/_protected')({
     beforeLoad: async () => {
-        const { data: { session }, error } = await supabase.auth.getSession()
+        const { data: { session }, error } = await SUPABASE_CLIENT.auth.getSession()
         if (!session && error) {
-            throw redirect({ to: '/', replace: true })
+            throw redirect({ 
+                to: '/', 
+                replace: true,
+            })
         }
     },
   component: RouteComponent,

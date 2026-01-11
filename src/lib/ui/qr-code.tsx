@@ -2,8 +2,8 @@
 
 import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
-import { useComposedRefs } from "@/lib/compose-refs";
-import { cn } from "@/lib/utils";
+import { useComposedRefs } from "@/hooks/compose-refs";
+import { cn } from "@/hooks/utils";
 import { useLazyRef } from "@/hooks/use-lazy-ref";
 
 const ROOT_NAME = "QRCode";

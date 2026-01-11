@@ -12,15 +12,14 @@
   },
   "iconLibrary": "lucide",
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
+    "components": "@/lib/components",
+    "utils": "@/hooks/utils",
+    "ui": "@/lib/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
   },
   "registries": {
     "@aceternity": "https://ui.aceternity.com/registry/{name}.json",
-    "@skiper-ui": "https://skiper-ui.com/registry/{name}.json",
     "@magicui": "https://magicui.design/r/{name}.json",
     "@diceui": "https://diceui.com/r/{name}.json"
   }

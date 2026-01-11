@@ -7,10 +7,10 @@ import {
   DialogTitle,
   DialogTrigger,
   DialogClose
-} from '@/components/ui/dialog';
+} from '@/lib/ui/dialog';
 import { Settings2, LogOutIcon } from 'lucide-react';
-import { Button } from './ui/button';
-import { useSignOutAccount } from '@/supabase/signout';
+import { Button } from '../lib/ui/button';
+import { useSignOutAccount } from '@/supabase/auth/signout';
 
 export default function Settings() {
    const { mutate: signOut, isPending } = useSignOutAccount();

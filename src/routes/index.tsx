@@ -1,23 +1,14 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Vortex } from '@/components/ui/vortex'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Vortex } from '@/lib/ui/vortex'
 import { ConfettiFireworks } from '@/components/fireworks'
-import { Highlighter } from '@/components/ui/highlighter'
-import SignupModal from '@/components/signup-modal'
+import { Highlighter } from '@/lib/ui/highlighter'
 import LoginModal from '@/components/login-modal'
-import { supabase } from '@/supabase/variables'
 
 export const Route = createFileRoute('/')({
-    beforeLoad: async () => {
-        const { data: { session }, error } = await supabase.auth.getSession()
-        // If a session exists, the user is already logged in. 
-        if (session && !error) {
-            throw redirect({ to: '/home', replace: true })
-    }
-},
-    component: Onboard,
+    component: AppComponent,
 })
 
-function Onboard() {
+function AppComponent() {
     return (
         <div className='h-dvh w-screen'>
             <Vortex backgroundColor='black'>
@@ -29,7 +20,7 @@ function Onboard() {
                     </Highlighter>
                 </ConfettiFireworks>
                 <div className="flex gap-7">
-                    <SignupModal />
+                    <Link to='/signup' className='cursor-pointer'>Sign up</Link>
                     <LoginModal />
                 </div>
             </main>

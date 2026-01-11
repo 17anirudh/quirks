@@ -5,7 +5,7 @@ import {
   DynamicContainer, 
   useDynamicIslandSize, 
   SIZE_PRESETS 
-} from "@/components/ui/dynamic-island"; //
+} from "@/lib/ui/dynamic-island"; //
 import { Play, Pause, Music, X } from "lucide-react";
 
 const MusicPlayerContent = () => {

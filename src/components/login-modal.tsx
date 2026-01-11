@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/lib/ui/dialog';
 import { useForm } from "@tanstack/react-form"
 import {
   Field,
@@ -14,9 +14,9 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { QueryLogin } from "@/supabase/login"
+} from "@/lib/ui/field"
+import { Input } from "@/lib/ui/input"
+import { QueryLogin } from "@/supabase/auth/login"
 import { LogUserSchema } from '@/schemas/User'
 
 export default function LoginModal() {
