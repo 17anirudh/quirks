@@ -1,5 +1,6 @@
 {
-  "name": "elysia",
+  "name": "quirks-server",
+  "private": true,
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -11,5 +12,5 @@
   "devDependencies": {
     "bun-types": "latest"
   },
-  "module": "src/index.js"
+  "module": "src/index.ts"
 }
