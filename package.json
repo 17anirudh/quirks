@@ -21,5 +21,8 @@
     "name": "Vedala Anirudh",
     "url": "https://portfolio-indol-eight-31.vercel.app/"
   },
-  "icon": "icon.jpg"
+  "icon": "icon.jpg",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.90.1"
+  }
 }
