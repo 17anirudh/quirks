@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/lib/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '@/lib/components/ui/dialog';
 import { Scroller } from '@/lib/components/ui/scroller';
 
 export default function TocDialog() {

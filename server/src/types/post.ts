@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const PostSchema = z.object({
+export const postSchema = z.object({
   p_id: z.uuid(),
   u_id: z.uuid(),
   type: z.enum(['image', 'video', 'moment', 'code']),
@@ -16,7 +16,7 @@ export const PostSchema = z.object({
   comment_count: z.number().int().nonnegative().default(0),
 });
 
-export const CommentSchema = z.object({
+export const commentSchema = z.object({
   c_id: z.uuid(),
   p_id: z.uuid(),
   u_id: z.uuid(),
@@ -26,7 +26,7 @@ export const CommentSchema = z.object({
   reply_count: z.number().int().nonnegative().default(0),
 });
 
-export const LikeSchema = z.object({
+export const likeSchema = z.object({
   l_id: z.uuid(),
   u_id: z.uuid(),
   target_type: z.enum(['post', 'comment']),

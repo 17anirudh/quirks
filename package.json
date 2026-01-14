@@ -6,23 +6,9 @@
     "web",
     "server"
   ],
-  "scripts": {
-    "dev": "bun run --filter quirks/web dev & bun run --filter quirks/server dev",
-    "dev:web": "bun run --filter quirks/web dev",
-    "dev:server": "bun run --filter quirks/server dev",
-    "build": "bun run --filter quirks/web build && bun run --filter quirks/server build",
-    "start": "bun run --filter quirks/server start",
-    "lint": "bun run lint --workspaces --if-present",
-    "typecheck": "bun run typecheck --workspaces --if-present",
-    "clean": "rm -rf node_modules web/node_modules server/node_modules bun.lockb",
-    "reset": "bun run clean && bun install"
-  },
   "author": {
     "name": "Vedala Anirudh",
     "url": "https://portfolio-indol-eight-31.vercel.app/"
   },
-  "icon": "icon.jpg",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.90.1"
-  }
+  "icon": "icon.jpg"
 }

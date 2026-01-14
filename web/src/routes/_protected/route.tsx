@@ -1,6 +1,4 @@
 import { createFileRoute, Outlet, Link, redirect } from '@tanstack/react-router'
-import MusicDynamicIsland from '@/components/music-dymanic'
-import Settings from '@/components/settings'
 import type { ReactNode } from 'react'
 import {
     PopcornIcon,
@@ -63,18 +61,9 @@ const navigations: navType[] = [
 function RouteComponent() {
   return (
     <div className="flex flex-col h-dvh w-screen">
-        <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background h-14">
-            <div className="flex items-center justify-between px-4 h-full">
-                <h1 className="text-xl font-semibold">QUIRKS</h1>
-                <MusicDynamicIsland />
-                <Settings />
-            </div>
-        </header>
-
-        <main className="flex-1 overflow-auto pt-14 pb-12">
+        <main className="fixed top-0 left-0 right-0 z-50 border-b bg-background h-14 flex-1 overflow-auto pt-14 pb-12">
             <Outlet />
         </main>
-
         <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-800 h-12 bg-background">
             <nav>
                 <div className="flex flex-row h-full items-center">
