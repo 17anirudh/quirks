@@ -1,58 +1,66 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { SUPABASE_CLIENT } from '@/hooks/variables'
 import Loader from '@/components/loader'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
+import { SUPABASE_CLIENT } from '@/hooks/variables';
 
 type QueryResult = {
   u_qid: string | null;
   u_name: string | null;
   u_bio: string | null;
   u_pfp: string | null;
-  u_friends: string[] | null;
-  u_posts: string[] | null;
 }
 
-const userQueryOptions = (qid: string) => ({
-  queryKey: ['user', qid],
-  queryFn: async () => {
-    const { data, error } = await SUPABASE_CLIENT
-      .from("user")
-      .select("u_qid, u_name, u_bio, u_pfp, u_friends, u_posts")
-      .eq("u_qid", qid)
-      .maybeSingle()
-    
-    if (error) throw error
-    return data as QueryResult
+const fetchMutation = useMutation({
+  mutationFn: async (params: string) => {
+    try {
+      await fetch(`${import.meta.env.VITE_BACKEND.URL}/search/${params}`, {
+        method: 'GET',
+      }).catch((err) => {
+        throw err
+      })
+    }
+    catch (err) {
+      throw err
+    }
+  },
+  onSuccess: (data) => {
+      return data as QueryResult | void
+  },
+  onError: (e) => {
+      throw new Error(e.message)
   },
 })
 
+const loggedIn = useMutation({
+  mutationFn: async () => {
+    const { error } = await SUPABASE_CLIENT.auth.getUserIdentities()
+    if(error) {
+      throw error
+    }
+  },
+  onSuccess: () => { return true as boolean },
+  onError: () => { return false as boolean }
+})
+
 export const Route = createFileRoute('/$qid')({
-  // loader: async ({ params, context }) => {
-  //   await context.queryClient.ensureQueryData(userQueryOptions(params.qid))
-  // },
+  loader: async ({ params }) => {
+    fetchMutation.mutate(params.qid)
+  },
   pendingComponent: () => <Loader />,
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  // const { qid } = Route.useParams()
-  // const { data: profile } = useQuery(userQueryOptions(qid))
+  const { qid } = Route.useParams()
+  const { data: profile } = Route.useRouteContext()
 
-  // const { data: currentUserQid } = useQuery({
-  //   queryKey: ['current-user'],
-  //   queryFn: async () => {
-  //     const { data } = await SUPABASE_CLIENT.auth.getSession()
-  //     return data.session?.user.user_metadata?.u_qid || null
-  //   }
-  // })
-
-  // const isLogged = !!currentUserQid
+  const authed = loggedIn.mutate()
 
   return (
     <>
       <div className="p-4">
         <h1 className="text-xl font-bold">{profile ? profile?.u_name : 'User not found'}</h1>
-        <p className="text-sm italic">{isLogged ? 'You are viewing this logged in' : 'Public view'}</p>
+        <p className="text-sm italic">{authed ? 'You are viewing this logged in' : 'Public view'}</p>
       </div>
 
       <details className="mt-10 opacity-50">

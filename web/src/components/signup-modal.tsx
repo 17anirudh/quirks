@@ -17,25 +17,69 @@ import {
   FieldSeparator
 } from "@/lib/components/ui/field"
 import { Input } from "@/lib/components/ui/input"
-import { QuerySignup } from "@/supabase/auth/signup"
-import { SignUserSchema } from '@/schemas/User'
+import { profileSchema } from '@/types/user';
+import z from 'zod';
+import { useMutation } from '@tanstack/react-query';
+import { SUPABASE_CLIENT } from '@/hooks/variables';
+import { toast } from 'sonner';
+import { useNavigate } from '@tanstack/react-router';
+
+const clientSignUp = profileSchema.pick({
+    u_mail: true,
+    u_qid: true,
+}).extend({ 
+    u_pass: z
+        .string()
+        .min(8, "Your password must atleast 8 characters")
+        .max(300, "Your password must be atmost 300 characters") 
+})
 
 export default function SignupModal() {
-  const QueryFunction = QuerySignup();
-      const form = useForm({
-          defaultValues: {
-              u_name: '',
-              u_qid: '',
-              u_mail: '',
-              u_pass: '',
-          },
-          validators: {
-              onSubmit: SignUserSchema,
-          },
-          onSubmit: async ({ value }) => {
-              QueryFunction.mutate(value)
-          },
-      })
+    const navigate = useNavigate();
+    const signUpMutation = useMutation({
+        mutationFn: async (value: z.infer<typeof clientSignUp>) => {
+            const { data: authData, error: authError } = await SUPABASE_CLIENT
+                .auth
+                .signInWithPassword({
+                    email: value.u_mail,
+                    password: value.u_pass
+                })
+            if (authError) throw authError
+            try {
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/create`, {
+                    method: 'POST',
+                    headers: {
+                        "Authorization": authData.session.access_token
+                    },
+                    body: JSON.stringify(value.u_qid)
+                })
+            }
+            catch (e) {
+                throw e
+            }
+        },
+        onSuccess: () => {
+            toast.success(`Account created, welcome 🥳`)
+            navigate({ to: '/', replace: true })
+        },
+        onError: (e) => {
+            toast.error(`${e.message}`)
+            throw new Error(e.message)
+        },
+    })
+    const form = useForm({
+        defaultValues: {
+            u_qid: '',
+            u_mail: '',
+            u_pass: '',
+        },
+        validators: {
+            onSubmit: clientSignUp,
+        },
+        onSubmit: async ({ value }) => {
+            signUpMutation.mutate(value)
+        },
+    })
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -72,33 +116,6 @@ export default function SignupModal() {
                 >
                 <FieldGroup>
                     <form.Field
-                    name="u_name"
-                    children={(field) => {
-                        const isInvalid =
-                        field.state.meta.isTouched && !field.state.meta.isValid
-                        return (
-                        <Field data-invalid={isInvalid}>
-                            <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                            <Input
-                                id={field.name}
-                                name={field.name}
-                                value={field.state.value}
-                                onBlur={field.handleBlur}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                aria-invalid={isInvalid}
-                                required
-                            />
-                            <FieldDescription>
-                            Enter your name.
-                            </FieldDescription>
-                            {isInvalid && (
-                            <FieldError errors={field.state.meta.errors} />
-                            )}
-                        </Field>
-                        )
-                    }}
-                    />
-                    <form.Field
                     name="u_qid"
                     children={(field) => {
                         const isInvalid =
@@ -125,7 +142,7 @@ export default function SignupModal() {
                         )
                     }}
                     />
-                    <FieldSeparator />
+                    {/* <FieldSeparator /> */}
                     <form.Field
                     name="u_mail"
                     children={(field) => {
@@ -181,32 +198,33 @@ export default function SignupModal() {
                         )
                     }}
                     />
-                    <Field orientation="horizontal">
+                    <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <div className='flex gap-3'>
+                        <Button type="submit" variant="outline" className='cursor-pointer' disabled={!canSubmit || signUpMutation.isPending}>
+                            {isSubmitting ? '...' : 'Submit'}
+                        </Button>
                         <Button
-                            className="cursor-pointer"
-                            type="button"
-                            variant="outline"
-                            onClick={() => form.reset()}
-                            disabled={QueryFunction.isPending} // Disable while loading
+                            type="reset"
+                            className='cursor-pointer'
+                            onClick={(e) => {
+                            e.preventDefault()
+                            form.reset()
+                            }}
                         >
                             Reset
                         </Button>
-                        <Button
-                            className="cursor-pointer"
-                            type="submit"
-                            form="signup-form"
-                            disabled={QueryFunction.isPending} // Disable while loading
-                        >
-                            {QueryFunction.isPending ? "Creating Account..." : "Submit"}
-                        </Button>
-                    </Field>
+                        </div>
+                    )}
+                    />
                 </FieldGroup>
                 </form>
             </div>
             {/* Error message */}
-            {QueryFunction.isError && (
+            {signUpMutation.isError && (
                 <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
-                    <pre>{JSON.stringify(QueryFunction.error, null, 2)}</pre> 
+                    <pre>{JSON.stringify(signUpMutation.error, null, 2)}</pre> 
                 </div>
             )}
         </div>

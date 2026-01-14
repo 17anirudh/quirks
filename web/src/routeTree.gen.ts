@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SignupRouteImport } from './routes/signup'
 import { Route as QidRouteImport } from './routes/$qid'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -18,11 +17,6 @@ import { Route as ProtectedPostsRouteImport } from './routes/_protected/posts'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedChatsRouteImport } from './routes/_protected/chats'
 
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const QidRoute = QidRouteImport.update({
   id: '/$qid',
   path: '/$qid',
@@ -61,7 +55,6 @@ const ProtectedChatsRoute = ProtectedChatsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$qid': typeof QidRoute
-  '/signup': typeof SignupRoute
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
   '/posts': typeof ProtectedPostsRoute
@@ -70,7 +63,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$qid': typeof QidRoute
-  '/signup': typeof SignupRoute
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
   '/posts': typeof ProtectedPostsRoute
@@ -81,7 +73,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
   '/$qid': typeof QidRoute
-  '/signup': typeof SignupRoute
   '/_protected/chats': typeof ProtectedChatsRoute
   '/_protected/home': typeof ProtectedHomeRoute
   '/_protected/posts': typeof ProtectedPostsRoute
@@ -89,22 +80,14 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/$qid'
-    | '/signup'
-    | '/chats'
-    | '/home'
-    | '/posts'
-    | '/profile'
+  fullPaths: '/' | '/$qid' | '/chats' | '/home' | '/posts' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$qid' | '/signup' | '/chats' | '/home' | '/posts' | '/profile'
+  to: '/' | '/$qid' | '/chats' | '/home' | '/posts' | '/profile'
   id:
     | '__root__'
     | '/'
     | '/_protected'
     | '/$qid'
-    | '/signup'
     | '/_protected/chats'
     | '/_protected/home'
     | '/_protected/posts'
@@ -115,18 +98,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   QidRoute: typeof QidRoute
-  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/$qid': {
       id: '/$qid'
       path: '/$qid'
@@ -201,7 +176,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   QidRoute: QidRoute,
-  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

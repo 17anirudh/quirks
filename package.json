@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "workspaces": [
-    "web",
-    "server"
+    "web/*",
+    "server/*"
   ],
   "author": {
     "name": "Vedala Anirudh",

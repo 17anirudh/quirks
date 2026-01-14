@@ -2,7 +2,8 @@ import { createFileRoute, Link, redirect } from '@tanstack/react-router'
 import { Vortex } from '@/lib/components/ui/vortex'
 import { ConfettiFireworks } from '@/components/fireworks'
 import { Highlighter } from '@/lib/components/ui/highlighter'
-import LoginModal from '@/components/login-modal'
+// import LoginModal from '@/components/login-modal'
+import SignupModal from '@/components/signup-modal'
 import { SUPABASE_CLIENT } from '@/hooks/variables'
 import Loader from '@/components/loader'
 
@@ -32,8 +33,8 @@ function AppComponent() {
                     </Highlighter>
                 </ConfettiFireworks>
                 <div className="flex gap-7">
-                    <Link to='/signup' className='cursor-pointer'>Sign up</Link>
-                    <LoginModal />
+                    <SignupModal />
+                    {/* <LoginModal /> */}
                 </div>
             </main>
         </Vortex>
