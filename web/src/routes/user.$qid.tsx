@@ -10,7 +10,7 @@ type QueryResult = {
   u_pfp: string | null;
 }
 
-export const Route = createFileRoute('/$qid')({
+export const Route = createFileRoute('/user/$qid')({
   component: RouteComponent,
 })
 
@@ -21,7 +21,11 @@ function RouteComponent() {
   const { data: profile, isLoading: profileLoading } = useQuery({
     queryKey: ['search', qid],
     queryFn: async () => {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/search/${qid}`)
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/search/${qid}`, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      })
       if (!res.ok) throw new Error('Failed to fetch profile')
       return res.json() as Promise<QueryResult>
     },

@@ -9,19 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as QidRouteImport } from './routes/$qid'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UserQidRouteImport } from './routes/user.$qid'
 import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
 import { Route as ProtectedPostsRouteImport } from './routes/_protected/posts'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedChatsRouteImport } from './routes/_protected/chats'
 
-const QidRoute = QidRouteImport.update({
-  id: '/$qid',
-  path: '/$qid',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
@@ -29,6 +24,11 @@ const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserQidRoute = UserQidRouteImport.update({
+  id: '/user/$qid',
+  path: '/user/$qid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
@@ -54,61 +54,54 @@ const ProtectedChatsRoute = ProtectedChatsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$qid': typeof QidRoute
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
   '/posts': typeof ProtectedPostsRoute
   '/profile': typeof ProtectedProfileRoute
+  '/user/$qid': typeof UserQidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$qid': typeof QidRoute
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
   '/posts': typeof ProtectedPostsRoute
   '/profile': typeof ProtectedProfileRoute
+  '/user/$qid': typeof UserQidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
-  '/$qid': typeof QidRoute
   '/_protected/chats': typeof ProtectedChatsRoute
   '/_protected/home': typeof ProtectedHomeRoute
   '/_protected/posts': typeof ProtectedPostsRoute
   '/_protected/profile': typeof ProtectedProfileRoute
+  '/user/$qid': typeof UserQidRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$qid' | '/chats' | '/home' | '/posts' | '/profile'
+  fullPaths: '/' | '/chats' | '/home' | '/posts' | '/profile' | '/user/$qid'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$qid' | '/chats' | '/home' | '/posts' | '/profile'
+  to: '/' | '/chats' | '/home' | '/posts' | '/profile' | '/user/$qid'
   id:
     | '__root__'
     | '/'
     | '/_protected'
-    | '/$qid'
     | '/_protected/chats'
     | '/_protected/home'
     | '/_protected/posts'
     | '/_protected/profile'
+    | '/user/$qid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
-  QidRoute: typeof QidRoute
+  UserQidRoute: typeof UserQidRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/$qid': {
-      id: '/$qid'
-      path: '/$qid'
-      fullPath: '/$qid'
-      preLoaderRoute: typeof QidRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -121,6 +114,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user/$qid': {
+      id: '/user/$qid'
+      path: '/user/$qid'
+      fullPath: '/user/$qid'
+      preLoaderRoute: typeof UserQidRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected/profile': {
@@ -175,7 +175,7 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
-  QidRoute: QidRoute,
+  UserQidRoute: UserQidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

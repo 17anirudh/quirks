@@ -48,7 +48,7 @@ export default function SignupModal() {
                 const token = authData.session?.access_token;
                 if (!token) throw new Error('No authentication token available');
                 
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/create`, {
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
                     method: 'POST',
                     headers: {
                         "Authorization": token

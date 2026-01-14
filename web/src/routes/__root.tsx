@@ -5,6 +5,8 @@ import TanStackQueryDevtools from '../hooks/devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ThemeProvider } from "@/hooks/theme-provider"
 import { Toaster } from '@/lib/components/ui/sonner'
+import { NotFound } from '@/components/404'
+import { ErrorComponent } from '@/components/400'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -31,4 +33,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       />
     </>
   ),
+  notFoundComponent: () => <NotFound />,
+  errorComponent: ErrorComponent
 })

@@ -1,8 +1,8 @@
-import { app } from ".";
 import { t } from "elysia";
 import { CLIENT } from "./supabase/config";
+import { app } from ".";
 
-app.post('/search/:id', async ({ params: { id }, set })=> {
+app.get('/search/:id', async ({ params: { id }, set })=> {
     if(!id) {
         set.status = 401;
         return { error: "No path parameter" }
@@ -12,18 +12,15 @@ app.post('/search/:id', async ({ params: { id }, set })=> {
                                 .select("u_qid, u_name, u_bio, u_pfp")
                                 .eq("u_qid", id)
                                 .maybeSingle()
-    if (error) {
-        set.status = 501
-        return { error: error.message }
+    if (error || !data) {
+        set.status = 501;
+        return { error: "No user" }
     }
-    set.status = 200
-    return data
+    set.status = 200;
+    return { ok: "User found" }
 },
 {
     params: t.Object({
         id: t.String()
-    }),
-    body: t.Object({
-        u_qid: t.String()
     })
 })
