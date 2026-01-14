@@ -14,7 +14,6 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldSeparator
 } from "@/lib/components/ui/field"
 import { Input } from "@/lib/components/ui/input"
 import { profileSchema } from '@/types/user';
@@ -40,16 +39,19 @@ export default function SignupModal() {
         mutationFn: async (value: z.infer<typeof clientSignUp>) => {
             const { data: authData, error: authError } = await SUPABASE_CLIENT
                 .auth
-                .signInWithPassword({
+                .signUp({
                     email: value.u_mail,
                     password: value.u_pass
                 })
             if (authError) throw authError
             try {
+                const token = authData.session?.access_token;
+                if (!token) throw new Error('No authentication token available');
+                
                 await fetch(`${import.meta.env.VITE_BACKEND_URL}/create`, {
                     method: 'POST',
                     headers: {
-                        "Authorization": authData.session.access_token
+                        "Authorization": token
                     },
                     body: JSON.stringify(value.u_qid)
                 })

@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import { SUPABASE_CLIENT } from '@/hooks/variables'
 import Loader from '@/components/loader'
+import { Scroller } from '@/lib/components/ui/scroller'
 
 export const Route = createFileRoute('/_protected')({
     beforeLoad: async () => {
@@ -61,7 +62,7 @@ const navigations: navType[] = [
 function RouteComponent() {
   return (
     <div className="flex flex-col h-dvh w-screen">
-        <main className="fixed top-0 left-0 right-0 z-50 border-b bg-background h-14 flex-1 overflow-auto pt-14 pb-12">
+        <main className="fixed top-0 left-0 right-0 z-50 border-b flex-1 overflow-auto h-full">
             <Outlet />
         </main>
         <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-800 h-12 bg-background">

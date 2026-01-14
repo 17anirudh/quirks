@@ -4,9 +4,11 @@ import { profileSchema } from "./types/user";
 
 app.post("/signup", async ({ body, headers, set }) => {
     // 1. Extract header token
+    console.log("Hello")
     const authHeader = headers.authorization;
-    if (!authHeader?.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith("Authorization")) {
       set.status = 401;
+      console.error('Header error')
       return { error: "Missing token" };
     }
 
@@ -17,6 +19,7 @@ app.post("/signup", async ({ body, headers, set }) => {
 
     if (error || !data.user) {
       set.status = 401;
+      console.error(`Couldn't verify token: ${error}`)
       return { error: "Invalid token" };
     }
 
@@ -25,7 +28,7 @@ app.post("/signup", async ({ body, headers, set }) => {
       await CLIENT.from("profile").insert({
         u_id: data.user.id,
         u_mail: data.user.email,
-        u_qid: body.qid,
+        u_qid: body.u_qid,
       }).maybeSingle()
 
       set.status = 201;
@@ -34,6 +37,7 @@ app.post("/signup", async ({ body, headers, set }) => {
     } catch (err: any) {
       await CLIENT.auth.admin.deleteUser(data.user.id);
       set.status = 409;
+      console.error(`qid already taken`)
       return { error: "qid already taken" };
     }
   },
