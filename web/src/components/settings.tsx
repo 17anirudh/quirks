@@ -10,14 +10,25 @@ import {
 } from '@/lib/components/ui/dialog';
 import { Settings2, LogOutIcon } from 'lucide-react';
 import { Button } from '../lib/components/ui/button';
-import { useSignOutAccount } from '@/supabase/auth/signout';
+import { SUPABASE_CLIENT } from '@/hooks/variables';
+import { toast } from 'sonner';
+import { useNavigate } from '@tanstack/react-router';
+
+
 
 export default function Settings() {
-   const { mutate: signOut, isPending } = useSignOutAccount();
+  const navigate = useNavigate()
+  function logout() {
+    SUPABASE_CLIENT.auth.signOut()
+    toast.info("Logged out, stay safe 🙂")
+    navigate({ to: '/', replace: true })
+  }
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Settings2 />
+        <Button className='bg-transparent cursor-pointer'>
+          <Settings2 /> App Settings
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <div className="flex flex-col items-center gap-2">
@@ -37,8 +48,7 @@ export default function Settings() {
         <div className='flex gap-5 justify-center items-center'> 
           <DialogClose asChild>
             <Button 
-                onClick={() => signOut()} 
-                disabled={isPending}
+                onClick={logout} 
                 className='cursor-pointer'
               >
                 <LogOutIcon /> <span>Log Out</span>

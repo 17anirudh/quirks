@@ -54,30 +54,44 @@ export const users = new Elysia({ prefix: '/user' })
             }),
         }
     )
-    .get('/search', async ({ params: { id }, set }) => 
+    .get('/search/:id', async ({ params: { id }, set }) => 
         {
-            if(!id) {
-                set.status = 401;
-                return { error: "No path parameter" }
+            if (!id || typeof id !== 'string' || id.length < 4) {
+                set.status = 400;
+                return { error: 'Invalid or missing qid' };
             }
+            try {
             const { data, error } = await CLIENT
-                                        .from("profile")
-                                        .select("u_qid, u_name, u_bio, u_pfp")
-                                        .eq("u_qid", id)
-                                        .maybeSingle()
-            if (error || !data) {
-                set.status = 501;
-                return { error: "No user" }
+                .from('profile')
+                .select('u_qid, u_name, u_bio, u_pfp') 
+                .eq('u_qid', id)
+                .maybeSingle();
+
+            if (error) {
+                console.error('Supabase error:', error);
+                set.status = 500;
+                return { error: 'Internal server error' };
             }
+
+            if (!data) {
+                set.status = 404;
+                return { error: 'User not found' };
+            }
+
             set.status = 200;
-            return { data }
+            set.headers['Cache-Control'] = 'public, max-age=300, s-maxage=3600'; // cache 5 min browser / 1h edge/CDN
+
+            return data;
+            } 
+            catch (err) {
+                console.error('Unexpected error in /user/search:', err);
+                set.status = 500;
+                return { error: 'Internal server error' };
+            }
         },
         {
             params: t.Object({
-                id: t.String({
-                    minLength: 4,
-                    maxLength: 200
-                })
+            id: t.String({ minLength: 4, maxLength: 200 })
             })
         }
     )

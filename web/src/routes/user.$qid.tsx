@@ -1,12 +1,27 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, notFound } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/user/$qid')({
+  loader: async ({ params: { qid } }) => {
+  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`, {
+    headers: { Accept: 'application/json' },
+    method: 'GET'
+  });
+
+  if (!res.ok) {
+    if (res.status === 404) {
+      throw notFound({ data: `${qid} not found` })
+    }
+    throw new Error("Failed to load profile");
+  }
+
+  return res.json();   // now directly gets the profile object
+},
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const { qid } = Route.useParams()
-  const profile = ''
+  const profile = Route.useLoaderData();
 
   return (
     <div className="flex flex-col min-h-screen bg-neutral-950 text-white p-6">
