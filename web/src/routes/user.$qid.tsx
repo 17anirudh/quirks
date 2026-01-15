@@ -1,31 +1,40 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
+import ProfileCard from '@/components/profile-card';
+import { useAuth } from '@/hooks/variables';
+
+type res = {
+  u_qid: string,
+  u_name: string | null,
+  u_bio: string | null,
+  u_pfp: string | null
+}
 
 export const Route = createFileRoute('/user/$qid')({
   loader: async ({ params: { qid } }) => {
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`, {
-    headers: { Accept: 'application/json' },
-    method: 'GET'
-  });
+    const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`, {
+      headers: { Accept: 'application/json' },
+      method: 'GET',
+    });
 
-  if (!res.ok) {
-    if (res.status === 404) {
-      throw notFound({ data: `${qid} not found` })
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw notFound({ data: `${qid} not found` })
+      }
+      throw new Error("Failed to load profile");
     }
-    throw new Error("Failed to load profile");
-  }
 
-  return res.json();   // now directly gets the profile object
-},
+    return res.json() as Promise<res>;
+  },
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const { qid } = Route.useParams()
   const profile = Route.useLoaderData();
-
+  const { user } = useAuth()
   return (
     <div className="flex flex-col min-h-screen bg-neutral-950 text-white p-6">
-       <details className="group border border-white/10 rounded-lg bg-white/5 overflow-hidden">
+      <details className="group border border-white/10 rounded-lg bg-white/5 overflow-hidden">
         <summary className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors">
           <span className="text-xs font-mono uppercase tracking-tighter text-neutral-500">
             Debug System State
@@ -46,6 +55,9 @@ function RouteComponent() {
           </div>
         </div>
       </details>
+      <ProfileCard
+        who={user?.user_metadata.u_qid === qid ? "user" : "other"}
+        qid={profile.u_qid} name={profile.u_name} bio={profile.u_bio} pfp={profile.u_pfp} />
     </div>
   )
 }

@@ -3,22 +3,31 @@ import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import TanStackQueryDevtools from '../hooks/devtools'
 import type { QueryClient } from '@tanstack/react-query'
+import type { User } from '@supabase/supabase-js'
 import { ThemeProvider } from "@/hooks/theme-provider"
 import { Toaster } from '@/lib/components/ui/sonner'
 import { NotFound } from '@/components/404'
 import { ErrorComponent } from '@/components/400'
+import { AuthProvider } from '@/hooks/auth-provider'
 
 interface MyRouterContext {
   queryClient: QueryClient
+  auth: {
+    user: User | null | undefined
+    isLoggedIn: boolean
+    isLoading: boolean
+  } | undefined
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: () => (
     <>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <Toaster richColors closeButton position='top-right' />
-        <Outlet />
-      </ThemeProvider>
+      <AuthProvider>
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <Toaster richColors closeButton position='top-right' />
+          <Outlet />
+        </ThemeProvider>
+      </AuthProvider>
       <TanStackDevtools
         config={{
           position: 'top-right',
