@@ -8,8 +8,11 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
+    "@elysiajs/html": "^1.4.0",
     "@supabase/supabase-js": "^2.90.1",
+    "@tqman/nice-logger": "^1.1.1",
     "elysia": "latest",
+    "elysia-rate-limit": "^4.4.2",
     "zod": "^4.3.5"
   },
   "devDependencies": {

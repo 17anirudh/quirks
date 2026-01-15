@@ -41,19 +41,25 @@ export default function SignupModal() {
                 .auth
                 .signUp({
                     email: value.u_mail,
-                    password: value.u_pass
+                    password: value.u_pass,
+                    options: {
+                        data: {
+                            "u_qid": value.u_qid
+                        }
+                    }
                 })
             if (authError) throw authError
             try {
                 const token = authData.session?.access_token;
                 if (!token) throw new Error('No authentication token available');
                 
-                await fetch(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
+                await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/create`, {
                     method: 'POST',
                     headers: {
-                        "Authorization": token
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
                     },
-                    body: JSON.stringify(value.u_qid)
+                    body: JSON.stringify({ u_qid: value.u_qid })
                 })
             }
             catch (e) {
