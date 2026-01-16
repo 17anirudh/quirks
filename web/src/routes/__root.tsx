@@ -8,43 +8,29 @@ import { NotFound } from '@/components/404';
 import { ErrorComponent } from '@/components/400';
 
 import type { QueryClient } from '@tanstack/react-query';
-import type { Session, User } from '@supabase/supabase-js';
+import type { AuthContextValue } from '@/hooks/auth-provider'; //
 
 export interface RouterContext {
   queryClient: QueryClient;
-  auth: {
-    user: User | null | undefined;
-    session: Session | null;
-    isLoading: boolean;
-    isAuthenticated: boolean;
-  };
+  auth: AuthContextValue; // Use the actual interface
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  component: () => {
-    return (
-      <>
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <Toaster richColors closeButton position="top-right" />
-          <Outlet />
-        </ThemeProvider>
-        <TanStackDevtools
-          config={{ position: 'bottom-right' }}
-          plugins={[
-            {
-              name: 'Router',
-              render: () => <TanStackRouterDevtoolsPanel />,
-            },
-            {
-              name: 'Query',
-              render: () => <ReactQueryDevtools initialIsOpen={false} />,
-            },
-          ]}
-        />
-      </>
-    );
-  },
-
+  component: () => (
+    <>
+      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <Toaster richColors closeButton position="top-right" />
+        <Outlet />
+      </ThemeProvider>
+      <TanStackDevtools
+        config={{ position: 'bottom-right' }}
+        plugins={[
+          { name: 'Router', render: () => <TanStackRouterDevtoolsPanel /> },
+          { name: 'Query', render: () => <ReactQueryDevtools initialIsOpen={false} /> },
+        ]}
+      />
+    </>
+  ),
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
 });

@@ -7,11 +7,11 @@ import SignupModal from '@/components/signup-modal'
 import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/')({
-    beforeLoad: ({ context }) => {
-        if (!context.auth?.isLoading && context.auth?.user) {
-            throw redirect({ to: '/home', replace: true })
-        }
-    },
+    // beforeLoad: ({ context }) => {
+    //     if (!context.auth?.isLoading && context.auth?.user) {
+    //         throw redirect({ to: '/home', replace: true })
+    //     }
+    // },
     pendingComponent: () => <Loader />,
     component: AppComponent,
 })

@@ -9,12 +9,12 @@ import {
 import { type Session, type User } from '@supabase/supabase-js';
 import { supabase } from './supabase';
 
-type AuthState =
+export type AuthState =
     | { status: 'loading' }
     | { status: 'authenticated'; user: User; session: Session }
     | { status: 'unauthenticated'; user: null; session: null };
 
-interface AuthContextValue {
+export interface AuthContextValue {
     state: AuthState;
     user: User | null;
     session: Session | null;
@@ -28,7 +28,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [state, setState] = useState<AuthState>({ status: 'loading' });
 
     useEffect(() => {
-        // Initial session check
         supabase.auth.getSession().then(({ data: { session } }) => {
             setState(
                 session
@@ -37,10 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             );
         });
 
-        // Listen for auth changes
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setState(
                 session
                     ? { status: 'authenticated', user: session.user, session }
@@ -73,13 +69,4 @@ export function useAuth(): AuthContextValue {
         throw new Error('useAuth must be used within AuthProvider');
     }
     return context;
-}
-
-// Optional: narrower hooks people often like
-export function useUser() {
-    return useAuth().user;
-}
-
-export function useIsAuthenticated() {
-    return useAuth().isAuthenticated;
 }
