@@ -1,8 +1,5 @@
-"use client";
-
 import "./message-bubble.css";
-
-import { cn } from "@/hooks/utils";
+import { cn } from '@/lib/utils'
 
 export interface MessageBubbleProps {
   message: string;
@@ -23,10 +20,10 @@ export function MessageBubble({
     grouped === "first"
       ? "imessage-grouped-first mb-1.5"
       : grouped === "last"
-      ? "imessage-grouped-last"
-      : grouped === "middle"
-      ? "imessage-grouped-middle mb-1.5"
-      : "";
+        ? "imessage-grouped-last"
+        : grouped === "middle"
+          ? "imessage-grouped-middle mb-1.5"
+          : "";
 
   return (
     <div

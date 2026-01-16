@@ -10,19 +10,28 @@ import {
 } from '@/lib/components/ui/dialog';
 import { Settings2, LogOutIcon } from 'lucide-react';
 import { Button } from '../lib/components/ui/button';
-import { SUPABASE_CLIENT } from '@/hooks/variables';
+import { useMutation, type QueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { SUPABASE_CLIENT } from '@/hooks/utils';
 import { useNavigate } from '@tanstack/react-router';
 
-
-
-export default function Settings() {
+export default function Settings({ queryClient }: { queryClient: QueryClient }) {
   const navigate = useNavigate()
-  function logout() {
-    SUPABASE_CLIENT.auth.signOut()
-    toast.info("Logged out, stay safe 🙂")
-    navigate({ to: '/', replace: true })
-  }
+  const byeAccount = useMutation({
+    mutationFn: async () => {
+      const { error: authError } = await SUPABASE_CLIENT.auth.signOut()
+      if (authError) throw authError
+    },
+    onError: (err) => {
+      toast.error(err.message + '😅')
+      throw new Error(err.message)
+    },
+    onSuccess: () => {
+      toast.success("Stay safe, see you again 😀")
+      queryClient.invalidateQueries({ queryKey: ['auth'] })
+      return navigate({ to: '/', replace: true })
+    }
+  })
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -45,14 +54,14 @@ export default function Settings() {
           <ThemeToggler />
           <span>Click to change Theme</span>
         </div>
-        <div className='flex gap-5 justify-center items-center'> 
+        <div className='flex gap-5 justify-center items-center'>
           <DialogClose asChild>
-            <Button 
-                onClick={logout} 
-                className='cursor-pointer'
-              >
-                <LogOutIcon /> <span>Log Out</span>
-              </Button>
+            <Button
+              onClick={() => byeAccount.mutate()}
+              className='cursor-pointer'
+            >
+              <LogOutIcon /> <span>Log Out</span>
+            </Button>
           </DialogClose>
         </div>
       </DialogContent>

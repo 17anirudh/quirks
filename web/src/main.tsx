@@ -4,13 +4,15 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import * as TanStackQueryProvider from './hooks/root-provider.tsx'
 import { routeTree } from './routeTree.gen'
 import './styles.css'
+import { useAuth } from './hooks/utils.ts'
 import reportWebVitals from './reportWebVitals.ts'
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
 const router = createRouter({
   routeTree,
   context: {
-    ...TanStackQueryProviderContext,
+    auth: undefined!,
+    queryClient: TanStackQueryProviderContext.queryClient,
   },
   defaultPreload: 'intent',
   scrollRestoration: true,
@@ -25,6 +27,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+function App() {
+  // 3. Call your hook inside a child of the QueryProvider
+  const auth = useAuth()
+
+  // 4. Pass the live auth state to the Router
+  return (
+    <RouterProvider
+      router={router}
+      context={{
+        auth,
+        queryClient: TanStackQueryProviderContext.queryClient
+      }}
+    />
+  )
+}
+
 // Render the app
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
@@ -32,7 +50,7 @@ if (rootElement && !rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <RouterProvider router={router} />
+        <App />
       </TanStackQueryProvider.Provider>
     </StrictMode>,
   )

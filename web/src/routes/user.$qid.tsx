@@ -1,51 +1,49 @@
-import { createFileRoute, notFound } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import Loader from '@/components/loader'
+import ProfileCard from '@/components/profile-card'
+
+type res = {
+  u_qid: string | null,
+  u_name: string | null,
+  u_bio: string | null,
+  u_pfp: string | null
+}
 
 export const Route = createFileRoute('/user/$qid')({
-  loader: async ({ params: { qid } }) => {
-  const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`, {
-    headers: { Accept: 'application/json' },
-    method: 'GET'
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) {
-      throw notFound({ data: `${qid} not found` })
-    }
-    throw new Error("Failed to load profile");
-  }
-
-  return res.json();   // now directly gets the profile object
-},
+  loader: async ({ context, params }) => {
+    return context.queryClient.ensureQueryData({
+      queryKey: ['user', params.qid],
+      queryFn: async () => {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${params.qid}`)
+        return await res.json() as res
+      }
+    })
+  },
+  pendingComponent: () => <Loader />,
   component: RouteComponent,
 })
 
 function RouteComponent() {
   const { qid } = Route.useParams()
-  const profile = Route.useLoaderData();
-
+  const ctx = Route.useLoaderData();
+  const context = Route.useRouteContext()
+  let who: string
+  if (context.auth.user) {
+    if (context.auth.user.user_metadata.u_qid === qid) {
+      who = 'self'
+    }
+    else {
+      who = 'other'
+    }
+  }
+  else {
+    who = 'anon'
+  }
   return (
-    <div className="flex flex-col min-h-screen bg-neutral-950 text-white p-6">
-       <details className="group border border-white/10 rounded-lg bg-white/5 overflow-hidden">
-        <summary className="flex items-center justify-between p-3 cursor-pointer hover:bg-white/5 transition-colors">
-          <span className="text-xs font-mono uppercase tracking-tighter text-neutral-500">
-            Debug System State
-          </span>
-        </summary>
-        <div className="p-4 border-t border-white/10 space-y-4">
-          <div>
-            <p className="text-[10px] text-cyan-500 font-bold mb-2">BACKEND_RESPONSE</p>
-            <pre className="text-[11px] p-3 bg-black/50 rounded border border-white/5 overflow-auto max-h-40 font-mono">
-              {profile ? JSON.stringify(profile, null, 2) : ''}
-            </pre>
-          </div>
-          <div>
-            <p className="text-[10px] text-emerald-500 font-bold mb-2">SUPABASE_AUTH</p>
-            <pre className="text-[11px] p-3 bg-black/50 rounded border border-white/5 overflow-auto font-mono">
-              {qid}
-            </pre>
-          </div>
-        </div>
-      </details>
-    </div>
+    <>
+      {who === 'self' && <ProfileCard ctx={ctx} qClient={context.queryClient} />}
+      {who === 'other' && <ProfileCard ctx={ctx} who='other' />}
+      {who === 'anon' && <ProfileCard ctx={ctx} who='anon' />}
+    </>
   )
 }
