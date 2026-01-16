@@ -19,7 +19,7 @@ import { Input } from "@/lib/components/ui/input"
 import { profileSchema } from '@/types/user';
 import z from 'zod';
 import { useNavigate } from '@tanstack/react-router';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SUPABASE_CLIENT } from '@/hooks/variables';
 import { toast } from 'sonner';
 
@@ -33,6 +33,7 @@ const clientLogInSchema = profileSchema.pick({
 })
 
 export default function LoginModal() {
+  const queryClient = useQueryClient()
   const navigate = useNavigate();
   const logInMutation = useMutation({
     mutationFn: async (value: z.infer<typeof clientLogInSchema>) => {
@@ -41,8 +42,10 @@ export default function LoginModal() {
         password: value.u_pass
       })
       if (authError || !authData) throw authError
+      return authData.user
     },
-    onSuccess: () => {
+    onSuccess: (user) => {
+      queryClient.setQueryData(['user'], user)
       navigate({ to: '/home', replace: true })
     },
     onError: (error) => {

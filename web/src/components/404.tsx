@@ -20,7 +20,7 @@ export function NotFound({ data }: NotFoundError) {
       <EmptyHeader>
         <BanIcon className="bg-transparent animate-pulse" color="red" />
         <EmptyTitle className="text-white flex gap-3"><pre className="text-red-500">{attemptedPath}</pre> does not exist</EmptyTitle>
-        <small>{data}</small>
+        <small>{(data as any)?.message || (typeof data === 'string' ? data : null)}</small>
         <EmptyContent className="mt-5">
           <Button variant="outline" size="sm" asChild className="hover:bg-transparent">
             <Link to='/' ><HouseIcon />Go back to Home</Link>

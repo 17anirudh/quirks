@@ -1,47 +1,50 @@
-import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import TanStackQueryDevtools from '../hooks/devtools'
-import type { QueryClient } from '@tanstack/react-query'
-import type { User } from '@supabase/supabase-js'
-import { ThemeProvider } from "@/hooks/theme-provider"
-import { Toaster } from '@/lib/components/ui/sonner'
-import { NotFound } from '@/components/404'
-import { ErrorComponent } from '@/components/400'
-import { AuthProvider } from '@/hooks/auth-provider'
+import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { TanStackDevtools } from '@tanstack/react-devtools';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { ThemeProvider } from '@/hooks/theme-provider';
+import { Toaster } from 'sonner';
+import { NotFound } from '@/components/404';
+import { ErrorComponent } from '@/components/400';
 
-interface MyRouterContext {
-  queryClient: QueryClient
+import type { QueryClient } from '@tanstack/react-query';
+import type { Session, User } from '@supabase/supabase-js';
+
+export interface RouterContext {
+  queryClient: QueryClient;
   auth: {
-    user: User | null | undefined
-    isLoggedIn: boolean
-    isLoading: boolean
-  } | undefined
+    user: User | null | undefined;
+    session: Session | null;
+    isLoading: boolean;
+    isAuthenticated: boolean;
+  };
 }
 
-export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
-    <>
-      <AuthProvider>
+export const Route = createRootRouteWithContext<RouterContext>()({
+  component: () => {
+    return (
+      <>
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-          <Toaster richColors closeButton position='top-right' />
+          <Toaster richColors closeButton position="top-right" />
           <Outlet />
         </ThemeProvider>
-      </AuthProvider>
-      <TanStackDevtools
-        config={{
-          position: 'top-right',
-        }}
-        plugins={[
-          {
-            name: 'Tanstack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-          TanStackQueryDevtools,
-        ]}
-      />
-    </>
-  ),
-  notFoundComponent: () => <NotFound />,
-  errorComponent: ErrorComponent
-})
+        <TanStackDevtools
+          config={{ position: 'bottom-right' }}
+          plugins={[
+            {
+              name: 'Router',
+              render: () => <TanStackRouterDevtoolsPanel />,
+            },
+            {
+              name: 'Query',
+              render: () => <ReactQueryDevtools initialIsOpen={false} />,
+            },
+          ]}
+        />
+      </>
+    );
+  },
+
+  notFoundComponent: NotFound,
+  errorComponent: ErrorComponent,
+});

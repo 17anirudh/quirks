@@ -17,12 +17,13 @@ import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
 import { Input } from '@/lib/components/ui/input';
 import { useState, useId } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function Settings() {
   const navigate = useNavigate()
   const id = useId();
   const [inputValue, setInputValue] = useState('');
+  const queryClient = useQueryClient()
   const { user, session } = useAuth()
   const [qid, access_token]: [string, string | undefined] = [user?.user_metadata.u_qid, session?.access_token]
 
@@ -45,10 +46,10 @@ export default function Settings() {
       return response
     },
     onSuccess: async () => {
-      // await SUPABASE_CLIENT.auth.signOut()
+      await SUPABASE_CLIENT.auth.signOut()
+      queryClient.clear();
       toast.info("Goodbye 😓")
       return navigate({ to: '/', replace: true })
-      // window.location.reload()
     },
     onError: (err) => {
       toast.error("Something went wrong, maybe universe is not ready for you to leave 😅")
@@ -58,6 +59,7 @@ export default function Settings() {
   function logout() {
     SUPABASE_CLIENT.auth.signOut()
     toast.info("Logged out, stay safe 🙂")
+    queryClient.clear();
     return navigate({ to: '/', replace: true })
   }
   return (

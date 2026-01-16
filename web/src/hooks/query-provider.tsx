@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 
 export function getContext() {
   const queryClient = new QueryClient()
@@ -18,3 +19,9 @@ export function Provider({
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
+
+export default {
+  name: 'Tanstack Query',
+  render: <ReactQueryDevtoolsPanel />,
+}
+

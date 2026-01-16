@@ -1,45 +1,85 @@
-import { useState, useEffect, createContext, type ReactNode, useContext } from "react"
-import { type User, type Session } from "@supabase/supabase-js"
-import { SUPABASE_CLIENT } from "./variables";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+    type ReactNode,
+} from 'react';
+import { type Session, type User } from '@supabase/supabase-js';
+import { supabase } from './supabase';
 
-export const AuthContext = createContext<{
+type AuthState =
+    | { status: 'loading' }
+    | { status: 'authenticated'; user: User; session: Session }
+    | { status: 'unauthenticated'; user: null; session: null };
+
+interface AuthContextValue {
+    state: AuthState;
     user: User | null;
+    session: Session | null;
     isLoading: boolean;
-    session: Session | null
-}>({ user: null, isLoading: true, session: null });
+    isAuthenticated: boolean;
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [session, setSession] = useState<Session | null>(null)
-    const [isLoading, setIsLoading] = useState(true);
+    const [state, setState] = useState<AuthState>({ status: 'loading' });
 
     useEffect(() => {
-        // 1. Check initial session
-        SUPABASE_CLIENT.auth.getSession().then(({ data }) => {
-            setUser(data.session?.user ?? null);
-            setIsLoading(false);
-            setSession(data.session ?? null)
+        // Initial session check
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setState(
+                session
+                    ? { status: 'authenticated', user: session.user, session }
+                    : { status: 'unauthenticated', user: null, session: null },
+            );
         });
 
-        // 2. Listen for changes (login, logout, token refresh)
-        const { data: { subscription } } = SUPABASE_CLIENT.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            setIsLoading(false);
-            setSession(session ?? null)
+        // Listen for auth changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setState(
+                session
+                    ? { status: 'authenticated', user: session.user, session }
+                    : { status: 'unauthenticated', user: null, session: null },
+            );
         });
 
         return () => subscription.unsubscribe();
     }, []);
 
-    return (
-        <AuthContext.Provider value={{ user, isLoading, session }}>
-            {children}
-        </AuthContext.Provider>
-    );
+    const value = useMemo<AuthContextValue>(() => {
+        const isLoading = state.status === 'loading';
+        const isAuthenticated = state.status === 'authenticated';
+
+        return {
+            state,
+            user: isAuthenticated ? state.user : null,
+            session: isAuthenticated ? state.session : null,
+            isLoading,
+            isAuthenticated,
+        };
+    }, [state]);
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = () => {
+export function useAuth(): AuthContextValue {
     const context = useContext(AuthContext);
-    if (!context) throw new Error("useAuth must be used within AuthProvider");
+    if (context === undefined) {
+        throw new Error('useAuth must be used within AuthProvider');
+    }
     return context;
-};
+}
+
+// Optional: narrower hooks people often like
+export function useUser() {
+    return useAuth().user;
+}
+
+export function useIsAuthenticated() {
+    return useAuth().isAuthenticated;
+}

@@ -3,7 +3,7 @@ import Settings from "./settings"
 import { useRef, useState } from "react";
 
 type props = {
-    who: "user" | "other"
+    who: "user" | "other" | "anon"
     qid?: string | null
     name?: string | null
     posts?: string[] | null[]
@@ -45,7 +45,9 @@ export default function ProfileCard({ who, qid, name, posts, friends, bio, pfp }
                 </div>
                 <div className="text-wrap flex flex-col justify-center items-center">
                     <p className="leading-7 not-first:mt-6">{bio ? bio : 'Nothing here...'}</p>
-                    {who === "user" ? <Settings /> : <Button>Follow</Button>}
+                    {who === "user" && <Settings />}
+                    {who === "other" && <Button>Follow</Button>}
+                    {who === "anon" && null}
                 </div>
             </div>
         </div>

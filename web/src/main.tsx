@@ -1,13 +1,14 @@
-import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import * as TanStackQueryProvider from './hooks/root-provider.tsx'
-import { routeTree } from './routeTree.gen'
-import './styles.css'
-import reportWebVitals from './reportWebVitals.ts'
-import { useAuth } from './hooks/variables.ts'
+import { StrictMode } from 'react';
+import ReactDOM from 'react-dom/client';
+import { RouterProvider, createRouter } from '@tanstack/react-router';
+import { routeTree } from './routeTree.gen';
+import { AuthProvider, useAuth } from './hooks/auth-provider';
+import * as TanStackQueryProvider from './hooks/query-provider'
+import './styles.css';
+import reportWebVitals from './reportWebVitals';
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
+
 const router = createRouter({
   routeTree,
   context: {
@@ -15,37 +16,33 @@ const router = createRouter({
     ...TanStackQueryProviderContext,
   },
   defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
+  scrollRestoration: true,
 })
 
-// Register the router instance for type safety
+// Register router type globally
 declare module '@tanstack/react-router' {
   interface Register {
-    router: typeof router
+    router: typeof router;
   }
 }
 
-// Render the app
 function App() {
-  const auth = useAuth()
-  return <RouterProvider router={router} context={{ auth }} />
+  const auth = useAuth();
+  return <RouterProvider router={router} context={{ auth }} />;
 }
 
-const rootElement = document.getElementById('app')
+const rootElement = document.getElementById('root');
 if (rootElement && !rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(
+  ReactDOM.createRoot(rootElement).render(
     <StrictMode>
       <TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </TanStackQueryProvider.Provider>
-    </StrictMode>,
-  )
+    </StrictMode>
+  );
 }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
+reportWebVitals();
