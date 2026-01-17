@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
-import { Vortex } from '@/lib/components/ui/vortex'
+import { Vortex } from '@/lib/components/vortex'
 import { ConfettiFireworks } from '@/components/fireworks'
 import { Highlighter } from '@/lib/components/ui/highlighter'
 import LoginModal from '@/components/login-modal'

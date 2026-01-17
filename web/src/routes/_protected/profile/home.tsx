@@ -11,7 +11,7 @@ type res = {
 
 export const Route = createFileRoute('/_protected/profile/home')({
   loader: async ({ context }) => {
-    const qid = context.auth.user?.user_metadata.u_qid
+    const qid = context.auth.session?.user.user_metadata.u_qid
     return context.queryClient.ensureQueryData({
       queryKey: ['user', qid],
       queryFn: async () => {
@@ -26,6 +26,7 @@ export const Route = createFileRoute('/_protected/profile/home')({
 
 function RouteComponent() {
   const ctx = Route.useLoaderData() as res
+  console.log(ctx)
   return (
     <div className="w-full p-4 flex flex-col gap-5 justify-center items-center">
       {/* Profile Card */}
@@ -61,7 +62,7 @@ function RouteComponent() {
           </p>
         </article>
       </div>
-      <Link to='/profile/settings' >Settings</Link>
+      <Link to='/profile/settings'>Settings</Link>
     </div>
   )
 }

@@ -20,14 +20,16 @@ import {
 } from '@/lib/components/ui/dialog';
 import { Label } from '@/lib/components/ui/label'
 import { Input } from '@/lib/components/ui/input'
+import PfpForm from '@/components/pfpForm'
 
 export const Route = createFileRoute('/_protected/profile/settings')({
   loader: async ({ context }) => {
-    const qid = context.auth.user?.user_metadata.u_qid
+    const qid = context.auth.session?.user.user_metadata.u_qid
     return context.queryClient.ensureQueryData({
       queryKey: ['user', qid],
       queryFn: async () => {
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`)
+        // console.log(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`)
         return await res.json() as res
       }
     })
@@ -51,9 +53,13 @@ type tabsType = {
 function RouteComponent() {
   const navigate = useNavigate()
   const ctx = Route.useRouteContext()
-  const [q, qid] = [ctx.queryClient, ctx.auth.user?.user_metadata.u_qid]
-  const id = useId();
-  const [inputValue, setInputValue] = useState('');
+  const loadInfo = Route.useLoaderData() as res
+  const [q, qid] = [ctx.queryClient, ctx.auth.session?.user.user_metadata.u_qid]
+
+  const id = useId()
+  const [inputValue, setInputValue] = useState<string>('')
+
+  // Log out logic
   const byeAccount = useMutation({
     mutationFn: async () => {
       const { error: authError } = await SUPABASE_CLIENT.auth.signOut()
@@ -69,27 +75,16 @@ function RouteComponent() {
       navigate({ to: '/', replace: true })
     }
   })
+
   const tabs: tabsType[] = [
-    {
-      title: "App",
-      value: "app",
-      content: (
-        <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black dark:text-white bg-white dark:bg-black">
-          <p>App Settings</p>
-          {/* Theme Toggler */}
-          <div className='flex gap-5 justify-center items-center'>
-            <ThemeToggler />
-            <span>Click to change Theme</span>
-          </div>
-        </div>
-      ),
-    },
     {
       title: "Account",
       value: "account",
       content: (
         <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black dark:text-white bg-white dark:bg-black">
           <p>Account Settings</p>
+          {/* Pfp Upload */}
+          <PfpForm loading={loadInfo!} client={q!} qid={qid!} />
           {/* Log out */}
           <div>
             <Button
@@ -154,6 +149,20 @@ function RouteComponent() {
           </Dialog>
         </div>
       )
+    },
+    {
+      title: "App",
+      value: "app",
+      content: (
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black dark:text-white bg-white dark:bg-black">
+          <p>App Settings</p>
+          {/* Theme Toggler */}
+          <div className='flex gap-5 justify-center items-center'>
+            <ThemeToggler />
+            <span>Click to change Theme</span>
+          </div>
+        </div>
+      ),
     }
   ]
   return (

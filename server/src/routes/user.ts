@@ -3,48 +3,47 @@ import { CLIENT } from "../supabase/config";
 
 export const users = new Elysia({ prefix: '/user' })
 
-    .post("/create", async ({ body, headers, set }) => 
-        {
-            const authHeader = headers.authorization;
+    .post("/create", async ({ body, headers, set }) => {
+        const authHeader = headers.authorization;
 
-            if(!body.u_qid) {
-                set.status = 400;
-                return { error: "Missing body" }
-            }
+        if (!body.u_qid) {
+            set.status = 400;
+            return { error: "Missing body" }
+        }
 
-            if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                set.status = 401;
-                return { error: "Missing or invalid Authorization header" };
-            }
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            set.status = 401;
+            return { error: "Missing or invalid Authorization header" };
+        }
 
-            const token = authHeader.slice(7);
-            const { data: tokenData, error: tokenError } = await CLIENT.auth.getUser(token);
+        const token = authHeader.slice(7);
+        const { data: tokenData, error: tokenError } = await CLIENT.auth.getUser(token);
 
-            if (tokenError || !tokenData.user) {
-                set.status = 401;
-                console.error(`Couldn't verify token: ${tokenError}`)
-                return { error: "Invalid token" };
-            }
+        if (tokenError || !tokenData.user) {
+            set.status = 401;
+            console.error(`Couldn't verify token: ${tokenError}`)
+            return { error: "Invalid token" };
+        }
 
-            try {
-                await CLIENT.from("profile")
-                    .insert({
-                        u_id: tokenData.user.id,
-                        u_mail: tokenData.user.email,
-                        u_qid: body.u_qid,
-                    })
-                    .maybeSingle()
+        try {
+            await CLIENT.from("profile")
+                .insert({
+                    u_id: tokenData.user.id,
+                    u_mail: tokenData.user.email,
+                    u_qid: body.u_qid,
+                })
+                .maybeSingle()
 
-                set.status = 201;
-                return { success: true };
-            } 
-            catch (err: any) {
-                await CLIENT.auth.admin.deleteUser(tokenData.user.id);
-                set.status = 409;
-                console.log(`qid already taken`)
-                return { error: "qid already taken" };
-            }
-        },
+            set.status = 201;
+            return { success: true };
+        }
+        catch (err: any) {
+            await CLIENT.auth.admin.deleteUser(tokenData.user.id);
+            set.status = 409;
+            console.log(`qid already taken`)
+            return { error: "qid already taken" };
+        }
+    },
         {
             body: t.Object({
                 u_qid: t.String({
@@ -54,16 +53,15 @@ export const users = new Elysia({ prefix: '/user' })
             }),
         }
     )
-    .get('/search/:id', async ({ params: { id }, set }) => 
-        {
-            if (!id || typeof id !== 'string' || id.length < 4) {
-                set.status = 400;
-                return { error: 'Invalid or missing qid' };
-            }
-            try {
+    .get('/search/:id', async ({ params: { id }, set }) => {
+        if (!id || typeof id !== 'string' || id.length < 4) {
+            set.status = 400;
+            return { error: 'Invalid or missing qid' };
+        }
+        try {
             const { data, error } = await CLIENT
                 .from('profile')
-                .select('u_qid, u_name, u_bio, u_pfp') 
+                .select('u_qid, u_name, u_bio, u_pfp')
                 .eq('u_qid', id)
                 .maybeSingle();
 
@@ -82,41 +80,82 @@ export const users = new Elysia({ prefix: '/user' })
             set.headers['Cache-Control'] = 'public, max-age=300, s-maxage=3600'; // cache 5 min browser / 1h edge/CDN
 
             return data;
-            } 
-            catch (err) {
-                console.error('Unexpected error in /user/search:', err);
-                set.status = 500;
-                return { error: 'Internal server error' };
-            }
-        },
+        }
+        catch (err) {
+            console.error('Unexpected error in /user/search:', err);
+            set.status = 500;
+            return { error: 'Internal server error' };
+        }
+    },
         {
             params: t.Object({
-            id: t.String({ minLength: 4, maxLength: 200 })
+                id: t.String({ minLength: 4, maxLength: 200 })
             })
         }
     )
-    .delete('/delete', async ({ set, headers }) => 
-        {
-            const authHeader = headers.authorization;
+    .delete('/delete', async ({ set, headers }) => {
+        const authHeader = headers.authorization;
 
-            if (!authHeader || !authHeader.startsWith("Bearer ")) {
-                set.status = 401;
-                return { error: "Missing or invalid Authorization header" };
-            }
-            const { data, error } = await CLIENT.auth.getUser(authHeader)
-            if (error || !data) {
-                set.status = 401;
-                return { error: "Invalid Token" }
-            }
-            const userId: string = data.user.id
-            try {
-                await CLIENT.auth.admin.deleteUser(userId)
-                set.status = 202;
-                return { ok: "User deleted" }
-            }
-            catch (e: any) {
-                set.status = 500;
-                return { error: "Server Error" }
-            }
-        },
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            set.status = 401;
+            return { error: "Missing or invalid Authorization header" };
+        }
+        const { data, error } = await CLIENT.auth.getUser(authHeader)
+        if (error || !data) {
+            set.status = 401;
+            return { error: "Invalid Token" }
+        }
+        const userId: string = data.user.id
+        try {
+            await CLIENT.auth.admin.deleteUser(userId)
+            set.status = 202;
+            return { ok: "User deleted" }
+        }
+        catch (e: any) {
+            set.status = 500;
+            return { error: "Server Error" }
+        }
+    },
+    )
+    .post("/upload-pfp/:qid", async ({ params, body, set }) => {
+        const file = body.file as File
+        if (!file) {
+            set.status = 400
+            return { error: "No file" }
+        }
+
+        const ext = file.name.split(".").pop()
+        const path = `${params.qid}.${ext}`
+
+        const { error } = await CLIENT.storage
+            .from("pfp")
+            .upload(path, file, {
+                upsert: true,
+                contentType: file.type,
+            })
+
+        if (error) {
+            set.status = 500
+            return { error: error.message }
+        }
+
+        const { data } = CLIENT.storage
+            .from("pfp")
+            .getPublicUrl(path)
+
+        await CLIENT
+            .from("profile")
+            .update({ u_pfp: data.publicUrl })
+            .eq("u_qid", params.qid)
+
+        return { url: data.publicUrl }
+    },
+        {
+            body: t.Object({
+                file: t.File(),
+            }),
+            params: t.Object({
+                qid: t.String({ minLength: 4, maxLength: 200 })
+            })
+        }
     )
