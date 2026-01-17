@@ -47,7 +47,7 @@ const navigations: navType[] = [
     },
     {
         display: "Profile",
-        path: '/profile',
+        path: '/profile/tsx/home',
         icon: <UserCircle2Icon height={27} />,
         value: 'profile'
     }

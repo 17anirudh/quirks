@@ -1,0 +1,9 @@
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/_protected/profile/tsx')({
+  component: RouteComponent,
+})
+
+function RouteComponent() {
+  return <><Outlet /></>
+}

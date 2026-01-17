@@ -45,7 +45,7 @@ export default function LoginModal() {
     },
     onSuccess: () => {
       toast.success("Welcome back 🦆🦆")
-      navigate({ to: '/home', replace: true })
+      return navigate({ to: '/home', replace: true })
     }
   })
   const form = useForm({

@@ -1,6 +1,5 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import Loader from '@/components/loader'
-import { Button } from '@/lib/components/ui/button'
 
 type res = {
   u_qid: string | null,
@@ -9,15 +8,15 @@ type res = {
   u_pfp: string | null
 }
 
-type loadData = [res, string | null | undefined, string]
 
-export const Route = createFileRoute('/user/$qid')({
-  loader: async ({ context, params }) => {
+export const Route = createFileRoute('/_protected/profile/tsx/home')({
+  loader: async ({ context }) => {
+    const qid = context.auth.user?.user_metadata.u_qid
     return context.queryClient.ensureQueryData({
-      queryKey: ['user', params.qid],
+      queryKey: ['user', qid],
       queryFn: async () => {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${params.qid}`)
-        return [await res.json() as res, context.auth.user?.user_metadata.u_qid, params.qid] as loadData
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`)
+        return await res.json() as res
       }
     })
   },
@@ -26,14 +25,10 @@ export const Route = createFileRoute('/user/$qid')({
 })
 
 function RouteComponent() {
-  const [ctx, qid, params] = Route.useLoaderData() as loadData;
-  const navigate = useNavigate()
-  const who: 'self' | 'anon' | 'other' = qid === params ? 'self' : !qid ? 'anon' : 'other'
-  if (who === 'self') {
-    return navigate({ to: '/profile/tsx/home' })
-  }
+  const ctx = Route.useLoaderData() as res
   return (
-    <>
+    <div className="w-full p-4 flex flex-col gap-5 justify-center items-center">
+      {/* Profile Card */}
       <div className='flex flex-col gap-5 p-5 border items-start w-11/12 h-full'>
         {/* qid */}
         <h2 id="id" className="text-center scroll-m-20 mb-5 pb-2 text-3xl font-semibold tracking-tight first:mt-0">{ctx ? `@${ctx.u_qid}` : ''}</h2>
@@ -60,14 +55,13 @@ function RouteComponent() {
             </div>
           </div>
         </div>
-        {/* bio */}
         <article className='w-full flex border-3'>
           <p className="min-w-0 break-words whitespace-normal overflow-hidden">
             {ctx.u_bio ? ctx.u_bio : 'csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh..csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh..csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh..csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh..csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh..csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh..csjdgfcudgcodfuohcvldhclidhciohefilhewlhdceioscusiefcwvdfvfdvrkdfhvcdjfhflrjhcflrejfcridsjcfrilcfjslefjcrleskfjciedsjclkdsjncklerh...'}
           </p>
         </article>
-        {who === 'other' && <Button>Follow</Button>}
       </div>
-    </>
+      <Link to='/profile/tsx/settings' >Settings</Link>
+    </div>
   )
 }

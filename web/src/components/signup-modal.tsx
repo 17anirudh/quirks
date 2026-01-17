@@ -21,7 +21,7 @@ import z from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { SUPABASE_CLIENT } from '@/hooks/utils';
 import { toast } from 'sonner';
-import { redirect } from '@tanstack/react-router';
+import { useNavigate } from '@tanstack/react-router';
 
 export const createAccountSchema = profileSchema.pick({
     u_qid: true,
@@ -34,6 +34,7 @@ export const createAccountSchema = profileSchema.pick({
 })
 
 export default function SignupModal() {
+    const navigate = useNavigate()
     const createAccount = useMutation({
         mutationFn: async (values: z.infer<typeof createAccountSchema>) => {
             const { data: authData, error: authError } = await SUPABASE_CLIENT.auth.signUp({
@@ -63,7 +64,7 @@ export default function SignupModal() {
         },
         onSuccess: () => {
             toast.success("Account created successfully 🦆🦆")
-            throw redirect({ to: '/home', replace: true })
+            navigate({ to: '/home', replace: true })
         }
     })
 
