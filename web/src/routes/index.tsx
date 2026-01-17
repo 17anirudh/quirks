@@ -5,18 +5,21 @@ import { Highlighter } from '@/lib/components/ui/highlighter'
 import LoginModal from '@/components/login-modal'
 import SignupModal from '@/components/signup-modal'
 import Loader from '@/components/loader'
+import type { QueryClient } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/')({
     beforeLoad: ({ context }) => {
-        if (context.auth.isLoggedIn) {
+        if (context.auth.qid) {
             throw redirect({ to: '/home', replace: true })
         }
+        return context.queryClient
     },
     pendingComponent: () => <Loader />,
     component: AppComponent,
 })
 
 function AppComponent() {
+    const qClient = Route.useRouteContext().queryClient as QueryClient
     return (
         <div className='h-dvh w-screen'>
             <Vortex backgroundColor='black'>
@@ -28,8 +31,8 @@ function AppComponent() {
                         </Highlighter>
                     </ConfettiFireworks>
                     <div className="flex gap-7">
-                        <SignupModal />
-                        <LoginModal />
+                        <SignupModal client={qClient} />
+                        <LoginModal client={qClient} />
                     </div>
                 </main>
             </Vortex>

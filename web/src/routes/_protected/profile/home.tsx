@@ -9,7 +9,7 @@ type res = {
 }
 
 
-export const Route = createFileRoute('/_protected/profile/tsx/home')({
+export const Route = createFileRoute('/_protected/profile/home')({
   loader: async ({ context }) => {
     const qid = context.auth.user?.user_metadata.u_qid
     return context.queryClient.ensureQueryData({
@@ -61,7 +61,7 @@ function RouteComponent() {
           </p>
         </article>
       </div>
-      <Link to='/profile/tsx/settings' >Settings</Link>
+      <Link to='/profile/settings' >Settings</Link>
     </div>
   )
 }

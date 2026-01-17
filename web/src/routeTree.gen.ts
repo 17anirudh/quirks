@@ -15,9 +15,9 @@ import { Route as UserQidRouteImport } from './routes/user.$qid'
 import { Route as ProtectedPostsRouteImport } from './routes/_protected/posts'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedChatsRouteImport } from './routes/_protected/chats'
-import { Route as ProtectedProfileTsxRouteRouteImport } from './routes/_protected/profile.tsx/route'
-import { Route as ProtectedProfileTsxSettingsRouteImport } from './routes/_protected/profile.tsx/settings'
-import { Route as ProtectedProfileTsxHomeRouteImport } from './routes/_protected/profile.tsx/home'
+import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/profile/route'
+import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
+import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
 
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
@@ -48,88 +48,87 @@ const ProtectedChatsRoute = ProtectedChatsRouteImport.update({
   path: '/chats',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-const ProtectedProfileTsxRouteRoute =
-  ProtectedProfileTsxRouteRouteImport.update({
-    id: '/profile/tsx',
-    path: '/profile/tsx',
-    getParentRoute: () => ProtectedRouteRoute,
-  } as any)
-const ProtectedProfileTsxSettingsRoute =
-  ProtectedProfileTsxSettingsRouteImport.update({
+const ProtectedProfileRouteRoute = ProtectedProfileRouteRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedProfileSettingsRoute =
+  ProtectedProfileSettingsRouteImport.update({
     id: '/settings',
     path: '/settings',
-    getParentRoute: () => ProtectedProfileTsxRouteRoute,
+    getParentRoute: () => ProtectedProfileRouteRoute,
   } as any)
-const ProtectedProfileTsxHomeRoute = ProtectedProfileTsxHomeRouteImport.update({
+const ProtectedProfileHomeRoute = ProtectedProfileHomeRouteImport.update({
   id: '/home',
   path: '/home',
-  getParentRoute: () => ProtectedProfileTsxRouteRoute,
+  getParentRoute: () => ProtectedProfileRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
   '/posts': typeof ProtectedPostsRoute
   '/user/$qid': typeof UserQidRoute
-  '/profile/tsx': typeof ProtectedProfileTsxRouteRouteWithChildren
-  '/profile/tsx/home': typeof ProtectedProfileTsxHomeRoute
-  '/profile/tsx/settings': typeof ProtectedProfileTsxSettingsRoute
+  '/profile/home': typeof ProtectedProfileHomeRoute
+  '/profile/settings': typeof ProtectedProfileSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
   '/posts': typeof ProtectedPostsRoute
   '/user/$qid': typeof UserQidRoute
-  '/profile/tsx': typeof ProtectedProfileTsxRouteRouteWithChildren
-  '/profile/tsx/home': typeof ProtectedProfileTsxHomeRoute
-  '/profile/tsx/settings': typeof ProtectedProfileTsxSettingsRoute
+  '/profile/home': typeof ProtectedProfileHomeRoute
+  '/profile/settings': typeof ProtectedProfileSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
+  '/_protected/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/_protected/chats': typeof ProtectedChatsRoute
   '/_protected/home': typeof ProtectedHomeRoute
   '/_protected/posts': typeof ProtectedPostsRoute
   '/user/$qid': typeof UserQidRoute
-  '/_protected/profile/tsx': typeof ProtectedProfileTsxRouteRouteWithChildren
-  '/_protected/profile/tsx/home': typeof ProtectedProfileTsxHomeRoute
-  '/_protected/profile/tsx/settings': typeof ProtectedProfileTsxSettingsRoute
+  '/_protected/profile/home': typeof ProtectedProfileHomeRoute
+  '/_protected/profile/settings': typeof ProtectedProfileSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/profile'
     | '/chats'
     | '/home'
     | '/posts'
     | '/user/$qid'
-    | '/profile/tsx'
-    | '/profile/tsx/home'
-    | '/profile/tsx/settings'
+    | '/profile/home'
+    | '/profile/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/profile'
     | '/chats'
     | '/home'
     | '/posts'
     | '/user/$qid'
-    | '/profile/tsx'
-    | '/profile/tsx/home'
-    | '/profile/tsx/settings'
+    | '/profile/home'
+    | '/profile/settings'
   id:
     | '__root__'
     | '/'
     | '/_protected'
+    | '/_protected/profile'
     | '/_protected/chats'
     | '/_protected/home'
     | '/_protected/posts'
     | '/user/$qid'
-    | '/_protected/profile/tsx'
-    | '/_protected/profile/tsx/home'
-    | '/_protected/profile/tsx/settings'
+    | '/_protected/profile/home'
+    | '/_protected/profile/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -182,58 +181,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedChatsRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/profile/tsx': {
-      id: '/_protected/profile/tsx'
-      path: '/profile/tsx'
-      fullPath: '/profile/tsx'
-      preLoaderRoute: typeof ProtectedProfileTsxRouteRouteImport
+    '/_protected/profile': {
+      id: '/_protected/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedProfileRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/profile/tsx/settings': {
-      id: '/_protected/profile/tsx/settings'
+    '/_protected/profile/settings': {
+      id: '/_protected/profile/settings'
       path: '/settings'
-      fullPath: '/profile/tsx/settings'
-      preLoaderRoute: typeof ProtectedProfileTsxSettingsRouteImport
-      parentRoute: typeof ProtectedProfileTsxRouteRoute
+      fullPath: '/profile/settings'
+      preLoaderRoute: typeof ProtectedProfileSettingsRouteImport
+      parentRoute: typeof ProtectedProfileRouteRoute
     }
-    '/_protected/profile/tsx/home': {
-      id: '/_protected/profile/tsx/home'
+    '/_protected/profile/home': {
+      id: '/_protected/profile/home'
       path: '/home'
-      fullPath: '/profile/tsx/home'
-      preLoaderRoute: typeof ProtectedProfileTsxHomeRouteImport
-      parentRoute: typeof ProtectedProfileTsxRouteRoute
+      fullPath: '/profile/home'
+      preLoaderRoute: typeof ProtectedProfileHomeRouteImport
+      parentRoute: typeof ProtectedProfileRouteRoute
     }
   }
 }
 
-interface ProtectedProfileTsxRouteRouteChildren {
-  ProtectedProfileTsxHomeRoute: typeof ProtectedProfileTsxHomeRoute
-  ProtectedProfileTsxSettingsRoute: typeof ProtectedProfileTsxSettingsRoute
+interface ProtectedProfileRouteRouteChildren {
+  ProtectedProfileHomeRoute: typeof ProtectedProfileHomeRoute
+  ProtectedProfileSettingsRoute: typeof ProtectedProfileSettingsRoute
 }
 
-const ProtectedProfileTsxRouteRouteChildren: ProtectedProfileTsxRouteRouteChildren =
-  {
-    ProtectedProfileTsxHomeRoute: ProtectedProfileTsxHomeRoute,
-    ProtectedProfileTsxSettingsRoute: ProtectedProfileTsxSettingsRoute,
-  }
+const ProtectedProfileRouteRouteChildren: ProtectedProfileRouteRouteChildren = {
+  ProtectedProfileHomeRoute: ProtectedProfileHomeRoute,
+  ProtectedProfileSettingsRoute: ProtectedProfileSettingsRoute,
+}
 
-const ProtectedProfileTsxRouteRouteWithChildren =
-  ProtectedProfileTsxRouteRoute._addFileChildren(
-    ProtectedProfileTsxRouteRouteChildren,
+const ProtectedProfileRouteRouteWithChildren =
+  ProtectedProfileRouteRoute._addFileChildren(
+    ProtectedProfileRouteRouteChildren,
   )
 
 interface ProtectedRouteRouteChildren {
+  ProtectedProfileRouteRoute: typeof ProtectedProfileRouteRouteWithChildren
   ProtectedChatsRoute: typeof ProtectedChatsRoute
   ProtectedHomeRoute: typeof ProtectedHomeRoute
   ProtectedPostsRoute: typeof ProtectedPostsRoute
-  ProtectedProfileTsxRouteRoute: typeof ProtectedProfileTsxRouteRouteWithChildren
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
+  ProtectedProfileRouteRoute: ProtectedProfileRouteRouteWithChildren,
   ProtectedChatsRoute: ProtectedChatsRoute,
   ProtectedHomeRoute: ProtectedHomeRoute,
   ProtectedPostsRoute: ProtectedPostsRoute,
-  ProtectedProfileTsxRouteRoute: ProtectedProfileTsxRouteRouteWithChildren,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

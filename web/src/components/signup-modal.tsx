@@ -18,10 +18,11 @@ import {
 import { Input } from "@/lib/components/ui/input"
 import { profileSchema } from '@/services/user';
 import z from 'zod';
-import { useMutation } from '@tanstack/react-query';
+import { type QueryClient, useMutation } from '@tanstack/react-query';
 import { SUPABASE_CLIENT } from '@/hooks/utils';
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
+import Loader from './loader';
 
 export const createAccountSchema = profileSchema.pick({
     u_qid: true,
@@ -33,7 +34,7 @@ export const createAccountSchema = profileSchema.pick({
         .max(300, "Your password must be atmost 300 characters")
 })
 
-export default function SignupModal() {
+export default function SignupModal({ client }: { client: QueryClient }) {
     const navigate = useNavigate()
     const createAccount = useMutation({
         mutationFn: async (values: z.infer<typeof createAccountSchema>) => {
@@ -57,12 +58,17 @@ export default function SignupModal() {
                 body: JSON.stringify({ u_qid: values.u_qid })
             })
             if (!res.ok) throw new Error("Failed to create account")
+            return authData.session
         },
+        onMutate: () => (
+            <Loader />
+        ),
         onError: (err) => {
             toast.error(err.message + '😅')
             throw new Error(err.message)
         },
-        onSuccess: () => {
+        onSuccess: (session) => {
+            client.setQueryData(['auth'], session)
             toast.success("Account created successfully 🦆🦆")
             navigate({ to: '/home', replace: true })
         }

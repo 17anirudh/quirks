@@ -7,38 +7,46 @@ import { ThemeProvider } from "@/hooks/theme-provider"
 import { Toaster } from '@/lib/components/ui/sonner'
 import { NotFound } from '@/components/404'
 import { ErrorComponent } from '@/components/400'
-import type { User } from '@supabase/supabase-js'
+import { useAuth } from '@/hooks/auth-provider'
+import Loader from '@/components/loader'
+import { Suspense } from 'react'
 
 interface MyRouterContext {
   queryClient: QueryClient
-  auth: {
-    user: User | null | undefined;
-    isLoggedIn: boolean;
-    isLoading: boolean;
-  };
+  auth: ReturnType<typeof useAuth>;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
-    <>
-      <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-        <Toaster richColors closeButton position='top-right' />
-        <Outlet />
-      </ThemeProvider>
-      <TanStackDevtools
-        config={{
-          position: 'top-right',
-        }}
-        plugins={[
-          {
-            name: 'Tanstack Router',
-            render: <TanStackRouterDevtoolsPanel />,
-          },
-          TanStackQueryDevtools,
-        ]}
-      />
-    </>
-  ),
+  component: () => {
+    const { isLoading } = useAuth()
+    return (
+      <>
+
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+          <Toaster richColors closeButton position='top-right' />
+          {isLoading ? (
+            <Loader />
+          ) : (
+            <Suspense fallback={<Loader />}>
+              <Outlet />
+            </Suspense>
+          )}
+        </ThemeProvider>
+        <TanStackDevtools
+          config={{
+            position: 'top-right',
+          }}
+          plugins={[
+            {
+              name: 'Tanstack Router',
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+            TanStackQueryDevtools,
+          ]}
+        />
+      </>
+    )
+  },
   notFoundComponent: () => <NotFound />,
   errorComponent: ErrorComponent
 })

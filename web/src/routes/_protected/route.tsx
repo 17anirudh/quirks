@@ -9,11 +9,20 @@ import {
 import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/_protected')({
-    beforeLoad: ({ context }) => {
-        if (!context.auth.isLoggedIn) {
-            throw redirect({ to: '/', replace: true })
+    beforeLoad: ({ context, location }) => {
+        const { user, isLoading } = context.auth   // ← from useAuth() which uses the query`
+        // This is the critical part you probably forgot:
+        if (isLoading) {
+            // ← Do NOTHING here — don't redirect yet!
+            return
         }
-        return context
+
+        if (!user) {
+            throw redirect({
+                to: '/',
+                search: { redirect: location.href },
+            })
+        }
     },
     pendingComponent: () => <Loader />,
     component: RouteComponent,
@@ -47,7 +56,7 @@ const navigations: navType[] = [
     },
     {
         display: "Profile",
-        path: '/profile/tsx/home',
+        path: '/profile/home',
         icon: <UserCircle2Icon height={27} />,
         value: 'profile'
     }

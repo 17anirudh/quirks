@@ -17,7 +17,7 @@ import {
 } from "@/lib/components/ui/field"
 import { Input } from "@/lib/components/ui/input"
 import { createAccountSchema } from './signup-modal';
-import { useMutation } from "@tanstack/react-query";
+import { type QueryClient, useMutation } from "@tanstack/react-query";
 import z from "zod";
 import { SUPABASE_CLIENT } from "@/hooks/utils";
 import { toast } from "sonner";
@@ -28,9 +28,14 @@ export const logInUserSchema = createAccountSchema.pick({
   u_pass: true
 })
 
-export default function LoginModal() {
+type props = {
+  client: QueryClient
+}
+
+export default function LoginModal({ client }: props) {
   const navigate = useNavigate()
   const logInUser = useMutation({
+    mutationKey: ['login'],
     mutationFn: async (values: z.infer<typeof logInUserSchema>) => {
       const { data: authData, error: authError } = await SUPABASE_CLIENT.auth.signInWithPassword({
         email: values.u_mail,
@@ -43,9 +48,13 @@ export default function LoginModal() {
       toast.error(err.message + '😅')
       console.error(err.message)
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Manual set query
+      client.setQueryData(['auth'], data.session)
+      // Manual invalidate query
+      client.invalidateQueries({ queryKey: ['auth'] })
       toast.success("Welcome back 🦆🦆")
-      return navigate({ to: '/home', replace: true })
+      navigate({ to: '/home', replace: true })
     }
   })
   const form = useForm({

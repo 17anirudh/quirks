@@ -30,7 +30,7 @@ function RouteComponent() {
   const navigate = useNavigate()
   const who: 'self' | 'anon' | 'other' = qid === params ? 'self' : !qid ? 'anon' : 'other'
   if (who === 'self') {
-    return navigate({ to: '/profile/tsx/home' })
+    navigate({ to: '/profile/home' })
   }
   return (
     <>

@@ -21,7 +21,7 @@ import {
 import { Label } from '@/lib/components/ui/label'
 import { Input } from '@/lib/components/ui/input'
 
-export const Route = createFileRoute('/_protected/profile/tsx/settings')({
+export const Route = createFileRoute('/_protected/profile/settings')({
   loader: async ({ context }) => {
     const qid = context.auth.user?.user_metadata.u_qid
     return context.queryClient.ensureQueryData({
