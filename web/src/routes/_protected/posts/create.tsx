@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useForm } from '@tanstack/react-form'
 import { toast } from "sonner"
@@ -7,7 +7,6 @@ import {
   Field,
   FieldError,
   FieldGroup,
-  FieldLabel,
 } from "@/lib/components/ui/field"
 import { Input } from "@/lib/components/ui/input"
 import Loader from '@/components/loader'
@@ -51,6 +50,7 @@ const postSchema = z.object({
 })
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const res: res = Route.useLoaderData()
   const qid: string = Route.useRouteContext().auth.session?.user.user_metadata.u_qid
   const uploadForm = useMutation({
@@ -97,6 +97,7 @@ function RouteComponent() {
       if (imageInputRef.current) {
         imageInputRef.current.value = ""
       }
+      navigate({ to: '/profile' })
     },
     onError: (error) => {
       console.error(error.message)
