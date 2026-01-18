@@ -1,5 +1,9 @@
 import * as React from "react"
+<<<<<<< HEAD
 import { cn } from "@/lib/utils"
+=======
+import { cn } from '@/lib/utils'
+>>>>>>> fix-attempt-backup
 
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
   return (

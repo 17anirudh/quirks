@@ -100,17 +100,26 @@ export const users = new Elysia({ prefix: '/user' })
             set.status = 401;
             return { error: "Missing or invalid Authorization header" };
         }
+<<<<<<< HEAD
         const token = authHeader.slice(7);
         const { data, error } = await CLIENT.auth.getUser(token)
+=======
+        const { data, error } = await CLIENT.auth.getUser(authHeader)
+>>>>>>> fix-attempt-backup
         if (error || !data) {
             set.status = 401;
             return { error: "Invalid Token" }
         }
         const userId: string = data.user.id
+<<<<<<< HEAD
         const qid: string = data.user.user_metadata.u_qid
         try {
             await CLIENT.auth.admin.deleteUser(userId)
             await CLIENT.from('profile').delete().eq('u_qid', qid)
+=======
+        try {
+            await CLIENT.auth.admin.deleteUser(userId)
+>>>>>>> fix-attempt-backup
             set.status = 202;
             return { ok: "User deleted" }
         }
@@ -119,4 +128,46 @@ export const users = new Elysia({ prefix: '/user' })
             return { error: "Server Error" }
         }
     },
+    )
+    .post("/upload-pfp/:qid", async ({ params, body, set }) => {
+        const file = body.file as File
+        if (!file) {
+            set.status = 400
+            return { error: "No file" }
+        }
+
+        const ext = file.name.split(".").pop()
+        const path = `${params.qid}.${ext}`
+
+        const { error } = await CLIENT.storage
+            .from("pfp")
+            .upload(path, file, {
+                upsert: true,
+                contentType: file.type,
+            })
+
+        if (error) {
+            set.status = 500
+            return { error: error.message }
+        }
+
+        const { data } = CLIENT.storage
+            .from("pfp")
+            .getPublicUrl(path)
+
+        await CLIENT
+            .from("profile")
+            .update({ u_pfp: data.publicUrl })
+            .eq("u_qid", params.qid)
+
+        return { url: data.publicUrl }
+    },
+        {
+            body: t.Object({
+                file: t.File(),
+            }),
+            params: t.Object({
+                qid: t.String({ minLength: 4, maxLength: 200 })
+            })
+        }
     )

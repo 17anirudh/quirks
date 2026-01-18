@@ -9,12 +9,28 @@ import {
 import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/_protected')({
+<<<<<<< HEAD
     beforeLoad: ({ context }) => {
         if (!context.auth?.user || !context.auth.isLoggedIn) {
             throw redirect({ to: '/', replace: true })
         }
         return {
             qid: context.auth.user.user_metadata?.u_qid
+=======
+    beforeLoad: ({ context, location }) => {
+        const { user, isLoading } = context.auth   // ← from useAuth() which uses the query`
+        // This is the critical part you probably forgot:
+        if (isLoading) {
+            // ← Do NOTHING here — don't redirect yet!
+            return
+        }
+
+        if (!user) {
+            throw redirect({
+                to: '/',
+                search: { redirect: location.href },
+            })
+>>>>>>> fix-attempt-backup
         }
     },
     pendingComponent: () => <Loader />,
@@ -31,7 +47,7 @@ type navType = {
 const navigations: navType[] = [
     {
         display: "Posts",
-        path: '/posts',
+        path: '/posts/home',
         icon: <PopcornIcon height={27} />,
         value: 'posts'
     },
@@ -49,7 +65,7 @@ const navigations: navType[] = [
     },
     {
         display: "Profile",
-        path: '/profile',
+        path: '/profile/home',
         icon: <UserCircle2Icon height={27} />,
         value: 'profile'
     }

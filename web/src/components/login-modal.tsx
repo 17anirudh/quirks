@@ -16,6 +16,7 @@ import {
   FieldLabel,
 } from "@/lib/components/ui/field"
 import { Input } from "@/lib/components/ui/input"
+<<<<<<< HEAD
 import { profileSchema } from '@/types/user';
 import z from 'zod';
 import { useNavigate } from '@tanstack/react-router';
@@ -50,6 +51,47 @@ export default function LoginModal() {
     },
     onError: (error) => {
       toast.error(`${error.message} Try again`)
+=======
+import { createAccountSchema } from './signup-modal';
+import { type QueryClient, useMutation } from "@tanstack/react-query";
+import z from "zod";
+import { SUPABASE_CLIENT } from "@/hooks/utils";
+import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
+
+export const logInUserSchema = createAccountSchema.pick({
+  u_mail: true,
+  u_pass: true
+})
+
+type props = {
+  client: QueryClient
+}
+
+export default function LoginModal({ client }: props) {
+  const navigate = useNavigate()
+  const logInUser = useMutation({
+    mutationKey: ['login'],
+    mutationFn: async (values: z.infer<typeof logInUserSchema>) => {
+      const { data: authData, error: authError } = await SUPABASE_CLIENT.auth.signInWithPassword({
+        email: values.u_mail,
+        password: values.u_pass
+      })
+      if (!authData || authError) throw authError
+      return authData
+    },
+    onError: (err) => {
+      toast.error(err.message + '😅')
+      console.error(err.message)
+    },
+    onSuccess: (data) => {
+      // Manual set query
+      client.setQueryData(['auth'], data.session)
+      // Manual invalidate query
+      client.invalidateQueries({ queryKey: ['auth'] })
+      toast.success("Welcome back 🦆🦆")
+      navigate({ to: '/home', replace: true })
+>>>>>>> fix-attempt-backup
     }
   })
   const form = useForm({
@@ -58,10 +100,17 @@ export default function LoginModal() {
       u_pass: ''
     },
     validators: {
+<<<<<<< HEAD
       onSubmit: clientLogInSchema,
     },
     onSubmit: async ({ value }) => {
       logInMutation.mutate(value)
+=======
+      onSubmit: logInUserSchema,
+    },
+    onSubmit: async ({ value }) => {
+      logInUser.mutate(value)
+>>>>>>> fix-attempt-backup
     },
   })
   return (
@@ -154,6 +203,7 @@ export default function LoginModal() {
                     )
                   }}
                 />
+<<<<<<< HEAD
                 <form.Subscribe
                   selector={(state) => [state.canSubmit, state.isSubmitting]}
                   children={([canSubmit, isSubmitting]) => (
@@ -174,6 +224,27 @@ export default function LoginModal() {
                     </div>
                   )}
                 />
+=======
+                <Field orientation="horizontal">
+                  <Button
+                    className="cursor-pointer"
+                    type="button"
+                    variant="outline"
+                    onClick={() => form.reset()}
+                    disabled={logInUser.isPending} // Disable while loading
+                  >
+                    Reset
+                  </Button>
+                  <Button
+                    className="cursor-pointer"
+                    type="submit"
+                    form="login-form"
+                    disabled={logInUser.isPending} // Disable while loading
+                  >
+                    {logInUser.isPending ? "Logining in..." : "Submit"}
+                  </Button>
+                </Field>
+>>>>>>> fix-attempt-backup
               </FieldGroup>
             </form>
           </div>

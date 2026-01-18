@@ -1,14 +1,19 @@
+<<<<<<< HEAD:web/src/routes/_protected/posts.tsx
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Input } from '@/lib/components/ui/input'
 import { SearchIcon } from 'lucide-react'
 import { Button } from '@/lib/components/ui/button'
 import { useState } from 'react'
+=======
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+>>>>>>> fix-attempt-backup:web/src/routes/_protected/posts/route.tsx
 
 export const Route = createFileRoute('/_protected/posts')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+<<<<<<< HEAD:web/src/routes/_protected/posts.tsx
   const [user, setUser] = useState<string>('')
   const navigate = useNavigate()
   function search(user: string) {
@@ -34,4 +39,7 @@ function RouteComponent() {
       </form>
     </div>
   )
+=======
+  return <div><Outlet /></div>
+>>>>>>> fix-attempt-backup:web/src/routes/_protected/posts/route.tsx
 }

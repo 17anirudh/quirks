@@ -1,6 +1,10 @@
 import * as React from "react"
 import * as SwitchPrimitive from "@radix-ui/react-switch"
+<<<<<<< HEAD
 import { cn } from "@/lib/utils"
+=======
+import { cn } from '@/lib/utils'
+>>>>>>> fix-attempt-backup
 
 function Switch({
   className,

@@ -16,16 +16,25 @@ import {
     FieldLabel,
 } from "@/lib/components/ui/field"
 import { Input } from "@/lib/components/ui/input"
-import { profileSchema } from '@/types/user';
+import { profileSchema } from '@/services/user';
 import z from 'zod';
+<<<<<<< HEAD
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SUPABASE_CLIENT } from '@/hooks/variables';
+=======
+import { type QueryClient, useMutation } from '@tanstack/react-query';
+import { SUPABASE_CLIENT } from '@/hooks/utils';
+>>>>>>> fix-attempt-backup
 import { toast } from 'sonner';
 import { useNavigate } from '@tanstack/react-router';
+import Loader from './loader';
 
-const clientSignUp = profileSchema.pick({
-    u_mail: true,
+export const createAccountSchema = profileSchema.pick({
     u_qid: true,
+<<<<<<< HEAD
+=======
+    u_mail: true
+>>>>>>> fix-attempt-backup
 }).extend({
     u_pass: z
         .string()
@@ -33,6 +42,7 @@ const clientSignUp = profileSchema.pick({
         .max(300, "Your password must be atmost 300 characters")
 })
 
+<<<<<<< HEAD
 export default function SignupModal() {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
@@ -74,8 +84,48 @@ export default function SignupModal() {
         onError: (e) => {
             toast.error(`${e.message}`)
             throw new Error(e.message)
+=======
+export default function SignupModal({ client }: { client: QueryClient }) {
+    const navigate = useNavigate()
+    const createAccount = useMutation({
+        mutationFn: async (values: z.infer<typeof createAccountSchema>) => {
+            const { data: authData, error: authError } = await SUPABASE_CLIENT.auth.signUp({
+                email: values.u_mail,
+                password: values.u_pass,
+                options: {
+                    data: {
+                        u_qid: values.u_qid
+                    }
+                }
+            })
+            if (!authData || authError) throw new Error("Failed to create account")
+            if (!authData.session?.access_token) throw new Error("Failed to create account")
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/create`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${authData.session.access_token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ u_qid: values.u_qid })
+            })
+            if (!res.ok) throw new Error("Failed to create account")
+            return authData.session
         },
+        onMutate: () => (
+            <Loader />
+        ),
+        onError: (err) => {
+            toast.error(err.message + '😅')
+            throw new Error(err.message)
+>>>>>>> fix-attempt-backup
+        },
+        onSuccess: (session) => {
+            client.setQueryData(['auth'], session)
+            toast.success("Account created successfully 🦆🦆")
+            navigate({ to: '/home', replace: true })
+        }
     })
+
     const form = useForm({
         defaultValues: {
             u_qid: '',
@@ -83,10 +133,10 @@ export default function SignupModal() {
             u_pass: '',
         },
         validators: {
-            onSubmit: clientSignUp,
+            onSubmit: createAccountSchema,
         },
         onSubmit: async ({ value }) => {
-            signUpMutation.mutate(value)
+            createAccount.mutate(value)
         },
     })
     return (
@@ -211,7 +261,16 @@ export default function SignupModal() {
                                     selector={(state) => [state.canSubmit, state.isSubmitting]}
                                     children={([canSubmit, isSubmitting]) => (
                                         <div className='flex gap-3'>
+<<<<<<< HEAD
                                             <Button type="submit" variant="outline" className='cursor-pointer' disabled={!canSubmit || signUpMutation.isPending}>
+=======
+                                            <Button
+                                                type="submit"
+                                                variant="outline"
+                                                className='cursor-pointer'
+                                                disabled={!canSubmit || createAccount.isPending}
+                                            >
+>>>>>>> fix-attempt-backup
                                                 {isSubmitting ? '...' : 'Submit'}
                                             </Button>
                                             <Button
@@ -231,9 +290,15 @@ export default function SignupModal() {
                         </form>
                     </div>
                     {/* Error message */}
+<<<<<<< HEAD
                     {signUpMutation.isError && (
                         <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
                             <pre>{JSON.stringify(signUpMutation.error, null, 2)}</pre>
+=======
+                    {createAccount.isError && (
+                        <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
+                            <pre>{JSON.stringify(createAccount.error, null, 2)}</pre>
+>>>>>>> fix-attempt-backup
                         </div>
                     )}
                 </div>

@@ -1,5 +1,9 @@
 import "./message-bubble.css";
+<<<<<<< HEAD
 import { cn } from "@/lib/utils"
+=======
+import { cn } from '@/lib/utils'
+>>>>>>> fix-attempt-backup
 
 export interface MessageBubbleProps {
   message: string;

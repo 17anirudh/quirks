@@ -1,6 +1,10 @@
 import * as React from "react"
 import * as SeparatorPrimitive from "@radix-ui/react-separator"
+<<<<<<< HEAD
 import { cn } from "@/lib/utils"
+=======
+import { cn } from '@/lib/utils'
+>>>>>>> fix-attempt-backup
 
 function Separator({
   className,

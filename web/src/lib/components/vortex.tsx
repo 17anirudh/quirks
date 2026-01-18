@@ -1,4 +1,8 @@
+<<<<<<< HEAD:web/src/lib/components/ui/vortex.tsx
 import { cn } from "@/lib/utils"
+=======
+import { cn } from '@/lib/utils'
+>>>>>>> fix-attempt-backup:web/src/lib/components/vortex.tsx
 import { useEffect, useRef } from "react";
 import { createNoise3D } from "simplex-noise";
 import { motion } from "motion/react";

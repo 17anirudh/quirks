@@ -12,12 +12,21 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UserQidRouteImport } from './routes/user.$qid'
-import { Route as ProtectedProfileRouteImport } from './routes/_protected/profile'
-import { Route as ProtectedPostsRouteImport } from './routes/_protected/posts'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
+<<<<<<< HEAD
 import { Route as ProtectedChatsRouteRouteImport } from './routes/_protected/_chats/route'
 import { Route as ProtectedChatsViewRouteImport } from './routes/_protected/_chats/view'
 import { Route as ProtectedChatsThreadsRouteImport } from './routes/_protected/_chats/$threads'
+=======
+import { Route as ProtectedChatsRouteImport } from './routes/_protected/chats'
+import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/profile/route'
+import { Route as ProtectedPostsRouteRouteImport } from './routes/_protected/posts/route'
+import { Route as PostViewPidRouteImport } from './routes/post.view.$pid'
+import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
+import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
+import { Route as ProtectedPostsHomeRouteImport } from './routes/_protected/posts/home'
+import { Route as ProtectedPostsCreateRouteImport } from './routes/_protected/posts/create'
+>>>>>>> fix-attempt-backup
 
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
@@ -33,16 +42,6 @@ const UserQidRoute = UserQidRouteImport.update({
   path: '/user/$qid',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProtectedProfileRoute = ProtectedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const ProtectedPostsRoute = ProtectedPostsRouteImport.update({
-  id: '/posts',
-  path: '/posts',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
 const ProtectedHomeRoute = ProtectedHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -52,6 +51,7 @@ const ProtectedChatsRouteRoute = ProtectedChatsRouteRouteImport.update({
   id: '/_chats',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
+<<<<<<< HEAD
 const ProtectedChatsViewRoute = ProtectedChatsViewRouteImport.update({
   id: '/view',
   path: '/view',
@@ -61,42 +61,116 @@ const ProtectedChatsThreadsRoute = ProtectedChatsThreadsRouteImport.update({
   id: '/$threads',
   path: '/$threads',
   getParentRoute: () => ProtectedChatsRouteRoute,
+=======
+const ProtectedProfileRouteRoute = ProtectedProfileRouteRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const ProtectedPostsRouteRoute = ProtectedPostsRouteRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
+const PostViewPidRoute = PostViewPidRouteImport.update({
+  id: '/post/view/$pid',
+  path: '/post/view/$pid',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedProfileSettingsRoute =
+  ProtectedProfileSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => ProtectedProfileRouteRoute,
+  } as any)
+const ProtectedProfileHomeRoute = ProtectedProfileHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => ProtectedProfileRouteRoute,
+} as any)
+const ProtectedPostsHomeRoute = ProtectedPostsHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => ProtectedPostsRouteRoute,
+} as any)
+const ProtectedPostsCreateRoute = ProtectedPostsCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => ProtectedPostsRouteRoute,
+>>>>>>> fix-attempt-backup
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+<<<<<<< HEAD
+=======
+  '/posts': typeof ProtectedPostsRouteRouteWithChildren
+  '/profile': typeof ProtectedProfileRouteRouteWithChildren
+  '/chats': typeof ProtectedChatsRoute
+>>>>>>> fix-attempt-backup
   '/home': typeof ProtectedHomeRoute
-  '/posts': typeof ProtectedPostsRoute
-  '/profile': typeof ProtectedProfileRoute
   '/user/$qid': typeof UserQidRoute
+<<<<<<< HEAD
   '/$threads': typeof ProtectedChatsThreadsRoute
   '/view': typeof ProtectedChatsViewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+=======
+  '/posts/create': typeof ProtectedPostsCreateRoute
+  '/posts/home': typeof ProtectedPostsHomeRoute
+  '/profile/home': typeof ProtectedProfileHomeRoute
+  '/profile/settings': typeof ProtectedProfileSettingsRoute
+  '/post/view/$pid': typeof PostViewPidRoute
+}
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/posts': typeof ProtectedPostsRouteRouteWithChildren
+  '/profile': typeof ProtectedProfileRouteRouteWithChildren
+  '/chats': typeof ProtectedChatsRoute
+>>>>>>> fix-attempt-backup
   '/home': typeof ProtectedHomeRoute
-  '/posts': typeof ProtectedPostsRoute
-  '/profile': typeof ProtectedProfileRoute
   '/user/$qid': typeof UserQidRoute
+<<<<<<< HEAD
   '/$threads': typeof ProtectedChatsThreadsRoute
   '/view': typeof ProtectedChatsViewRoute
+=======
+  '/posts/create': typeof ProtectedPostsCreateRoute
+  '/posts/home': typeof ProtectedPostsHomeRoute
+  '/profile/home': typeof ProtectedProfileHomeRoute
+  '/profile/settings': typeof ProtectedProfileSettingsRoute
+  '/post/view/$pid': typeof PostViewPidRoute
+>>>>>>> fix-attempt-backup
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
+<<<<<<< HEAD
   '/_protected/_chats': typeof ProtectedChatsRouteRouteWithChildren
+=======
+  '/_protected/posts': typeof ProtectedPostsRouteRouteWithChildren
+  '/_protected/profile': typeof ProtectedProfileRouteRouteWithChildren
+  '/_protected/chats': typeof ProtectedChatsRoute
+>>>>>>> fix-attempt-backup
   '/_protected/home': typeof ProtectedHomeRoute
-  '/_protected/posts': typeof ProtectedPostsRoute
-  '/_protected/profile': typeof ProtectedProfileRoute
   '/user/$qid': typeof UserQidRoute
+<<<<<<< HEAD
   '/_protected/_chats/$threads': typeof ProtectedChatsThreadsRoute
   '/_protected/_chats/view': typeof ProtectedChatsViewRoute
+=======
+  '/_protected/posts/create': typeof ProtectedPostsCreateRoute
+  '/_protected/posts/home': typeof ProtectedPostsHomeRoute
+  '/_protected/profile/home': typeof ProtectedProfileHomeRoute
+  '/_protected/profile/settings': typeof ProtectedProfileSettingsRoute
+  '/post/view/$pid': typeof PostViewPidRoute
+>>>>>>> fix-attempt-backup
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+<<<<<<< HEAD
     | '/home'
     | '/posts'
     | '/profile'
@@ -112,23 +186,62 @@ export interface FileRouteTypes {
     | '/user/$qid'
     | '/$threads'
     | '/view'
+=======
+    | '/posts'
+    | '/profile'
+    | '/chats'
+    | '/home'
+    | '/user/$qid'
+    | '/posts/create'
+    | '/posts/home'
+    | '/profile/home'
+    | '/profile/settings'
+    | '/post/view/$pid'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | '/posts'
+    | '/profile'
+    | '/chats'
+    | '/home'
+    | '/user/$qid'
+    | '/posts/create'
+    | '/posts/home'
+    | '/profile/home'
+    | '/profile/settings'
+    | '/post/view/$pid'
+>>>>>>> fix-attempt-backup
   id:
     | '__root__'
     | '/'
     | '/_protected'
+<<<<<<< HEAD
     | '/_protected/_chats'
     | '/_protected/home'
+=======
+>>>>>>> fix-attempt-backup
     | '/_protected/posts'
     | '/_protected/profile'
+    | '/_protected/chats'
+    | '/_protected/home'
     | '/user/$qid'
+<<<<<<< HEAD
     | '/_protected/_chats/$threads'
     | '/_protected/_chats/view'
+=======
+    | '/_protected/posts/create'
+    | '/_protected/posts/home'
+    | '/_protected/profile/home'
+    | '/_protected/profile/settings'
+    | '/post/view/$pid'
+>>>>>>> fix-attempt-backup
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
   UserQidRoute: typeof UserQidRoute
+  PostViewPidRoute: typeof PostViewPidRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,20 +267,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserQidRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_protected/profile': {
-      id: '/_protected/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProtectedProfileRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_protected/posts': {
-      id: '/_protected/posts'
-      path: '/posts'
-      fullPath: '/posts'
-      preLoaderRoute: typeof ProtectedPostsRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
     '/_protected/home': {
       id: '/_protected/home'
       path: '/home'
@@ -182,6 +281,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedChatsRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
+<<<<<<< HEAD
     '/_protected/_chats/view': {
       id: '/_protected/_chats/view'
       path: '/view'
@@ -195,10 +295,61 @@ declare module '@tanstack/react-router' {
       fullPath: '/$threads'
       preLoaderRoute: typeof ProtectedChatsThreadsRouteImport
       parentRoute: typeof ProtectedChatsRouteRoute
+=======
+    '/_protected/profile': {
+      id: '/_protected/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProtectedProfileRouteRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/_protected/posts': {
+      id: '/_protected/posts'
+      path: '/posts'
+      fullPath: '/posts'
+      preLoaderRoute: typeof ProtectedPostsRouteRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
+    '/post/view/$pid': {
+      id: '/post/view/$pid'
+      path: '/post/view/$pid'
+      fullPath: '/post/view/$pid'
+      preLoaderRoute: typeof PostViewPidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_protected/profile/settings': {
+      id: '/_protected/profile/settings'
+      path: '/settings'
+      fullPath: '/profile/settings'
+      preLoaderRoute: typeof ProtectedProfileSettingsRouteImport
+      parentRoute: typeof ProtectedProfileRouteRoute
+    }
+    '/_protected/profile/home': {
+      id: '/_protected/profile/home'
+      path: '/home'
+      fullPath: '/profile/home'
+      preLoaderRoute: typeof ProtectedProfileHomeRouteImport
+      parentRoute: typeof ProtectedProfileRouteRoute
+    }
+    '/_protected/posts/home': {
+      id: '/_protected/posts/home'
+      path: '/home'
+      fullPath: '/posts/home'
+      preLoaderRoute: typeof ProtectedPostsHomeRouteImport
+      parentRoute: typeof ProtectedPostsRouteRoute
+    }
+    '/_protected/posts/create': {
+      id: '/_protected/posts/create'
+      path: '/create'
+      fullPath: '/posts/create'
+      preLoaderRoute: typeof ProtectedPostsCreateRouteImport
+      parentRoute: typeof ProtectedPostsRouteRoute
+>>>>>>> fix-attempt-backup
     }
   }
 }
 
+<<<<<<< HEAD
 interface ProtectedChatsRouteRouteChildren {
   ProtectedChatsThreadsRoute: typeof ProtectedChatsThreadsRoute
   ProtectedChatsViewRoute: typeof ProtectedChatsViewRoute
@@ -214,16 +365,52 @@ const ProtectedChatsRouteRouteWithChildren =
 
 interface ProtectedRouteRouteChildren {
   ProtectedChatsRouteRoute: typeof ProtectedChatsRouteRouteWithChildren
+=======
+interface ProtectedPostsRouteRouteChildren {
+  ProtectedPostsCreateRoute: typeof ProtectedPostsCreateRoute
+  ProtectedPostsHomeRoute: typeof ProtectedPostsHomeRoute
+}
+
+const ProtectedPostsRouteRouteChildren: ProtectedPostsRouteRouteChildren = {
+  ProtectedPostsCreateRoute: ProtectedPostsCreateRoute,
+  ProtectedPostsHomeRoute: ProtectedPostsHomeRoute,
+}
+
+const ProtectedPostsRouteRouteWithChildren =
+  ProtectedPostsRouteRoute._addFileChildren(ProtectedPostsRouteRouteChildren)
+
+interface ProtectedProfileRouteRouteChildren {
+  ProtectedProfileHomeRoute: typeof ProtectedProfileHomeRoute
+  ProtectedProfileSettingsRoute: typeof ProtectedProfileSettingsRoute
+}
+
+const ProtectedProfileRouteRouteChildren: ProtectedProfileRouteRouteChildren = {
+  ProtectedProfileHomeRoute: ProtectedProfileHomeRoute,
+  ProtectedProfileSettingsRoute: ProtectedProfileSettingsRoute,
+}
+
+const ProtectedProfileRouteRouteWithChildren =
+  ProtectedProfileRouteRoute._addFileChildren(
+    ProtectedProfileRouteRouteChildren,
+  )
+
+interface ProtectedRouteRouteChildren {
+  ProtectedPostsRouteRoute: typeof ProtectedPostsRouteRouteWithChildren
+  ProtectedProfileRouteRoute: typeof ProtectedProfileRouteRouteWithChildren
+  ProtectedChatsRoute: typeof ProtectedChatsRoute
+>>>>>>> fix-attempt-backup
   ProtectedHomeRoute: typeof ProtectedHomeRoute
-  ProtectedPostsRoute: typeof ProtectedPostsRoute
-  ProtectedProfileRoute: typeof ProtectedProfileRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
+<<<<<<< HEAD
   ProtectedChatsRouteRoute: ProtectedChatsRouteRouteWithChildren,
+=======
+  ProtectedPostsRouteRoute: ProtectedPostsRouteRouteWithChildren,
+  ProtectedProfileRouteRoute: ProtectedProfileRouteRouteWithChildren,
+  ProtectedChatsRoute: ProtectedChatsRoute,
+>>>>>>> fix-attempt-backup
   ProtectedHomeRoute: ProtectedHomeRoute,
-  ProtectedPostsRoute: ProtectedPostsRoute,
-  ProtectedProfileRoute: ProtectedProfileRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
@@ -234,6 +421,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
   UserQidRoute: UserQidRoute,
+  PostViewPidRoute: PostViewPidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

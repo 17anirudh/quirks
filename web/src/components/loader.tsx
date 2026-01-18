@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 import './loader.css';
 
 export default function Loader() {
     return (
         <div className="h-screen w-screen flex flex-col justify-center items-center bg-black">
+=======
+import './loader.css'
+
+export default function Loader() {
+    return (
+        <div className="h-screen w-screen flex flex-col justify-center items-center bg-black z-20">
+>>>>>>> fix-attempt-backup
             {/* <!-- From Uiverse.io by vinodjangid07 --> */}
             <div className="loader">
                 <div className="truckWrapper">
@@ -130,8 +138,14 @@ h78.747C231.693,100.736,232.77,106.162,232.77,111.694z"
                         ></path>
                     </svg>
                 </div>
+<<<<<<< HEAD
             </div>
 
         </div>
+=======
+                <p className='animate-pulse text-2xl font-semibold tracking-tight'>Loading...</p>
+            </div>
+        </div >
+>>>>>>> fix-attempt-backup
     )
 }
