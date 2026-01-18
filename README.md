@@ -1,6 +1,6 @@
 # Quirks
 
-!['mascot'](/web/public/duck.gif){width="20"} __Quak.. Quak..__
+<img src="web/public/duck.gif" width="20" />
 
 Social Applications are meant to network and meet people rather, it has become algorithm optimized content driven application. Quirks is built as an alternative to make people-driven social app with forced cooldown and encouraged (not forced) conversations.
 
