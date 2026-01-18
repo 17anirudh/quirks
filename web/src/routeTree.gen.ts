@@ -12,11 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UserQidRouteImport } from './routes/user.$qid'
+import { Route as PPidRouteImport } from './routes/p.$pid'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedChatsRouteImport } from './routes/_protected/chats'
 import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/profile/route'
 import { Route as ProtectedPostsRouteRouteImport } from './routes/_protected/posts/route'
-import { Route as PostViewPidRouteImport } from './routes/post.view.$pid'
 import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
 import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
 import { Route as ProtectedPostsHomeRouteImport } from './routes/_protected/posts/home'
@@ -34,6 +34,11 @@ const IndexRoute = IndexRouteImport.update({
 const UserQidRoute = UserQidRouteImport.update({
   id: '/user/$qid',
   path: '/user/$qid',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PPidRoute = PPidRouteImport.update({
+  id: '/p/$pid',
+  path: '/p/$pid',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedHomeRoute = ProtectedHomeRouteImport.update({
@@ -55,11 +60,6 @@ const ProtectedPostsRouteRoute = ProtectedPostsRouteRouteImport.update({
   id: '/posts',
   path: '/posts',
   getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const PostViewPidRoute = PostViewPidRouteImport.update({
-  id: '/post/view/$pid',
-  path: '/post/view/$pid',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ProtectedProfileSettingsRoute =
   ProtectedProfileSettingsRouteImport.update({
@@ -89,12 +89,12 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
+  '/p/$pid': typeof PPidRoute
   '/user/$qid': typeof UserQidRoute
   '/posts/create': typeof ProtectedPostsCreateRoute
   '/posts/home': typeof ProtectedPostsHomeRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
-  '/post/view/$pid': typeof PostViewPidRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,12 +102,12 @@ export interface FileRoutesByTo {
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/chats': typeof ProtectedChatsRoute
   '/home': typeof ProtectedHomeRoute
+  '/p/$pid': typeof PPidRoute
   '/user/$qid': typeof UserQidRoute
   '/posts/create': typeof ProtectedPostsCreateRoute
   '/posts/home': typeof ProtectedPostsHomeRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
-  '/post/view/$pid': typeof PostViewPidRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -117,12 +117,12 @@ export interface FileRoutesById {
   '/_protected/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/_protected/chats': typeof ProtectedChatsRoute
   '/_protected/home': typeof ProtectedHomeRoute
+  '/p/$pid': typeof PPidRoute
   '/user/$qid': typeof UserQidRoute
   '/_protected/posts/create': typeof ProtectedPostsCreateRoute
   '/_protected/posts/home': typeof ProtectedPostsHomeRoute
   '/_protected/profile/home': typeof ProtectedProfileHomeRoute
   '/_protected/profile/settings': typeof ProtectedProfileSettingsRoute
-  '/post/view/$pid': typeof PostViewPidRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -132,12 +132,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/chats'
     | '/home'
+    | '/p/$pid'
     | '/user/$qid'
     | '/posts/create'
     | '/posts/home'
     | '/profile/home'
     | '/profile/settings'
-    | '/post/view/$pid'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -145,12 +145,12 @@ export interface FileRouteTypes {
     | '/profile'
     | '/chats'
     | '/home'
+    | '/p/$pid'
     | '/user/$qid'
     | '/posts/create'
     | '/posts/home'
     | '/profile/home'
     | '/profile/settings'
-    | '/post/view/$pid'
   id:
     | '__root__'
     | '/'
@@ -159,19 +159,19 @@ export interface FileRouteTypes {
     | '/_protected/profile'
     | '/_protected/chats'
     | '/_protected/home'
+    | '/p/$pid'
     | '/user/$qid'
     | '/_protected/posts/create'
     | '/_protected/posts/home'
     | '/_protected/profile/home'
     | '/_protected/profile/settings'
-    | '/post/view/$pid'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
+  PPidRoute: typeof PPidRoute
   UserQidRoute: typeof UserQidRoute
-  PostViewPidRoute: typeof PostViewPidRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -195,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/user/$qid'
       fullPath: '/user/$qid'
       preLoaderRoute: typeof UserQidRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/p/$pid': {
+      id: '/p/$pid'
+      path: '/p/$pid'
+      fullPath: '/p/$pid'
+      preLoaderRoute: typeof PPidRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_protected/home': {
@@ -224,13 +231,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/posts'
       preLoaderRoute: typeof ProtectedPostsRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
-    }
-    '/post/view/$pid': {
-      id: '/post/view/$pid'
-      path: '/post/view/$pid'
-      fullPath: '/post/view/$pid'
-      preLoaderRoute: typeof PostViewPidRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_protected/profile/settings': {
       id: '/_protected/profile/settings'
@@ -312,8 +312,8 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
+  PPidRoute: PPidRoute,
   UserQidRoute: UserQidRoute,
-  PostViewPidRoute: PostViewPidRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

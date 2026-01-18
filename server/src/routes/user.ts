@@ -76,10 +76,23 @@ export const users = new Elysia({ prefix: '/user' })
                 return { error: 'User not found' };
             }
 
+            const { data: postData, error: postError } = await CLIENT
+                .from('post')
+                .select('*')
+                .eq('p_author_qid', id)
+                .order('created_at', { ascending: false })
+                .limit(20)
+
+            if (postError) {
+                console.error('Supabase error:', postError);
+                set.status = 500;
+                return { error: 'Internal server error' };
+            }
+
             set.status = 200;
             set.headers['Cache-Control'] = 'public, max-age=300, s-maxage=3600'; // cache 5 min browser / 1h edge/CDN
 
-            return data;
+            return { ...data, posts: postData };
         }
         catch (err) {
             console.error('Unexpected error in /user/search:', err);

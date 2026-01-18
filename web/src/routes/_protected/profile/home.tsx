@@ -1,12 +1,24 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import Loader from '@/components/loader'
 import { PlusCircleIcon, WrenchIcon } from 'lucide-react'
+import PostCard from '@/components/post-card'
 
 type res = {
   u_qid: string | null,
   u_name: string | null,
   u_bio: string | null,
-  u_pfp: string | null
+  u_pfp: string | null,
+  posts: [
+    {
+      p_id: string | null,
+      p_author_qid: string | null,
+      p_text: string | null,
+      p_likes_count: number | null,
+      p_comments_count: number | null,
+      created_at: string | Date | null,
+      p_url: string | null
+    }
+  ]
 }
 
 
@@ -27,7 +39,6 @@ export const Route = createFileRoute('/_protected/profile/home')({
 
 function RouteComponent() {
   const ctx = Route.useLoaderData() as res
-  console.log(ctx)
   return (
     <div className="w-full p-4 flex flex-col gap-5 justify-center items-center">
       {/* Profile Card */}
@@ -72,6 +83,13 @@ function RouteComponent() {
           <PlusCircleIcon />
           Create Post
         </Link>
+      </div>
+
+      {/* Posts */}
+      <div className='w-full flex flex-col gap-2 justify-center items-center'>
+        {ctx.posts.map((post, index) => (
+          <PostCard key={index} p_id={post.p_id} p_author_qid={post.p_author_qid} p_text={post.p_text} p_likes_count={post.p_likes_count} p_comments_count={post.p_comments_count} created_at={post.created_at} p_url={post.p_url} u_pfp={ctx.u_pfp} />
+        ))}
       </div>
     </div>
   )
