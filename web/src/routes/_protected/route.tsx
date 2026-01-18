@@ -38,7 +38,7 @@ type navType = {
 const navigations: navType[] = [
     {
         display: "Posts",
-        path: '/posts',
+        path: '/posts/home',
         icon: <PopcornIcon height={27} />,
         value: 'posts'
     },

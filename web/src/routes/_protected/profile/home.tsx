@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import Loader from '@/components/loader'
+import { PlusCircleIcon, WrenchIcon } from 'lucide-react'
 
 type res = {
   u_qid: string | null,
@@ -62,7 +63,16 @@ function RouteComponent() {
           </p>
         </article>
       </div>
-      <Link to='/profile/settings'>Settings</Link>
+      <div className='flex gap-2 flex-wrap'>
+        <Link className='flex flex-wrap gap-2' to='/profile/settings'>
+          <WrenchIcon />
+          Settings
+        </Link>
+        <Link className='flex flex-wrap gap-2' to='/posts/create'>
+          <PlusCircleIcon />
+          Create Post
+        </Link>
+      </div>
     </div>
   )
 }
