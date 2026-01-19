@@ -51,8 +51,6 @@ export default function LoginModal({ client }: props) {
     onSuccess: (data) => {
       // Manual set query
       client.setQueryData(['auth'], data.session)
-      // Manual invalidate query
-      client.invalidateQueries({ queryKey: ['auth'] })
       toast.success("Welcome back 🦆🦆")
       navigate({ to: '/home', replace: true })
     }

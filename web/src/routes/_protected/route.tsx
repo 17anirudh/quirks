@@ -10,14 +10,14 @@ import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/_protected')({
     beforeLoad: ({ context, location }) => {
-        const { user, isLoading } = context.auth   // ← from useAuth() which uses the query`
+        const { session, isLoading } = context.auth   // ← from useAuth() which uses the query`
         // This is the critical part you probably forgot:
         if (isLoading) {
             // ← Do NOTHING here — don't redirect yet!
             return
         }
 
-        if (!user) {
+        if (!session) {
             throw redirect({
                 to: '/',
                 search: { redirect: location.href },

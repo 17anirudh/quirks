@@ -1,18 +1,19 @@
 import { SmileIcon, MessageCircleMore, EarthIcon, CheckIcon } from "lucide-react";
 import { Button } from "@/lib/components/ui/button";
-import { useState } from "react";
 import { toast } from "sonner";
 
 type props = {
     key: number
-    p_id: string | null,
-    p_author_qid: string | null,
-    p_text: string | null,
-    p_likes_count: number | null,
-    p_comments_count: number | null,
-    created_at: string | Date | null,
-    p_url: string | null
-    u_pfp: string | null
+    post: {
+        p_id: string | null,
+        p_author_qid: string | null,
+        p_text: string | null,
+        p_likes_count: number | null,
+        p_comments_count: number | null,
+        created_at: string | null,
+        p_url: string | null
+        p_author_pfp: string | null
+    }
 }
 
 const MONTHS = [
@@ -32,10 +33,11 @@ function formatDayMonthName(isoDate: string): string {
     return `${day} ${monthName}`;
 }
 
-export default function PostCard({ key, p_id, p_author_qid, p_text, p_likes_count, p_comments_count, created_at, p_url, u_pfp }: props) {
+export default function PostCard({ key, post }: props) {
+
     async function copyLink(): Promise<void> {
         if (typeof window === 'undefined') return;
-        const url = `${window.location.origin}/p/${p_id}`;
+        const url = `${window.location.origin}/p/${post.p_id}`;
         if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(url);
             toast.success(`Link copied to clipboard 🔗`)
@@ -49,8 +51,8 @@ export default function PostCard({ key, p_id, p_author_qid, p_text, p_likes_coun
                 {/* Profile photo */}
                 <div className="w-18 h-18 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
                     <img
-                        src={u_pfp || "/pfp.webp"}
-                        alt={p_author_qid ? `${p_author_qid} profile photo` : "profile picture"}
+                        src={post.p_author_pfp || "/pfp.webp"}
+                        alt={post.p_author_qid ? `${post.p_author_qid} profile photo` : "profile picture"}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
                     />
@@ -59,19 +61,19 @@ export default function PostCard({ key, p_id, p_author_qid, p_text, p_likes_coun
                 <div className="flex flex-col">
                     {/* Qid */}
                     <h4 className="scroll-m-20 text-xl tracking-tight">
-                        @{p_author_qid}
+                        @{post.p_author_qid}
                     </h4>
                     {/* Time */}
                     <h4 className="scroll-m-20 tracking-tight">
-                        {formatDayMonthName(created_at!.toLocaleString()) || 'Recently uploaded'}
+                        {formatDayMonthName(post.created_at!.toLocaleString()) || 'Recently uploaded'}
                     </h4>
                 </div>
             </div>
             {/* Post Image */}
-            {p_url && (
+            {post.p_url && (
                 <div className="w-10/12 sm:w-8/12 aspect-rectangle border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
                     <img
-                        src={p_url}
+                        src={post.p_url}
                         alt={key + 'post image'}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
@@ -80,17 +82,17 @@ export default function PostCard({ key, p_id, p_author_qid, p_text, p_likes_coun
             )}
             {/* Content */}
             <p className="leading-7 [&:not(:first-child)]:mt-6 break-words whitespace-normal overflow-hidden w-10/12">
-                {p_text}
+                {post.p_text}
             </p>
             {/* Interactions */}
             <div className="flex gap-4 flex-wrap mt-3 items-center">
                 {/* Likes */}
                 <span className="flex gap-2 flex-wrap">
-                    <SmileIcon /> {p_likes_count}
+                    <SmileIcon /> {post.p_likes_count}
                 </span>
                 {/* Comments */}
                 <span className="flex gap-2 flex-wrap">
-                    <MessageCircleMore /> {p_comments_count}
+                    <MessageCircleMore /> {post.p_comments_count}
                 </span>
                 {/* Share */}
                 <Button

@@ -59,7 +59,7 @@ export default function PfpForm({ client, qid, loading }: props) {
             return res.json()
         },
         onSuccess: () => {
-            client.invalidateQueries({ queryKey: ['user', qid] })
+            client.invalidateQueries({ queryKey: ['me'] })
             toast.success("Pfp uploaded")
             setBlobURL(null)
             setNewPfp(null)

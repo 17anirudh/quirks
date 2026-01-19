@@ -2,7 +2,7 @@ import { Elysia, t } from "elysia";
 import { CLIENT } from "../supabase/config";
 
 export const users = new Elysia({ prefix: '/user' })
-
+    // Create account
     .post("/create", async ({ body, headers, set }) => {
         const authHeader = headers.authorization;
 
@@ -53,59 +53,129 @@ export const users = new Elysia({ prefix: '/user' })
             }),
         }
     )
-    .get('/search/:id', async ({ params: { id }, set }) => {
+    // View Own profile
+    .get('/me', async ({ headers, set }) => {
+        const { id } = headers;
         if (!id || typeof id !== 'string' || id.length < 4) {
             set.status = 400;
             return { error: 'Invalid or missing qid' };
         }
-        try {
-            const { data, error } = await CLIENT
-                .from('profile')
-                .select('u_qid, u_name, u_bio, u_pfp')
-                .eq('u_qid', id)
-                .maybeSingle();
+        const { data: profileData, error: profileError } = await CLIENT
+            .from('profile')
+            .select('u_qid, u_bio, u_pfp, u_name')
+            .eq('u_qid', id)
+            .maybeSingle();
 
-            if (error) {
-                console.error('Supabase error:', error);
-                set.status = 500;
-                return { error: 'Internal server error' };
-            }
-
-            if (!data) {
-                set.status = 404;
-                return { error: 'User not found' };
-            }
-
-            const { data: postData, error: postError } = await CLIENT
-                .from('post')
-                .select('*')
-                .eq('p_author_qid', id)
-                .order('created_at', { ascending: false })
-                .limit(20)
-
-            if (postError) {
-                console.error('Supabase error:', postError);
-                set.status = 500;
-                return { error: 'Internal server error' };
-            }
-
-            set.status = 200;
-            set.headers['Cache-Control'] = 'public, max-age=300, s-maxage=3600'; // cache 5 min browser / 1h edge/CDN
-
-            return { ...data, posts: postData };
+        if (profileError) {
+            set.status = 500;
+            return { error: profileError.message || "Database Error" };
         }
-        catch (err) {
-            console.error('Unexpected error in /user/search:', err);
+
+        if (!profileData) {
+            set.status = 404;
+            return { error: "User not found" }
+        }
+
+        const { data: postData, error: postError } = await CLIENT
+            .from('post')
+            .select('*')
+            .eq('p_author_qid', id)
+            .order('created_at', { ascending: false })
+            .limit(20)
+
+        if (postError) {
+            console.error('Supabase error:', postError);
             set.status = 500;
             return { error: 'Internal server error' };
         }
+
+        const { data: relationData, error: relationError } = await CLIENT
+            .from('friendship')
+            .select('*')
+            .eq('fs_status', 'friends')
+            .or(`sent_qid.eq.${id},receive_qid.eq.${id}`)
+            .limit(20)
+
+        if (relationError) {
+            set.status = 500;
+            return { error: relationError.message || "Database Error" }
+        }
+
+        set.status = 200;
+        return { user: profileData, posts: postData, relations: relationData };
     },
         {
-            params: t.Object({
+            headers: t.Object({
                 id: t.String({ minLength: 4, maxLength: 200 })
             })
         }
     )
+    // Public View
+    .get('/u/:search', async ({ params: { search }, set, headers }) => {
+        if (!search) {
+            set.status = 400;
+            return { error: "Required param missing" }
+        }
+        const { data: userData, error: userError } = await CLIENT
+            .from('profile')
+            .select('*')
+            .eq('u_qid', search)
+            .maybeSingle()
+
+        if (userError) {
+            set.status = 500;
+            return { error: userError?.message || "Database Error" }
+        }
+        if (!userData) {
+            set.status = 404;
+            return { error: "User not found" }
+        }
+        const { data: postData, error: postError } = await CLIENT
+            .from('post')
+            .select('*')
+            .eq('p_author_qid', search)
+            .order('p_created_at', { ascending: false })
+            .limit(20)
+
+        if (postError) {
+            set.status = 500;
+            return { error: postError?.message || "Database Error" }
+        }
+
+        const viewer = headers.viewer
+        if (viewer && viewer!.length > 3) {
+            const { data: relationData, error: relationError } = await CLIENT
+                .from('friendship')
+                .select('*')
+                .or(
+                    `and(sent_qid.eq.${viewer},receive_qid.eq.${search}),
+                    and(sent_qid.eq.${search},receive_qid.eq.${viewer})`
+                )
+                .maybeSingle()
+
+            if (relationError) {
+                set.status = 500;
+                return { error: relationError.message || "Database Error" }
+            }
+
+            set.status = 200;
+            return { user: userData, post: postData, relation: relationData }
+        }
+        else {
+            set.status = 200;
+            return { user: userData, post: postData }
+        }
+    },
+        {
+            params: t.Object({
+                search: t.String({ minLength: 4, maxLength: 400 }),
+            }),
+            headers: t.Object({
+                viewer: t.Optional(t.String({ minLength: 4, maxLength: 200 }))
+            })
+        }
+    )
+    // Delete account
     .delete('/delete', async ({ set, headers }) => {
         const authHeader = headers.authorization;
 
@@ -130,6 +200,7 @@ export const users = new Elysia({ prefix: '/user' })
         }
     },
     )
+    // Upload pfp
     .post("/upload-pfp/:qid", async ({ params, body, set }) => {
         const file = body.file as File
         if (!file) {

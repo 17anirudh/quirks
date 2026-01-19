@@ -22,27 +22,26 @@ import { Label } from '@/lib/components/ui/label'
 import { Input } from '@/lib/components/ui/input'
 import PfpForm from '@/components/pfpForm'
 
-export const Route = createFileRoute('/_protected/profile/settings')({
-  loader: async ({ context }) => {
-    const qid = context.auth.session?.user.user_metadata.u_qid
-    return context.queryClient.ensureQueryData({
-      queryKey: ['user', qid],
-      queryFn: async () => {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`)
-        // console.log(`${import.meta.env.VITE_BACKEND_URL}/user/search/${qid}`)
-        return await res.json() as res
-      }
-    })
+type queryResponse = {
+  user: {
+    u_qid: string | null,
+    u_bio: string | null,
+    u_pfp: string | null,
+    u_name: string | null
   },
-  pendingComponent: () => <Loader />,
-  component: RouteComponent,
-})
-
-type res = {
-  u_qid: string | null,
-  u_name: string | null,
-  u_bio: string | null,
-  u_pfp: string | null
+  posts: [
+    {
+      p_id: string | null,
+      p_author_qid: string | null,
+      p_text: string | null,
+      p_likes_count: number | null,
+      p_comments_count: number | null,
+      created_at: string | null,
+      p_url: string | null
+      p_author_pfp: string | null
+    }
+  ],
+  relations: Array<any | null>
 }
 type tabsType = {
   title: string;
@@ -50,11 +49,20 @@ type tabsType = {
   content: ReactNode;
 }
 
+export const Route = createFileRoute('/_protected/profile/settings')({
+  loader: async ({ context }) => {
+    return context.queryClient.getQueryData(['me'])
+  },
+  pendingComponent: () => <Loader />,
+  component: RouteComponent,
+})
+
+
+
 function RouteComponent() {
   const navigate = useNavigate()
-  const ctx = Route.useRouteContext()
-  const loadInfo = Route.useLoaderData() as res
-  const [q, qid] = [ctx.queryClient, ctx.auth.session?.user.user_metadata.u_qid]
+  const ctx = Route.useLoaderData() as queryResponse
+  const qClient = Route.useRouteContext().queryClient
 
   const id = useId()
   const [inputValue, setInputValue] = useState<string>('')
@@ -70,7 +78,7 @@ function RouteComponent() {
       throw new Error(err.message)
     },
     onSuccess: () => {
-      q.invalidateQueries({ queryKey: ['auth'] })
+      qClient.clear()
       toast.info("Stay safe, see you again 😀")
       navigate({ to: '/', replace: true })
     }
@@ -84,7 +92,7 @@ function RouteComponent() {
         <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black dark:text-white bg-white dark:bg-black">
           <p>Account Settings</p>
           {/* Pfp Upload */}
-          <PfpForm loading={loadInfo!} client={q!} qid={qid!} />
+          <PfpForm loading={ctx.user!} client={qClient} qid={ctx.user.u_qid!} />
           {/* Log out */}
           <div>
             <Button
@@ -114,7 +122,7 @@ function RouteComponent() {
                     Final confirmation
                   </DialogTitle>
                   <DialogDescription className="sm:text-center">
-                    This action cannot be undone. To confirm, please enter your qid <span className="text-red-500">{qid}</span>.
+                    This action cannot be undone. To confirm, please enter your qid <span className="text-red-500">{ctx.user.u_qid}</span>.
                   </DialogDescription>
                 </DialogHeader>
               </div>
@@ -124,7 +132,7 @@ function RouteComponent() {
                   <Input
                     id={id}
                     type="text"
-                    placeholder={`Type ${qid} to confirm`}
+                    placeholder={`Type ${ctx.user.u_qid} to confirm`}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                   />
@@ -139,7 +147,7 @@ function RouteComponent() {
                     type="button"
                     variant="destructive"
                     className="flex-1"
-                    disabled={inputValue !== qid}
+                    disabled={inputValue !== ctx.user.u_qid}
                   >
                     Delete
                   </Button>
