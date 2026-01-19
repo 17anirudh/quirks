@@ -1,9 +1,8 @@
-import { SmileIcon, MessageCircleMore, EarthIcon, CheckIcon } from "lucide-react";
+import { SmileIcon, MessageCircleMore, EarthIcon } from "lucide-react";
 import { Button } from "@/lib/components/ui/button";
 import { toast } from "sonner";
 
 type props = {
-    key: number
     post: {
         p_id: string | null,
         p_author_qid: string | null,
@@ -33,7 +32,7 @@ function formatDayMonthName(isoDate: string): string {
     return `${day} ${monthName}`;
 }
 
-export default function PostCard({ key, post }: props) {
+export default function PostCard({ post }: props) {
 
     async function copyLink(): Promise<void> {
         if (typeof window === 'undefined') return;
@@ -46,7 +45,7 @@ export default function PostCard({ key, post }: props) {
     }
 
     return (
-        <div className="flex flex-col gap-2 border-2 p-5 w-11/12 sm:w-8/12 mb-10" key={key}>
+        <div className="flex flex-col gap-2 border-2 p-5 w-11/12 sm:w-8/12 mb-10">
             <div className="flex flex-wrap gap-3">
                 {/* Profile photo */}
                 <div className="w-18 h-18 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
@@ -74,7 +73,7 @@ export default function PostCard({ key, post }: props) {
                 <div className="w-10/12 sm:w-8/12 aspect-rectangle border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
                     <img
                         src={post.p_url}
-                        alt={key + 'post image'}
+                        alt={'post image'}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
                     />

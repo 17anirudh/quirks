@@ -9,7 +9,6 @@ import { NotFound } from '@/components/404'
 import { ErrorComponent } from '@/components/400'
 import { useAuth } from '@/hooks/auth-provider'
 import Loader from '@/components/loader'
-import { Suspense } from 'react'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -21,15 +20,12 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     const { isLoading } = useAuth()
     return (
       <>
-
         <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <Toaster richColors closeButton position='top-right' />
           {isLoading ? (
             <Loader />
           ) : (
-            <Suspense fallback={<Loader />}>
-              <Outlet />
-            </Suspense>
+            <Outlet />
           )}
         </ThemeProvider>
         <TanStackDevtools

@@ -32,10 +32,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             return session
         },
         // These help reduce flashes / unnecessary refetches
-        staleTime: 30 * 1000,          // consider fresh for 30 seconds
-        gcTime: 5 * 60 * 1000,         // keep in cache 5 min
+        staleTime: Infinity,
+        gcTime: Infinity,
         retry: false,                  // don't retry on auth errors
-        refetchOnWindowFocus: false,   // optional — prevent extra calls
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false   // optional — prevent extra calls
     })
 
     // Listen for auth state changes (login, logout, token refresh, etc.)
@@ -48,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [queryClient])
 
     const user = data?.user ?? null
-    const qid = user?.user_metadata?.qid as string | undefined ?? null
+    const qid = data?.user.user_metadata.u_qid as string | null | undefined
 
     const value: AuthContextValue = {
         user,
@@ -76,8 +77,9 @@ export function useSignOut() {
     return useMutation({
         mutationFn: () => SUPABASE_CLIENT.auth.signOut(),
         onSuccess: () => {
-            queryClient.setQueryData(AUTH_QUERY_KEY, null)
-            queryClient.invalidateQueries({ queryKey: ['auth'] })
+            // queryClient.setQueryData(AUTH_QUERY_KEY, null)
+            // queryClient.invalidateQueries({ queryKey: ['auth'] })
+            queryClient.clear()
             navigate({ to: '/', replace: true })
             toast.info('Signed out successfully')
         },

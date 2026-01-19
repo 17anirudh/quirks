@@ -21,6 +21,7 @@ import {
 import { Label } from '@/lib/components/ui/label'
 import { Input } from '@/lib/components/ui/input'
 import PfpForm from '@/components/pfpForm'
+import { useSignOut } from '@/hooks/auth-provider'
 
 type queryResponse = {
   user: {
@@ -60,29 +61,14 @@ export const Route = createFileRoute('/_protected/profile/settings')({
 
 
 function RouteComponent() {
-  const navigate = useNavigate()
   const ctx = Route.useLoaderData() as queryResponse
   const qClient = Route.useRouteContext().queryClient
 
   const id = useId()
   const [inputValue, setInputValue] = useState<string>('')
 
+  const signOut = useSignOut()
   // Log out logic
-  const byeAccount = useMutation({
-    mutationFn: async () => {
-      const { error: authError } = await SUPABASE_CLIENT.auth.signOut()
-      if (authError) throw authError
-    },
-    onError: (err) => {
-      toast.error(err.message + '😅')
-      throw new Error(err.message)
-    },
-    onSuccess: () => {
-      qClient.clear()
-      toast.info("Stay safe, see you again 😀")
-      navigate({ to: '/', replace: true })
-    }
-  })
 
   const tabs: tabsType[] = [
     {
@@ -96,7 +82,7 @@ function RouteComponent() {
           {/* Log out */}
           <div>
             <Button
-              onClick={() => byeAccount.mutate()}
+              onClick={() => signOut.mutate()}
               className='cursor-pointer'
             >
               <LogOutIcon /> <span>Log Out</span>

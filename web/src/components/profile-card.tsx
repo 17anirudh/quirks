@@ -26,7 +26,7 @@ export default function ProfileCard({ information }: props) {
     return (
         <div className='flex flex-col gap-5 p-5 border items-start w-11/12 h-full'>
             {/* qid */}
-            <h2 id="id" className="text-center scroll-m-20 mb-5 pb-2 text-3xl font-semibold tracking-tight first:mt-0">{information ? `@${information.user.u_qid}` : ''}</h2>
+            <h2 id="id" className="text-center scroll-m-20 mb-5 pb-2 text-3xl font-semibold tracking-tight first:mt-0">{`@${information.user.u_qid}` || ''}</h2>
             {/* image, posts, Friends */}
             <div className="flex flex-wrap gap-4 justify-center items-center sm:gap-9">
                 <div className="w-28 h-28 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
@@ -41,11 +41,11 @@ export default function ProfileCard({ information }: props) {
                 <div className="flex-col gap-5">
                     <h3 className="capitalize scroll-m-20 text-2xl font-semibold tracking-tight">{information ? information.user.u_name : ''}</h3>
                     <div className="flex flex-wrap gap-2">
-                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information ? information.posts.length : 0}</h4>
+                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information?.posts?.length || 0}</h4>
                         <h4 className="scroll-m-20 text-xl font-light tracking-tight">Posts</h4>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information.relations.length}</h4>
+                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information.relations ? information?.relations?.length : 0}</h4>
                         <h4 className="scroll-m-20 text-xl font-light tracking-tight">Friends</h4>
                     </div>
                 </div>
@@ -53,7 +53,7 @@ export default function ProfileCard({ information }: props) {
             <article className='w-full flex'>
                 <p className="min-w-0 break-words whitespace-normal overflow-hidden">
                     {information.user.u_bio ? information.user.u_bio : (
-                        <p className="text-muted text-primary">Add some bio....</p>
+                        <p className="text-muted text-secondary">Add some bio....</p>
                     )}
                 </p>
             </article>

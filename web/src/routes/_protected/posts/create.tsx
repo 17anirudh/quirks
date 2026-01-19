@@ -15,27 +15,31 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '@/lib/components/ui/button'
 import { useMutation } from '@tanstack/react-query'
 
-type res = {
-  u_qid: string | null,
-  u_name: string | null,
-  u_bio: string | null,
-  u_pfp: string | null
+type queryResponse = {
+  user: {
+    u_qid: string | null,
+    u_bio: string | null,
+    u_pfp: string | null,
+    u_name: string | null
+  },
+  posts: [
+    {
+      p_id: string | null,
+      p_author_qid: string | null,
+      p_text: string | null,
+      p_likes_count: number | null,
+      p_comments_count: number | null,
+      created_at: string | null,
+      p_url: string | null
+      p_author_pfp: string | null
+    }
+  ],
+  relations: Array<any | null>
 }
 
 export const Route = createFileRoute('/_protected/posts/create')({
   loader: ({ context }) => {
-    const qid = context.auth.session?.user.user_metadata.u_qid
-    return context.queryClient.ensureQueryData({
-      queryKey: ['user', qid],
-      queryFn: async () => {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/user/search/${qid}`)
-        const data = await response.json()
-        if (!data || !response.ok) {
-          throw new Error("Failed to fetch data")
-        }
-        return data
-      }
-    })
+    return context.queryClient.getQueryData(['me'])
   },
   pendingComponent: () => <Loader />,
   component: RouteComponent,
@@ -51,14 +55,14 @@ const postSchema = z.object({
 
 function RouteComponent() {
   const navigate = useNavigate()
-  const res: res = Route.useLoaderData()
-  const qid: string = Route.useRouteContext().auth.session?.user.user_metadata.u_qid
+  const res = Route.useLoaderData() as queryResponse
+  const queryClient = Route.useRouteContext().queryClient
   const uploadForm = useMutation({
     mutationKey: ['post'],
     mutationFn: async (values: z.infer<typeof postSchema>) => {
       if (!values.p_image) {
         const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_URL}/post/create/${qid}`,
+          `${import.meta.env.VITE_BACKEND_URL}/post/create/${res.user.u_qid}`,
           {
             method: "POST",
             headers: {
@@ -66,6 +70,7 @@ function RouteComponent() {
             },
             body: JSON.stringify({
               p_text: values.p_text,
+              p_author_pfp: res.user.u_pfp
             }),
           }
         )
@@ -77,9 +82,10 @@ function RouteComponent() {
       const formData = new FormData()
       formData.append("p_text", values.p_text)
       formData.append("p_image", values.p_image)
+      formData.append("p_authour_pfp", res.user.u_pfp!)
 
       const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/post/create/${qid}`,
+        `${import.meta.env.VITE_BACKEND_URL}/post/create/${res.user.u_qid}`,
         {
           method: "POST",
           body: formData,
@@ -90,6 +96,7 @@ function RouteComponent() {
       return response.json()
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
       toast.success("Post uploaded")
       form.reset()
       setBlobURL(null)
@@ -142,8 +149,8 @@ function RouteComponent() {
           {/* Profile photo */}
           <div className="w-18 h-18 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
             <img
-              src={res?.u_pfp || "/pfp.webp"}
-              alt={res?.u_qid ? `${res?.u_qid} profile photo` : "profile picture"}
+              src={res.user.u_pfp || "/pfp.webp"}
+              alt={res?.user.u_qid ? `${res?.user.u_qid} profile photo` : "profile picture"}
               className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
               loading="lazy"
             />
@@ -152,10 +159,10 @@ function RouteComponent() {
           <div className="flex flex-col">
             {/* Qid */}
             <h4 className="scroll-m-20 text-xl tracking-tight">
-              @{res?.u_qid || "QiD"}
+              @{res.user.u_qid!}
             </h4>
             {/* Time */}
-            <h4 className="scroll-m-20 tracking-tight">Just now</h4>
+            <h4 className="scroll-m-20 tracking-tight text-green-500 animate-pulse">Just now</h4>
           </div>
         </div>
         {/* Actual User form */}

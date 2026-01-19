@@ -8,21 +8,61 @@ import {
 } from 'lucide-react'
 import Loader from '@/components/loader'
 
-export const Route = createFileRoute('/_protected')({
-    beforeLoad: ({ context, location }) => {
-        const { session, isLoading } = context.auth   // ← from useAuth() which uses the query`
-        // This is the critical part you probably forgot:
-        if (isLoading) {
-            // ← Do NOTHING here — don't redirect yet!
-            return
+type queryResponse = {
+    user: {
+        u_qid: string | null,
+        u_bio: string | null,
+        u_pfp: string | null,
+        u_name: string | null
+    },
+    post: [
+        {
+            p_id: string | null,
+            p_author_qid: string | null,
+            p_text: string | null,
+            p_likes_count: number | null,
+            p_comments_count: number | null,
+            created_at: string | null,
+            p_url: string | null
+            p_author_pfp: string | null
         }
+    ],
+    relations: Array<any | null>
+}
+
+export const Route = createFileRoute('/_protected')({
+    beforeLoad: ({ context }) => {
+        const { session, isLoading } = context.auth
+
+        if (isLoading) return
 
         if (!session) {
             throw redirect({
                 to: '/',
-                search: { redirect: location.href },
+                replace: true,
             })
         }
+    },
+
+    loader: async ({ context }) => {
+        if (context.auth.isLoading) return
+        const qid = context.auth.session?.user.user_metadata.u_qid
+
+        return context.queryClient.ensureQueryData({
+            queryKey: ['me'],
+            queryFn: async () => {
+                const res = await fetch(
+                    `${import.meta.env.VITE_BACKEND_URL}/user/me`,
+                    { headers: { id: qid } }
+                )
+
+                if (!res.ok) {
+                    throw new Error('Failed to fetch profile')
+                }
+
+                return await res.json() as queryResponse
+            }
+        })
     },
     pendingComponent: () => <Loader />,
     component: RouteComponent,
@@ -50,7 +90,7 @@ const navigations: navType[] = [
     },
     {
         display: "Chats",
-        path: '/chats',
+        path: '/chats/home',
         icon: <MessageCircle height={27} />,
         value: 'chats'
     },

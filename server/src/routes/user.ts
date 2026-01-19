@@ -73,7 +73,7 @@ export const users = new Elysia({ prefix: '/user' })
 
         if (!profileData) {
             set.status = 404;
-            return { error: "User not found" }
+            return { error: "User not found" + id }
         }
 
         const { data: postData, error: postError } = await CLIENT
@@ -134,7 +134,7 @@ export const users = new Elysia({ prefix: '/user' })
             .from('post')
             .select('*')
             .eq('p_author_qid', search)
-            .order('p_created_at', { ascending: false })
+            .order('created_at', { ascending: false })
             .limit(20)
 
         if (postError) {
@@ -143,7 +143,7 @@ export const users = new Elysia({ prefix: '/user' })
         }
 
         const viewer = headers.viewer
-        if (viewer && viewer!.length > 3) {
+        if (viewer !== 'a') {
             const { data: relationData, error: relationError } = await CLIENT
                 .from('friendship')
                 .select('*')
@@ -171,7 +171,7 @@ export const users = new Elysia({ prefix: '/user' })
                 search: t.String({ minLength: 4, maxLength: 400 }),
             }),
             headers: t.Object({
-                viewer: t.Optional(t.String({ minLength: 4, maxLength: 200 }))
+                viewer: t.Optional(t.String({ minLength: 1, maxLength: 200 }))
             })
         }
     )

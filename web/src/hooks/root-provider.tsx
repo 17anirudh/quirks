@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { keepPreviousData, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 
 export default {
@@ -7,7 +7,17 @@ export default {
 }
 
 export function getContext() {
-  const queryClient = new QueryClient()
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: Infinity,
+        placeholderData: keepPreviousData,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false,
+
+      }
+    }
+  })
   return {
     queryClient,
   }
