@@ -44,8 +44,9 @@ const logInUserSchema = createAccountSchema.pick({
 })
 
 export const Route = createFileRoute('/')({
-    beforeLoad: ({ context }) => {
-        if (context.auth.session) {
+    loader: async ({ context }) => {
+        const session = await context.auth.waitForAuth()
+        if (session) {
             throw redirect({ to: '/home', replace: true })
         }
     },

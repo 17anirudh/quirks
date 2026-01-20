@@ -6,7 +6,7 @@ type props = {
             u_pfp: string | null,
             u_name: string | null
         },
-        posts: [
+        post: [
             {
                 p_id: string | null,
                 p_author_qid: string | null,
@@ -18,7 +18,7 @@ type props = {
                 p_author_pfp: string | null
             }
         ],
-        relations: Array<any | null>
+        relation: Array<any | null>
     }
 }
 
@@ -41,11 +41,11 @@ export default function ProfileCard({ information }: props) {
                 <div className="flex-col gap-5">
                     <h3 className="capitalize scroll-m-20 text-2xl font-semibold tracking-tight">{information ? information.user.u_name : ''}</h3>
                     <div className="flex flex-wrap gap-2">
-                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information?.posts?.length || 0}</h4>
+                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information?.post?.length || 0}</h4>
                         <h4 className="scroll-m-20 text-xl font-light tracking-tight">Posts</h4>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information.relations ? information?.relations?.length : 0}</h4>
+                        <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information.relation ? information?.relation?.length : 0}</h4>
                         <h4 className="scroll-m-20 text-xl font-light tracking-tight">Friends</h4>
                     </div>
                 </div>

@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import Loader from '@/components/loader'
 import PostCard from '@/components/post-card'
 import ProfileCard from '@/components/profile-card'
+import CtxProfile from '@/components/ctxProfile'
 
 type queryResponse = {
   user: {
@@ -10,7 +11,7 @@ type queryResponse = {
     u_pfp: string | null,
     u_name: string | null
   },
-  posts: [
+  post: [
     {
       p_id: string | null,
       p_author_qid: string | null,
@@ -22,25 +23,19 @@ type queryResponse = {
       p_author_pfp: string | null
     }
   ],
-  relations: Array<any | null>
+  relation: any | null,
 }
 
 export const Route = createFileRoute('/u/$qid')({
-  beforeLoad: ({ context }) => {
-    if (context.auth.isLoading) {
-      return
-    }
-  },
   loader: async ({ context, params }) => {
-    const viewer: string | null = context.auth.session?.user.user_metadata.u_qid || null
-    const search: string = params.qid
-
-    console.log(viewer, search)
+    const session = await context.auth.waitForAuth()
+    const viewer = !session ? 'a' : session.user.user_metadata.u_qid
+    const search = params.qid
     if (viewer === search) {
       throw redirect({ to: '/profile/home', replace: true })
     }
-    return await context.queryClient.ensureQueryData({
-      queryKey: ['user', search],
+    const data = await context.queryClient.ensureQueryData({
+      queryKey: ['user', search, viewer],
       queryFn: async () => {
         const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/u/${search}`, {
           method: 'GET',
@@ -54,27 +49,51 @@ export const Route = createFileRoute('/u/$qid')({
           throw new Error('Failed to fetch user')
         }
         const response = await res.json()
-        return { user: response.user, post: response.post, relation: response.relation, viewer: viewer }
+        return {
+          user: response.user,
+          post: response.post || [],
+          relation: response.relation || null,
+        } as queryResponse
       }
     })
+    return {
+      data,
+      viewer
+    }
   },
   pendingComponent: () => <Loader />,
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const { user: userData, post: postData, relation: relationData, viewer: viewer } = Route.useLoaderData()
-  const data = { user: userData, posts: postData, relations: relationData }
+  const { data, viewer } = Route.useLoaderData()
+  const qClient = Route.useRouteContext().queryClient
+  console.log(viewer)
+
   return (
-    <>
-      <div className='h-screen w-screen flex flex-col gap-3'>
-        {/* <ProfileCard information={data} />
-        <pre className='w-9/12 text-pretty overflow-hidden break-words'>{JSON.stringify(relationData, null, 2)}</pre>
-        {postData.map((post, index) => (
-          <PostCard key={index} post={post} />
-        ))} */}
-        <pre className='w-9/12 text-pretty break-words'>{JSON.stringify(data, null, 2)}</pre>
-      </div>
-    </>
+    <div className='flex flex-col min-h-dvh w-screen px-4 py-6 md:py-8 gap-6 md:gap-8 overflow-x-hidden'>
+      {/* Pfp, name, qid, no.of posts, no.of friends */}
+      <ProfileCard information={data} />
+
+      {/* Only show CtxProfile if user is logged in (viewer !== 'a') */}
+      {viewer !== 'a' && (
+        <CtxProfile
+          relation={data.relation}
+          viewer={viewer}
+          targetQid={data.user.u_qid}
+          queryClient={qClient}
+        />
+      )}
+
+      {/* User posts */}
+      {data.post.map((post) => (
+        <PostCard key={post.p_id} post={post} />
+      ))}
+    </div>
   )
+  // return (
+  //   <div className='h-dvh w-screen flex justify-center items-center'>
+  //     <pre className='w-9/12 text-pretty break-words'>{JSON.stringify(data, null, 2)}</pre>
+  //   </div>
+  // )
 }

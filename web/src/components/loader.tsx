@@ -2,7 +2,15 @@ import './loader.css'
 
 export default function Loader() {
     return (
-        <div className="h-screen w-screen flex flex-col justify-center items-center bg-black z-20">
+        <div style={{
+            height: '100vh',
+            width: '100vw',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: '#000', // or your app's bg to avoid flash
+            color: '#fff',
+        }}>
             {/* <!-- From Uiverse.io by vinodjangid07 --> */}
             <div className="loader">
                 <div className="truckWrapper">

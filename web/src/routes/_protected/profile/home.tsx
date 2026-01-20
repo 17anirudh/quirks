@@ -14,7 +14,7 @@ type queryResponse = {
     u_pfp: string | null,
     u_name: string | null
   },
-  posts: [
+  post: [
     {
       p_id: string | null,
       p_author_qid: string | null,
@@ -26,15 +26,17 @@ type queryResponse = {
       p_author_pfp: string | null
     }
   ],
-  relations: Array<any | null>
+  relation: Array<any | null>
 }
 
 export const Route = createFileRoute('/_protected/profile/home')({
-  loader: ({ context }) => {
-    return context.queryClient.getQueryData(['me'])
+  loader: async ({ context }) => {
+    const data = await context.queryClient.getQueryData(['me'])
+    return data
   },
   pendingComponent: () => <Loader />,
   component: RouteComponent,
+  pendingMinMs: 0
 })
 
 function RouteComponent() {
@@ -77,8 +79,8 @@ function RouteComponent() {
       </div>
       {/* Posts */}
       <div className='w-full flex flex-col gap-2 justify-center items-center'>
-        {ctx.posts.map((post: any, index: number) => (
-          <PostCard key={index} post={post} />
+        {ctx.post.map((post) => (
+          <PostCard post={post} />
         ))}
       </div>
     </div>

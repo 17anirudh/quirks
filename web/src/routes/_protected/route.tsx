@@ -27,34 +27,25 @@ type queryResponse = {
             p_author_pfp: string | null
         }
     ],
-    relations: Array<any | null>
+    relation: Array<any | null>
 }
 
 export const Route = createFileRoute('/_protected')({
-    beforeLoad: ({ context }) => {
-        const { session, isLoading } = context.auth
-
-        if (isLoading) return
-
-        if (!session) {
-            throw redirect({
-                to: '/',
-                replace: true,
-            })
-        }
-    },
-
     loader: async ({ context }) => {
-        if (context.auth.isLoading) return
-        const qid = context.auth.session?.user.user_metadata.u_qid
-
+        const session = await context.auth.waitForAuth()
+        if (session === null) {
+            throw redirect({ to: '/', replace: true })
+        }
+        const qid = session.user.user_metadata.u_qid
+        console.log(qid)
         return context.queryClient.ensureQueryData({
             queryKey: ['me'],
             queryFn: async () => {
-                const res = await fetch(
-                    `${import.meta.env.VITE_BACKEND_URL}/user/me`,
-                    { headers: { id: qid } }
-                )
+                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/me`, {
+                    headers: {
+                        id: qid
+                    }
+                })
 
                 if (!res.ok) {
                     throw new Error('Failed to fetch profile')

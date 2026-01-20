@@ -102,7 +102,7 @@ export const users = new Elysia({ prefix: '/user' })
         }
 
         set.status = 200;
-        return { user: profileData, posts: postData, relations: relationData };
+        return { user: profileData, post: postData, relation: relationData };
     },
         {
             headers: t.Object({
@@ -148,10 +148,10 @@ export const users = new Elysia({ prefix: '/user' })
                 .from('friendship')
                 .select('*')
                 .or(
-                    `and(sent_qid.eq.${viewer},receive_qid.eq.${search}),
-                    and(sent_qid.eq.${search},receive_qid.eq.${viewer})`
+                    `and(sent_qid.eq.${viewer},receive_qid.eq.${search}),and(sent_qid.eq.${search},receive_qid.eq.${viewer})`
                 )
                 .maybeSingle()
+
 
             if (relationError) {
                 set.status = 500;
