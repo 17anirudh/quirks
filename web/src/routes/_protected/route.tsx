@@ -7,6 +7,7 @@ import {
     UserCircle2Icon,
 } from 'lucide-react'
 import Loader from '@/components/loader'
+import { TimerProvider } from '@/hooks/time-provider'
 
 type queryResponse = {
     user: {
@@ -95,14 +96,17 @@ const navigations: navType[] = [
 ]
 
 
+
 function RouteComponent() {
     return (
-        <div className="flex flex-col h-dvh w-screen">
-            <main className="fixed top-0 left-0 right-0 z-50 border-b flex-1 overflow-auto h-full">
-                <Outlet />
+        <div className="flex flex-col h-dvh w-screen overflow-hidden">
+            <main className="flex-1 overflow-hidden relative flex flex-col">
+                <TimerProvider>
+                    <Outlet />
+                </TimerProvider>
             </main>
-            <footer className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-800 h-12 bg-background">
-                <nav>
+            <footer className="border-t border-gray-800 h-12 bg-background flex-none z-50">
+                <nav className="h-full">
                     <div className="flex flex-row h-full items-center">
                         {navigations.map((item, index) => (
                             <Link
@@ -121,3 +125,4 @@ function RouteComponent() {
         </div>
     )
 }
+

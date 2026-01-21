@@ -19,6 +19,7 @@ import { Label } from '@/lib/components/ui/label'
 import { Input } from '@/lib/components/ui/input'
 import PfpForm from '@/components/pfpForm'
 import { useSignOut } from '@/hooks/auth-provider'
+import { useGlobalTimer } from '@/hooks/time-provider'
 
 type queryResponse = {
   user: {
@@ -75,6 +76,9 @@ function RouteComponent() {
   const [inputValue, setInputValue] = useState<string>('')
 
   const signOut = useSignOut()
+
+  const { setCooldown, duration } = useGlobalTimer();
+  const options = [1, 18, 27, 36, 45, 54];
 
   const tabs: tabsType[] = [
     {
@@ -164,7 +168,22 @@ function RouteComponent() {
           </div>
           {/* App Cooldown */}
           <div className='flex flex-col gap-5 border mt-9 w-fit p-5'>
-            <span className='text-sm'>App Cooldown</span>
+            <div className="p-10 space-y-6">
+              <div className="space-y-2">
+                <p>Select Cooldown Duration (Minutes)</p>
+                <div className="flex gap-2">
+                  {options.map((mins) => (
+                    <Button
+                      key={mins}
+                      variant={duration === mins * 60 ? "default" : "outline"}
+                      onClick={() => setCooldown(mins)}
+                    >
+                      {mins}m
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
           </div>
         </div>
