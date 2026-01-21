@@ -18,8 +18,8 @@ import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/p
 import { Route as ProtectedPostsRouteRouteImport } from './routes/_protected/posts/route'
 import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
 import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
+import { Route as ProtectedProfileCreateRouteImport } from './routes/_protected/profile/create'
 import { Route as ProtectedPostsHomeRouteImport } from './routes/_protected/posts/home'
-import { Route as ProtectedPostsCreateRouteImport } from './routes/_protected/posts/create'
 import { Route as ProtectedChatsHomeRouteImport } from './routes/_protected/chats/home'
 
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
@@ -67,14 +67,14 @@ const ProtectedProfileHomeRoute = ProtectedProfileHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => ProtectedProfileRouteRoute,
 } as any)
+const ProtectedProfileCreateRoute = ProtectedProfileCreateRouteImport.update({
+  id: '/create',
+  path: '/create',
+  getParentRoute: () => ProtectedProfileRouteRoute,
+} as any)
 const ProtectedPostsHomeRoute = ProtectedPostsHomeRouteImport.update({
   id: '/home',
   path: '/home',
-  getParentRoute: () => ProtectedPostsRouteRoute,
-} as any)
-const ProtectedPostsCreateRoute = ProtectedPostsCreateRouteImport.update({
-  id: '/create',
-  path: '/create',
   getParentRoute: () => ProtectedPostsRouteRoute,
 } as any)
 const ProtectedChatsHomeRoute = ProtectedChatsHomeRouteImport.update({
@@ -91,8 +91,8 @@ export interface FileRoutesByFullPath {
   '/p/$pid': typeof PPidRoute
   '/u/$qid': typeof UQidRoute
   '/chats/home': typeof ProtectedChatsHomeRoute
-  '/posts/create': typeof ProtectedPostsCreateRoute
   '/posts/home': typeof ProtectedPostsHomeRoute
+  '/profile/create': typeof ProtectedProfileCreateRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
 }
@@ -104,8 +104,8 @@ export interface FileRoutesByTo {
   '/p/$pid': typeof PPidRoute
   '/u/$qid': typeof UQidRoute
   '/chats/home': typeof ProtectedChatsHomeRoute
-  '/posts/create': typeof ProtectedPostsCreateRoute
   '/posts/home': typeof ProtectedPostsHomeRoute
+  '/profile/create': typeof ProtectedProfileCreateRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
 }
@@ -119,8 +119,8 @@ export interface FileRoutesById {
   '/p/$pid': typeof PPidRoute
   '/u/$qid': typeof UQidRoute
   '/_protected/chats/home': typeof ProtectedChatsHomeRoute
-  '/_protected/posts/create': typeof ProtectedPostsCreateRoute
   '/_protected/posts/home': typeof ProtectedPostsHomeRoute
+  '/_protected/profile/create': typeof ProtectedProfileCreateRoute
   '/_protected/profile/home': typeof ProtectedProfileHomeRoute
   '/_protected/profile/settings': typeof ProtectedProfileSettingsRoute
 }
@@ -134,8 +134,8 @@ export interface FileRouteTypes {
     | '/p/$pid'
     | '/u/$qid'
     | '/chats/home'
-    | '/posts/create'
     | '/posts/home'
+    | '/profile/create'
     | '/profile/home'
     | '/profile/settings'
   fileRoutesByTo: FileRoutesByTo
@@ -147,8 +147,8 @@ export interface FileRouteTypes {
     | '/p/$pid'
     | '/u/$qid'
     | '/chats/home'
-    | '/posts/create'
     | '/posts/home'
+    | '/profile/create'
     | '/profile/home'
     | '/profile/settings'
   id:
@@ -161,8 +161,8 @@ export interface FileRouteTypes {
     | '/p/$pid'
     | '/u/$qid'
     | '/_protected/chats/home'
-    | '/_protected/posts/create'
     | '/_protected/posts/home'
+    | '/_protected/profile/create'
     | '/_protected/profile/home'
     | '/_protected/profile/settings'
   fileRoutesById: FileRoutesById
@@ -239,18 +239,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedProfileHomeRouteImport
       parentRoute: typeof ProtectedProfileRouteRoute
     }
+    '/_protected/profile/create': {
+      id: '/_protected/profile/create'
+      path: '/create'
+      fullPath: '/profile/create'
+      preLoaderRoute: typeof ProtectedProfileCreateRouteImport
+      parentRoute: typeof ProtectedProfileRouteRoute
+    }
     '/_protected/posts/home': {
       id: '/_protected/posts/home'
       path: '/home'
       fullPath: '/posts/home'
       preLoaderRoute: typeof ProtectedPostsHomeRouteImport
-      parentRoute: typeof ProtectedPostsRouteRoute
-    }
-    '/_protected/posts/create': {
-      id: '/_protected/posts/create'
-      path: '/create'
-      fullPath: '/posts/create'
-      preLoaderRoute: typeof ProtectedPostsCreateRouteImport
       parentRoute: typeof ProtectedPostsRouteRoute
     }
     '/_protected/chats/home': {
@@ -264,12 +264,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface ProtectedPostsRouteRouteChildren {
-  ProtectedPostsCreateRoute: typeof ProtectedPostsCreateRoute
   ProtectedPostsHomeRoute: typeof ProtectedPostsHomeRoute
 }
 
 const ProtectedPostsRouteRouteChildren: ProtectedPostsRouteRouteChildren = {
-  ProtectedPostsCreateRoute: ProtectedPostsCreateRoute,
   ProtectedPostsHomeRoute: ProtectedPostsHomeRoute,
 }
 
@@ -277,11 +275,13 @@ const ProtectedPostsRouteRouteWithChildren =
   ProtectedPostsRouteRoute._addFileChildren(ProtectedPostsRouteRouteChildren)
 
 interface ProtectedProfileRouteRouteChildren {
+  ProtectedProfileCreateRoute: typeof ProtectedProfileCreateRoute
   ProtectedProfileHomeRoute: typeof ProtectedProfileHomeRoute
   ProtectedProfileSettingsRoute: typeof ProtectedProfileSettingsRoute
 }
 
 const ProtectedProfileRouteRouteChildren: ProtectedProfileRouteRouteChildren = {
+  ProtectedProfileCreateRoute: ProtectedProfileCreateRoute,
   ProtectedProfileHomeRoute: ProtectedProfileHomeRoute,
   ProtectedProfileSettingsRoute: ProtectedProfileSettingsRoute,
 }

@@ -37,7 +37,7 @@ type queryResponse = {
   relations: Array<any | null>
 }
 
-export const Route = createFileRoute('/_protected/posts/create')({
+export const Route = createFileRoute('/_protected/profile/create')({
   loader: ({ context }) => {
     return context.queryClient.getQueryData(['me'])
   },

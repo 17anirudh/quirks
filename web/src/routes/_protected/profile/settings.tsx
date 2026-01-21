@@ -1,11 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import Loader from '@/components/loader'
 import { Tabs } from '@/lib/components/tabs'
 import { type ReactNode, useState, useId } from 'react'
 import { ThemeToggler } from '@/components/theme-toggler'
-import { useMutation } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import { SUPABASE_CLIENT } from '@/hooks/utils'
 import { Button } from '@/lib/components/ui/button'
 import { LogOutIcon, Trash2Icon, CircleAlertIcon } from 'lucide-react'
 import {
@@ -161,9 +158,14 @@ function RouteComponent() {
         <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black dark:text-white bg-white dark:bg-black">
           <p>App Settings</p>
           {/* Theme Toggler */}
-          <div className='flex gap-5 justify-center items-center'>
+          <div className='flex flex-col gap-5 border mt-9 w-fit p-5'>
+            <span className='text-sm'>Click to change Theme</span>
             <ThemeToggler />
-            <span>Click to change Theme</span>
+          </div>
+          {/* App Cooldown */}
+          <div className='flex flex-col gap-5 border mt-9 w-fit p-5'>
+            <span className='text-sm'>App Cooldown</span>
+
           </div>
         </div>
       ),

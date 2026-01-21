@@ -7,8 +7,12 @@ export const Route = createFileRoute('/_protected/posts/home')({
 function RouteComponent() {
 
   return (
-    <main>
-      Hello
+    <main className='w-full flex flex-col gap-5 items-center'>
+      {Array.from({ length: 20 }).map((_, i) => (
+        <div key={i} className='border-4 w-9/12 h-40'>
+          Hello
+        </div>
+      ))}
     </main>
   )
 }
