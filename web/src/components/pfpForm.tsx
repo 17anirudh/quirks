@@ -74,8 +74,8 @@ export default function PfpForm({ client, qid, loading }: props) {
     })
 
     return (
-        <div className='flex flex-col mb-5'>
-            <h2 className='font-light text-xl mt-5'>Pfp</h2>
+        <div className='flex flex-col mt-9 border-2 gap-3 p-9 w-fit'>
+            <h3 className='text-xl font-semibol underline'>Change PFP</h3>
             <input
                 ref={imageInputRef}
                 type="file"
@@ -98,8 +98,9 @@ export default function PfpForm({ client, qid, loading }: props) {
                     <img
                         src={loading.u_pfp ?? "/pfp.webp"}
                         alt="profile picture"
-                        className="w-full h-full object-cover pointer-events-none"
+                        className="w-full h-full object-cover pointer-events-none bg-transparent"
                         draggable={false}
+                        title="Click to change PFP"
                     />
                 ) : (
                     <img
@@ -114,11 +115,12 @@ export default function PfpForm({ client, qid, loading }: props) {
             {newPfp && (
                 <Button
                     type="button"
+                    variant="outline"
                     onClick={() => uploadPfp.mutate()}
                     disabled={uploadPfp.isPending}
                     className="w-fit cursor-pointer"
                 >
-                    {uploadPfp.isPending ? 'Uploading...' : 'Upload Pfp'}
+                    {uploadPfp.isPending ? 'Uploading...' : 'Upload pfp'}
                 </Button>
             )}
         </div>

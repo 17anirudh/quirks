@@ -1,6 +1,13 @@
 import { SmileIcon, MessageCircleMore, EarthIcon } from "lucide-react";
 import { Button } from "@/lib/components/ui/button";
 import { toast } from "sonner";
+import { useNavigate } from "@tanstack/react-router";
+import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+} from "@/lib/components/ui/hover-card"
+import { Avatar, AvatarFallback, AvatarImage } from "@/lib/components/ui/avatar"
 
 type props = {
     post: {
@@ -34,6 +41,8 @@ function formatDayMonthName(isoDate: string): string {
 
 export default function PostCard({ post }: props) {
 
+    const navigate = useNavigate();
+
     async function copyLink(): Promise<void> {
         if (typeof window === 'undefined') return;
         const url = `${window.location.origin}/p/${post.p_id}`;
@@ -59,9 +68,24 @@ export default function PostCard({ post }: props) {
                 {/* Qid and time */}
                 <div className="flex flex-col">
                     {/* Qid */}
-                    <h4 className="scroll-m-20 text-xl tracking-tight">
-                        @{post.p_author_qid}
-                    </h4>
+                    <HoverCard openDelay={10} closeDelay={100}>
+                        <HoverCardTrigger asChild>
+                            <Button
+                                variant="link"
+                                className="scroll-m-20 text-xl tracking-tight cursor-pointer"
+                                onClick={() => navigate({ to: '/u/$qid', params: { qid: post.p_author_qid! } })}
+                            >
+                                @{post.p_author_qid}
+                            </Button>
+                        </HoverCardTrigger>
+                        <HoverCardContent className="flex w-64 flex-col gap-0.5" side="right">
+                            <Avatar>
+                                <AvatarImage src={post.p_author_pfp || "/pfp.webp"} />
+                                <AvatarFallback>{post.p_author_qid?.slice(0, 2).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <div className="font-semibold">@{post.p_author_qid}</div>
+                        </HoverCardContent>
+                    </HoverCard>
                     {/* Time */}
                     <h4 className="scroll-m-20 tracking-tight">
                         {formatDayMonthName(post.created_at!.toLocaleString()) || 'Recently uploaded'}

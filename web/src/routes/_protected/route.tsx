@@ -27,7 +27,8 @@ type queryResponse = {
             p_author_pfp: string | null
         }
     ],
-    relation: Array<any | null>
+    relation: Array<any | null>,
+    pending: Array<any | null>
 }
 
 export const Route = createFileRoute('/_protected')({
@@ -38,7 +39,7 @@ export const Route = createFileRoute('/_protected')({
         }
         const qid = session.user.user_metadata.u_qid
         console.log(qid)
-        return context.queryClient.ensureQueryData({
+        return await context.queryClient.ensureQueryData({
             queryKey: ['me'],
             queryFn: async () => {
                 const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/me`, {

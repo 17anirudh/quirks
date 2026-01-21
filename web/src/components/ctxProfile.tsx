@@ -74,13 +74,13 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         return (
             <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
-                    <Button disabled={isSending}>
+                    <Button className='w-fit p-4' disabled={isSending}>
                         {isSending ? <LoaderIcon className='animate-spin' /> : <>Initiate <HandIcon /></>}
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <Button onClick={() => sendRequest()}>Send Friend Request</Button>
-                    <Button>Message</Button>
+                    <Button className='w-fit p-4' onClick={() => sendRequest()}>Send Friend Request</Button>
+                    <Button className='w-fit p-4'>Message</Button>
                 </DropdownMenuContent>
             </DropdownMenu>
         )
@@ -93,7 +93,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         return (
             <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
-                    <Button disabled={!isSender}>
+                    <Button className='w-fit p-4' disabled={!isSender}>
                         Pending... <LoaderIcon className='animate-spin' />
                     </Button>
                 </DropdownMenuTrigger>
@@ -101,7 +101,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                     <DropdownMenuContent>
                         <Dialog>
                             <DialogTrigger asChild>
-                                <Button disabled={isRemoving}>
+                                <Button className='w-fit p-4' disabled={isRemoving}>
                                     Withdraw Request
                                 </Button>
                             </DialogTrigger>
@@ -111,18 +111,18 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                                     <h3>Try messaging instead 🙂</h3>
                                     <div className='flex flex-row flex-wrap gap-2'>
                                         <DialogClose asChild>
-                                            <Button variant="destructive" onClick={() => removeRequest(relation.fs_id)}>
+                                            <Button className='w-fit p-4' variant="destructive" onClick={() => removeRequest(relation.fs_id)}>
                                                 Yes, Withdraw
                                             </Button>
                                         </DialogClose>
                                         <DialogClose asChild>
-                                            <Button variant="outline">Cancel</Button>
+                                            <Button className='w-fit p-4' variant="outline">Cancel</Button>
                                         </DialogClose>
                                     </div>
                                 </div>
                             </DialogContent>
                         </Dialog>
-                        <Button>Message</Button>
+                        <Button className='w-fit p-4'>Message</Button>
                     </DropdownMenuContent>
                 )}
             </DropdownMenu>
@@ -134,14 +134,14 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         return (
             <DropdownMenu modal={true}>
                 <DropdownMenuTrigger asChild>
-                    <Button>
+                    <Button className='w-fit p-4'>
                         Friends <HandshakeIcon />
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button disabled={isRemoving}>
+                            <Button className='w-fit p-4' disabled={isRemoving}>
                                 Unfriend
                             </Button>
                         </DialogTrigger>
@@ -151,18 +151,18 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                                 <h3>They won't be notified, but you'll lose access to friends-only content.</h3>
                                 <div className='flex flex-row flex-wrap gap-2'>
                                     <DialogClose asChild>
-                                        <Button variant="destructive" onClick={() => removeRequest(relation.fs_id)}>
+                                        <Button className='w-fit p-4' variant="destructive" onClick={() => removeRequest(relation.fs_id)}>
                                             Yes, Unfriend
                                         </Button>
                                     </DialogClose>
                                     <DialogClose asChild>
-                                        <Button variant="outline">Cancel</Button>
+                                        <Button className='w-fit p-4' variant="outline">Cancel</Button>
                                     </DialogClose>
                                 </div>
                             </div>
                         </DialogContent>
                     </Dialog>
-                    <Button>Message</Button>
+                    <Button className='w-fit p-4'>Message</Button>
                 </DropdownMenuContent>
             </DropdownMenu>
         )

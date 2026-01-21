@@ -101,8 +101,20 @@ export const users = new Elysia({ prefix: '/user' })
             return { error: relationError.message || "Database Error" }
         }
 
+        const { data: pendingData, error: pendingError } = await CLIENT
+            .from('friendship')
+            .select('*')
+            .eq('fs_status', 'pending')
+            .eq('receive_qid', id)  // Only requests sent TO this user
+            .order('fs_created_at', { ascending: false })
+
+        if (pendingError) {
+            set.status = 500;
+            return { error: pendingError.message || "Database Error" }
+        }
+
         set.status = 200;
-        return { user: profileData, post: postData, relation: relationData };
+        return { user: profileData, post: postData, relation: relationData, pending: pendingData };
     },
         {
             headers: t.Object({
@@ -150,7 +162,6 @@ export const users = new Elysia({ prefix: '/user' })
                 .or(
                     `and(sent_qid.eq.${viewer},receive_qid.eq.${search}),and(sent_qid.eq.${search},receive_qid.eq.${viewer})`
                 )
-                .maybeSingle()
 
 
             if (relationError) {

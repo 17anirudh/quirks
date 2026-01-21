@@ -30,20 +30,32 @@ type queryResponse = {
     u_pfp: string | null,
     u_name: string | null
   },
-  posts: [
-    {
-      p_id: string | null,
-      p_author_qid: string | null,
-      p_text: string | null,
-      p_likes_count: number | null,
-      p_comments_count: number | null,
-      created_at: string | null,
-      p_url: string | null
-      p_author_pfp: string | null
-    }
-  ],
-  relations: Array<any | null>
+  post: {
+    p_id: string | null,
+    p_author_qid: string | null,
+    p_text: string | null,
+    p_likes_count: number | null,
+    p_comments_count: number | null,
+    created_at: string | null,
+    p_url: string | null
+    p_author_pfp: string | null
+  }[],
+  relation: {
+    fs_id: string | null,
+    sent_qid: string | null,
+    receive_qid: string | null,
+    fs_status: string | null,
+    fs_created_at: string | null
+  }[],
+  pending: {
+    fs_id: string | null,
+    sent_qid: string | null,
+    receive_qid: string | null,
+    fs_status: string | null,
+    fs_created_at: string | null
+  }[]
 }
+
 type tabsType = {
   title: string;
   value: string;
@@ -58,8 +70,6 @@ export const Route = createFileRoute('/_protected/profile/settings')({
   component: RouteComponent,
 })
 
-
-
 function RouteComponent() {
   const ctx = Route.useLoaderData() as queryResponse
   const qClient = Route.useRouteContext().queryClient
@@ -68,7 +78,6 @@ function RouteComponent() {
   const [inputValue, setInputValue] = useState<string>('')
 
   const signOut = useSignOut()
-  // Log out logic
 
   const tabs: tabsType[] = [
     {
@@ -80,10 +89,11 @@ function RouteComponent() {
           {/* Pfp Upload */}
           <PfpForm loading={ctx.user!} client={qClient} qid={ctx.user.u_qid!} />
           {/* Log out */}
-          <div>
+          <div className='mt-9 p-5 w-fit'>
             <Button
+              variant="ghost"
               onClick={() => signOut.mutate()}
-              className='cursor-pointer'
+              className='cursor-pointer bg-yellow-500/10 hover:bg-yellow-500/20'
             >
               <LogOutIcon /> <span>Log Out</span>
             </Button>

@@ -11,19 +11,30 @@ type queryResponse = {
     u_pfp: string | null,
     u_name: string | null
   },
-  post: [
-    {
-      p_id: string | null,
-      p_author_qid: string | null,
-      p_text: string | null,
-      p_likes_count: number | null,
-      p_comments_count: number | null,
-      created_at: string | null,
-      p_url: string | null
-      p_author_pfp: string | null
-    }
-  ],
-  relation: any | null,
+  post: {
+    p_id: string | null,
+    p_author_qid: string | null,
+    p_text: string | null,
+    p_likes_count: number | null,
+    p_comments_count: number | null,
+    created_at: string | null,
+    p_url: string | null
+    p_author_pfp: string | null
+  }[],
+  relation: {
+    fs_id: string | null,
+    sent_qid: string | null,
+    receive_qid: string | null,
+    fs_status: string | null,
+    fs_created_at: string | null
+  }[],
+  pending: {
+    fs_id: string | null,
+    sent_qid: string | null,
+    receive_qid: string | null,
+    fs_status: string | null,
+    fs_created_at: string | null
+  }[]
 }
 
 export const Route = createFileRoute('/u/$qid')({
@@ -71,7 +82,7 @@ function RouteComponent() {
   console.log(viewer)
 
   return (
-    <div className='flex flex-col min-h-dvh w-screen px-4 py-6 md:py-8 gap-6 md:gap-8 overflow-x-hidden'>
+    <div className='flex flex-col min-h-dvh w-screen px-4 py-6 md:py-8 gap-6 md:gap-8 overflow-x-hidden justify-center items-center'>
       {/* Pfp, name, qid, no.of posts, no.of friends */}
       <ProfileCard information={data} />
 
