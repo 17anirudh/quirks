@@ -17,6 +17,7 @@ import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/profile/route'
 import { Route as ProtectedPostsRouteRouteImport } from './routes/_protected/posts/route'
 import { Route as ProtectedChatsRouteRouteImport } from './routes/_protected/chats/route'
+import { Route as ProtectedChatsIndexRouteImport } from './routes/_protected/chats/index'
 import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
 import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
 import { Route as ProtectedProfileCreateRouteImport } from './routes/_protected/profile/create'
@@ -62,6 +63,11 @@ const ProtectedChatsRouteRoute = ProtectedChatsRouteRouteImport.update({
   path: '/chats',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
+const ProtectedChatsIndexRoute = ProtectedChatsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ProtectedChatsRouteRoute,
+} as any)
 const ProtectedProfileSettingsRoute =
   ProtectedProfileSettingsRouteImport.update({
     id: '/settings',
@@ -102,10 +108,10 @@ export interface FileRoutesByFullPath {
   '/profile/create': typeof ProtectedProfileCreateRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
+  '/chats/': typeof ProtectedChatsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/chats': typeof ProtectedChatsRouteRouteWithChildren
   '/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/home': typeof ProtectedHomeRoute
@@ -116,6 +122,7 @@ export interface FileRoutesByTo {
   '/profile/create': typeof ProtectedProfileCreateRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
+  '/chats': typeof ProtectedChatsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,6 +139,7 @@ export interface FileRoutesById {
   '/_protected/profile/create': typeof ProtectedProfileCreateRoute
   '/_protected/profile/home': typeof ProtectedProfileHomeRoute
   '/_protected/profile/settings': typeof ProtectedProfileSettingsRoute
+  '/_protected/chats/': typeof ProtectedChatsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -148,10 +156,10 @@ export interface FileRouteTypes {
     | '/profile/create'
     | '/profile/home'
     | '/profile/settings'
+    | '/chats/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/chats'
     | '/posts'
     | '/profile'
     | '/home'
@@ -162,6 +170,7 @@ export interface FileRouteTypes {
     | '/profile/create'
     | '/profile/home'
     | '/profile/settings'
+    | '/chats'
   id:
     | '__root__'
     | '/'
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/_protected/profile/create'
     | '/_protected/profile/home'
     | '/_protected/profile/settings'
+    | '/_protected/chats/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -244,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedChatsRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
+    '/_protected/chats/': {
+      id: '/_protected/chats/'
+      path: '/'
+      fullPath: '/chats/'
+      preLoaderRoute: typeof ProtectedChatsIndexRouteImport
+      parentRoute: typeof ProtectedChatsRouteRoute
+    }
     '/_protected/profile/settings': {
       id: '/_protected/profile/settings'
       path: '/settings'
@@ -284,10 +301,12 @@ declare module '@tanstack/react-router' {
 
 interface ProtectedChatsRouteRouteChildren {
   ProtectedChatsHomeRoute: typeof ProtectedChatsHomeRoute
+  ProtectedChatsIndexRoute: typeof ProtectedChatsIndexRoute
 }
 
 const ProtectedChatsRouteRouteChildren: ProtectedChatsRouteRouteChildren = {
   ProtectedChatsHomeRoute: ProtectedChatsHomeRoute,
+  ProtectedChatsIndexRoute: ProtectedChatsIndexRoute,
 }
 
 const ProtectedChatsRouteRouteWithChildren =

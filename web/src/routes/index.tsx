@@ -154,9 +154,9 @@ function AppComponent() {
                         </Highlighter>
                     </ConfettiFireworks>
                 </div>
-                <div className='absolute top-0'>
+                {/* <div className='absolute top-0'>
                     <img src='/landing/mindless crowd.avif' className='h-[70%] object-cover' />
-                </div>
+                </div> */}
             </header>
             <div className="flex gap-7">
                 {/* Login Form */}

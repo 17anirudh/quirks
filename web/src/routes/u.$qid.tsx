@@ -89,7 +89,7 @@ function RouteComponent() {
       {/* Only show CtxProfile if user is logged in (viewer !== 'a') */}
       {viewer !== 'a' && (
         <CtxProfile
-          relation={data.relation}
+          relation={data.relation?.[0] || null}
           viewer={viewer}
           targetQid={data.user.u_qid}
           queryClient={qClient}

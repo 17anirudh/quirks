@@ -1,8 +1,5 @@
-"use client";
-
 import "./message-bubble.css";
-
-import { cn } from "@/hooks/utils";
+import { cn } from "@/lib/utils";
 
 export interface MessageBubbleProps {
 	message: string;
