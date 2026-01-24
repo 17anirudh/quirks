@@ -14,6 +14,8 @@ import {
 import { DialogTrigger } from '@radix-ui/react-dialog'
 import { useMutation, type QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useNavigate } from '@tanstack/react-router'
+import { SUPABASE_CLIENT } from '@/hooks/utils'
 
 type props = {
     relation?: any | null
@@ -23,6 +25,7 @@ type props = {
 }
 
 export default function CtxProfile({ relation, viewer, targetQid, queryClient }: props) {
+    const navigate = useNavigate()
 
     const { mutate: sendRequest, isPending: isSending } = useMutation({
         mutationFn: async () => {
@@ -69,6 +72,34 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         }
     })
 
+    const { mutate: initChat } = useMutation({
+        mutationFn: async () => {
+            const { data: { session } } = await SUPABASE_CLIENT.auth.getSession();
+            if (!session) throw new Error("Unauthorized");
+
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/message/init`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ target_qid: targetQid })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || "Failed to start chat");
+            }
+            return await res.json();
+        },
+        onSuccess: (data: { conv_id: string }) => {
+            navigate({ to: '/messages/$chatId', params: { chatId: data.conv_id } });
+        },
+        onError: (err) => {
+            toast.error(err.message);
+        }
+    })
+
     // No relationship exists - show "Initiate" button
     if (!relation) {
         return (
@@ -80,7 +111,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
                     <Button className='w-fit p-4' onClick={() => sendRequest()}>Send Friend Request</Button>
-                    <Button className='w-fit p-4'>Message</Button>
+                    <Button className='w-fit p-4' onClick={() => initChat()}>Message</Button>
                 </DropdownMenuContent>
             </DropdownMenu>
         )
@@ -122,7 +153,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                                 </div>
                             </DialogContent>
                         </Dialog>
-                        <Button className='w-fit p-4'>Message</Button>
+                        <Button className='w-fit p-4' onClick={() => initChat()}>Message</Button>
                     </DropdownMenuContent>
                 )}
             </DropdownMenu>
@@ -162,7 +193,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                             </div>
                         </DialogContent>
                     </Dialog>
-                    <Button className='w-fit p-4'>Message</Button>
+                    <Button className='w-fit p-4' onClick={() => initChat()}>Message</Button>
                 </DropdownMenuContent>
             </DropdownMenu>
         )

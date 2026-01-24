@@ -1,12 +1,14 @@
 
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { SUPABASE_CLIENT } from '@/hooks/utils'
 import { Loader2, MessageSquare } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar'
 import type { Conversation } from '@/types'
 
-export const Route = createFileRoute('/_protected/chats/')({
+
+
+export const Route = createFileRoute('/_protected/messages/')({
     component: MessagesLayout,
 })
 
@@ -35,7 +37,7 @@ function MessagesLayout() {
 
     return (
         <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden">
-            {/* Conversation List - Full width on mobile, split on desktop */}
+            {/* Conversation List - Hidden on mobile if viewing specific chat (handled by router outlet usually, but for index route we show list) */}
             <div className="flex w-full flex-col border-r md:w-1/3 lg:w-1/4">
                 <div className="border-b p-4 font-bold text-xl">Messages</div>
                 <div className="flex-1 overflow-y-auto">
@@ -45,7 +47,7 @@ function MessagesLayout() {
                         conversations?.map((conv) => (
                             <Link
                                 key={conv.conv_id}
-                                to={`/chats/$chatId`}
+                                to={`/messages/$chatId`}
                                 params={{ chatId: conv.conv_id }}
                                 className="flex items-center gap-3 border-b p-4 hover:bg-muted/50 transition-colors"
                             >
