@@ -20,6 +20,7 @@ const app = new Elysia({ name: 'Quirks API' })
   .use(routes.users)
   .use(routes.post)
   .use(routes.friendship)
+  .use(routes.messages)
   .listen(5000);
 
 app.use(html()).get('/', () => htmlDoc)

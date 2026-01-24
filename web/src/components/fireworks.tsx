@@ -3,10 +3,10 @@ import { Button } from "@/lib/components/ui/button"
 import type { ReactNode } from "react"
 
 type props = {
-    children: ReactNode
+  children: ReactNode
 }
 
-export function ConfettiFireworks({children}: props) {
+export function ConfettiFireworks({ children }: props) {
   const handleClick = () => {
     const duration = 5 * 1000
     const animationEnd = Date.now() + duration

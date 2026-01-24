@@ -16,6 +16,7 @@ import { Route as PPidRouteImport } from './routes/p.$pid'
 import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/profile/route'
 import { Route as ProtectedPostsRouteRouteImport } from './routes/_protected/posts/route'
+import { Route as ProtectedChatsRouteRouteImport } from './routes/_protected/chats/route'
 import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
 import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
 import { Route as ProtectedProfileCreateRouteImport } from './routes/_protected/profile/create'
@@ -56,6 +57,11 @@ const ProtectedPostsRouteRoute = ProtectedPostsRouteRouteImport.update({
   path: '/posts',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
+const ProtectedChatsRouteRoute = ProtectedChatsRouteRouteImport.update({
+  id: '/chats',
+  path: '/chats',
+  getParentRoute: () => ProtectedRouteRoute,
+} as any)
 const ProtectedProfileSettingsRoute =
   ProtectedProfileSettingsRouteImport.update({
     id: '/settings',
@@ -78,13 +84,14 @@ const ProtectedPostsHomeRoute = ProtectedPostsHomeRouteImport.update({
   getParentRoute: () => ProtectedPostsRouteRoute,
 } as any)
 const ProtectedChatsHomeRoute = ProtectedChatsHomeRouteImport.update({
-  id: '/chats/home',
-  path: '/chats/home',
-  getParentRoute: () => ProtectedRouteRoute,
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => ProtectedChatsRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chats': typeof ProtectedChatsRouteRouteWithChildren
   '/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/home': typeof ProtectedHomeRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chats': typeof ProtectedChatsRouteRouteWithChildren
   '/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/home': typeof ProtectedHomeRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
+  '/_protected/chats': typeof ProtectedChatsRouteRouteWithChildren
   '/_protected/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/_protected/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/_protected/home': typeof ProtectedHomeRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/chats'
     | '/posts'
     | '/profile'
     | '/home'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/chats'
     | '/posts'
     | '/profile'
     | '/home'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_protected'
+    | '/_protected/chats'
     | '/_protected/posts'
     | '/_protected/profile'
     | '/_protected/home'
@@ -225,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPostsRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
+    '/_protected/chats': {
+      id: '/_protected/chats'
+      path: '/chats'
+      fullPath: '/chats'
+      preLoaderRoute: typeof ProtectedChatsRouteRouteImport
+      parentRoute: typeof ProtectedRouteRoute
+    }
     '/_protected/profile/settings': {
       id: '/_protected/profile/settings'
       path: '/settings'
@@ -255,13 +274,24 @@ declare module '@tanstack/react-router' {
     }
     '/_protected/chats/home': {
       id: '/_protected/chats/home'
-      path: '/chats/home'
+      path: '/home'
       fullPath: '/chats/home'
       preLoaderRoute: typeof ProtectedChatsHomeRouteImport
-      parentRoute: typeof ProtectedRouteRoute
+      parentRoute: typeof ProtectedChatsRouteRoute
     }
   }
 }
+
+interface ProtectedChatsRouteRouteChildren {
+  ProtectedChatsHomeRoute: typeof ProtectedChatsHomeRoute
+}
+
+const ProtectedChatsRouteRouteChildren: ProtectedChatsRouteRouteChildren = {
+  ProtectedChatsHomeRoute: ProtectedChatsHomeRoute,
+}
+
+const ProtectedChatsRouteRouteWithChildren =
+  ProtectedChatsRouteRoute._addFileChildren(ProtectedChatsRouteRouteChildren)
 
 interface ProtectedPostsRouteRouteChildren {
   ProtectedPostsHomeRoute: typeof ProtectedPostsHomeRoute
@@ -292,17 +322,17 @@ const ProtectedProfileRouteRouteWithChildren =
   )
 
 interface ProtectedRouteRouteChildren {
+  ProtectedChatsRouteRoute: typeof ProtectedChatsRouteRouteWithChildren
   ProtectedPostsRouteRoute: typeof ProtectedPostsRouteRouteWithChildren
   ProtectedProfileRouteRoute: typeof ProtectedProfileRouteRouteWithChildren
   ProtectedHomeRoute: typeof ProtectedHomeRoute
-  ProtectedChatsHomeRoute: typeof ProtectedChatsHomeRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
+  ProtectedChatsRouteRoute: ProtectedChatsRouteRouteWithChildren,
   ProtectedPostsRouteRoute: ProtectedPostsRouteRouteWithChildren,
   ProtectedProfileRouteRoute: ProtectedProfileRouteRouteWithChildren,
   ProtectedHomeRoute: ProtectedHomeRoute,
-  ProtectedChatsHomeRoute: ProtectedChatsHomeRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

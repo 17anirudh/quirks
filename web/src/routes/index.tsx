@@ -143,289 +143,294 @@ function AppComponent() {
         },
     })
     return (
-        <div className='h-dvh w-screen'>
-            <Vortex backgroundColor='black'>
-                <main className='w-screen h-dvh flex flex-col justify-center items-center gap-9 -z-20 absolute'>
+        <div className='min-h-dvh w-screen items-center flex flex-col overflow-x-hidden'>
+            <header className='flex flex-col w-full justify-center items-center gap-6 relative'>
+                <div className='absolute z-10 top-5 left-50 bg-black'>
                     <ConfettiFireworks>
-                        <Highlighter action='underline' color='#f59e0b'>
-                            <img src='./duck.gif' alt='logo' className='h-20' title='Quak.. quak...' />
-                            <h1 className='text-4xl font-semibold font-serif'>QUIRKS</h1>
+                        <Highlighter action='underline'>
+                            <h3 className="font-extrabold uppercase mt-5 scroll-m-20 text-2xl font-serif tracking-tight text-center">
+                                Quirks
+                            </h3>
                         </Highlighter>
                     </ConfettiFireworks>
-                    <div className="flex gap-7">
-                        {/* Login Form */}
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" className='cursor-pointer'>Log in</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <div className="flex flex-col items-center gap-2">
-                                    <div
-                                        className="flex size-11 shrink-0 items-center justify-center rounded-full"
-                                        aria-hidden="true"
-                                    >
-                                        <img
-                                            src="./duck.gif"
-                                            alt="logo"
-                                            className="h-8 w-8 rounded-full"
-                                        />
-                                    </div>
-                                    <DialogHeader>
-                                        <DialogTitle className="sm:text-center">Welcome back</DialogTitle>
-                                        <DialogDescription className="sm:text-center">
-                                            Welcome back, enter your credentials to log in.
-                                        </DialogDescription>
-                                    </DialogHeader>
-                                </div>
-                                <div className='flex flex-col justify-center items-center gap-9'>
-                                    {/* login form */}
-                                    <div className="w-full p-10">
-                                        <form
-                                            id="login-form"
-                                            onSubmit={(e) => {
-                                                e.preventDefault()
-                                                loginForm.handleSubmit()
+                </div>
+                <div className='absolute top-0'>
+                    <img src='/landing/mindless crowd.avif' className='h-[70%] object-cover' />
+                </div>
+            </header>
+            <div className="flex gap-7">
+                {/* Login Form */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" className='cursor-pointer'>Log in</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <div className="flex flex-col items-center gap-2">
+                            <div
+                                className="flex size-11 shrink-0 items-center justify-center rounded-full"
+                                aria-hidden="true"
+                            >
+                                <img
+                                    src="./duck.gif"
+                                    alt="logo"
+                                    className="h-8 w-8 rounded-full"
+                                />
+                            </div>
+                            <DialogHeader>
+                                <DialogTitle className="sm:text-center">Welcome back</DialogTitle>
+                                <DialogDescription className="sm:text-center">
+                                    Welcome back, enter your credentials to log in.
+                                </DialogDescription>
+                            </DialogHeader>
+                        </div>
+                        <div className='flex flex-col justify-center items-center gap-9'>
+                            {/* login form */}
+                            <div className="w-full p-10">
+                                <form
+                                    id="login-form"
+                                    onSubmit={(e) => {
+                                        e.preventDefault()
+                                        loginForm.handleSubmit()
+                                    }}
+                                >
+                                    <FieldGroup>
+                                        <loginForm.Field
+                                            name="u_mail"
+                                            children={(field) => {
+                                                const isInvalid =
+                                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                                return (
+                                                    <Field data-invalid={isInvalid}>
+                                                        <FieldLabel htmlFor={field.name}>Mail</FieldLabel>
+                                                        <Input
+                                                            id={field.name}
+                                                            name={field.name}
+                                                            value={field.state.value}
+                                                            onBlur={field.handleBlur}
+                                                            onChange={(e) => field.handleChange(e.target.value)}
+                                                            aria-invalid={isInvalid}
+                                                            required
+                                                        />
+                                                        <FieldDescription>
+                                                            Enter your mail.
+                                                        </FieldDescription>
+                                                        {isInvalid && (
+                                                            <FieldError errors={field.state.meta.errors} />
+                                                        )}
+                                                    </Field>
+                                                )
                                             }}
-                                        >
-                                            <FieldGroup>
-                                                <loginForm.Field
-                                                    name="u_mail"
-                                                    children={(field) => {
-                                                        const isInvalid =
-                                                            field.state.meta.isTouched && !field.state.meta.isValid
-                                                        return (
-                                                            <Field data-invalid={isInvalid}>
-                                                                <FieldLabel htmlFor={field.name}>Mail</FieldLabel>
-                                                                <Input
-                                                                    id={field.name}
-                                                                    name={field.name}
-                                                                    value={field.state.value}
-                                                                    onBlur={field.handleBlur}
-                                                                    onChange={(e) => field.handleChange(e.target.value)}
-                                                                    aria-invalid={isInvalid}
-                                                                    required
-                                                                />
-                                                                <FieldDescription>
-                                                                    Enter your mail.
-                                                                </FieldDescription>
-                                                                {isInvalid && (
-                                                                    <FieldError errors={field.state.meta.errors} />
-                                                                )}
-                                                            </Field>
-                                                        )
-                                                    }}
-                                                />
-                                                <loginForm.Field
-                                                    name="u_pass"
-                                                    children={(field) => {
-                                                        const isInvalid =
-                                                            field.state.meta.isTouched && !field.state.meta.isValid
-                                                        return (
-                                                            <Field data-invalid={isInvalid}>
-                                                                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                                                                <Input
-                                                                    id={field.name}
-                                                                    name={field.name}
-                                                                    value={field.state.value}
-                                                                    onBlur={field.handleBlur}
-                                                                    onChange={(e) => field.handleChange(e.target.value)}
-                                                                    aria-invalid={isInvalid}
-                                                                    required
-                                                                    type="password"
-                                                                />
-                                                                <FieldDescription>
-                                                                    Enter your password.
-                                                                </FieldDescription>
-                                                                {isInvalid && (
-                                                                    <FieldError errors={field.state.meta.errors} />
-                                                                )}
-                                                            </Field>
-                                                        )
-                                                    }}
-                                                />
-                                                <Field orientation="horizontal">
+                                        />
+                                        <loginForm.Field
+                                            name="u_pass"
+                                            children={(field) => {
+                                                const isInvalid =
+                                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                                return (
+                                                    <Field data-invalid={isInvalid}>
+                                                        <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                                                        <Input
+                                                            id={field.name}
+                                                            name={field.name}
+                                                            value={field.state.value}
+                                                            onBlur={field.handleBlur}
+                                                            onChange={(e) => field.handleChange(e.target.value)}
+                                                            aria-invalid={isInvalid}
+                                                            required
+                                                            type="password"
+                                                        />
+                                                        <FieldDescription>
+                                                            Enter your password.
+                                                        </FieldDescription>
+                                                        {isInvalid && (
+                                                            <FieldError errors={field.state.meta.errors} />
+                                                        )}
+                                                    </Field>
+                                                )
+                                            }}
+                                        />
+                                        <Field orientation="horizontal">
+                                            <Button
+                                                className="cursor-pointer"
+                                                type="button"
+                                                variant="outline"
+                                                onClick={() => loginForm.reset()}
+                                                disabled={logInUser.isPending} // Disable while loading
+                                            >
+                                                Reset
+                                            </Button>
+                                            <Button
+                                                className="cursor-pointer"
+                                                type="submit"
+                                                form="login-form"
+                                                disabled={logInUser.isPending} // Disable while loading
+                                            >
+                                                {logInUser.isPending ? "Logining in..." : "Submit"}
+                                            </Button>
+                                        </Field>
+                                    </FieldGroup>
+                                </form>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+                {/* Signup Form */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button variant="outline" className='cursor-pointer'>Sign up</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <div className="flex flex-col items-center gap-2">
+                            <div
+                                className="flex size-11 shrink-0 items-center justify-center rounded-full"
+                                aria-hidden="true"
+                            >
+                                <img
+                                    src="./duck.gif"
+                                    alt="logo"
+                                    className="h-8 w-8 rounded-full"
+                                />
+                            </div>
+                            <DialogHeader>
+                                <DialogTitle className="sm:text-center">Create an Account</DialogTitle>
+                                <DialogDescription className="sm:text-center">
+                                    Add your credentials to create your account.
+                                </DialogDescription>
+                            </DialogHeader>
+                        </div>
+                        <div className='flex flex-col justify-center items-center gap-9'>
+                            {/* Signup form */}
+                            <div className="w-full p-10">
+                                <form
+                                    id="signup-form"
+                                    onSubmit={(e) => {
+                                        e.preventDefault()
+                                        signUpForm.handleSubmit()
+                                    }}
+                                >
+                                    <FieldGroup>
+                                        <signUpForm.Field
+                                            name="u_qid"
+                                            children={(field) => {
+                                                const isInvalid =
+                                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                                return (
+                                                    <Field data-invalid={isInvalid}>
+                                                        <FieldLabel htmlFor={field.name}>QID</FieldLabel>
+                                                        <Input
+                                                            id={field.name}
+                                                            name={field.name}
+                                                            value={field.state.value}
+                                                            onBlur={field.handleBlur}
+                                                            onChange={(e) => field.handleChange(e.target.value)}
+                                                            aria-invalid={isInvalid}
+                                                            required
+                                                        />
+                                                        <FieldDescription>
+                                                            Create your identity 😎.
+                                                        </FieldDescription>
+                                                        {isInvalid && (
+                                                            <FieldError errors={field.state.meta.errors} />
+                                                        )}
+                                                    </Field>
+                                                )
+                                            }}
+                                        />
+                                        {/* <FieldSeparator /> */}
+                                        <signUpForm.Field
+                                            name="u_mail"
+                                            children={(field) => {
+                                                const isInvalid =
+                                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                                return (
+                                                    <Field data-invalid={isInvalid}>
+                                                        <FieldLabel htmlFor={field.name}>Mail</FieldLabel>
+                                                        <Input
+                                                            id={field.name}
+                                                            name={field.name}
+                                                            value={field.state.value}
+                                                            onBlur={field.handleBlur}
+                                                            onChange={(e) => field.handleChange(e.target.value)}
+                                                            aria-invalid={isInvalid}
+                                                            required
+                                                        />
+                                                        <FieldDescription>
+                                                            Enter your mail.
+                                                        </FieldDescription>
+                                                        {isInvalid && (
+                                                            <FieldError errors={field.state.meta.errors} />
+                                                        )}
+                                                    </Field>
+                                                )
+                                            }}
+                                        />
+                                        <signUpForm.Field
+                                            name="u_pass"
+                                            children={(field) => {
+                                                const isInvalid =
+                                                    field.state.meta.isTouched && !field.state.meta.isValid
+                                                return (
+                                                    <Field data-invalid={isInvalid}>
+                                                        <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                                                        <Input
+                                                            id={field.name}
+                                                            name={field.name}
+                                                            value={field.state.value}
+                                                            onBlur={field.handleBlur}
+                                                            onChange={(e) => field.handleChange(e.target.value)}
+                                                            aria-invalid={isInvalid}
+                                                            required
+                                                            type="password"
+                                                        />
+                                                        <FieldDescription>
+                                                            Enter your password.
+                                                        </FieldDescription>
+                                                        {isInvalid && (
+                                                            <FieldError errors={field.state.meta.errors} />
+                                                        )}
+                                                    </Field>
+                                                )
+                                            }}
+                                        />
+                                        <signUpForm.Subscribe
+                                            selector={(state) => [state.canSubmit, state.isSubmitting]}
+                                            children={([canSubmit, isSubmitting]) => (
+                                                <div className='flex gap-3'>
                                                     <Button
-                                                        className="cursor-pointer"
-                                                        type="button"
+                                                        type="submit"
                                                         variant="outline"
-                                                        onClick={() => loginForm.reset()}
-                                                        disabled={logInUser.isPending} // Disable while loading
+                                                        className='cursor-pointer'
+                                                        disabled={!canSubmit || createAccount.isPending}
+                                                    >
+                                                        {isSubmitting ? '...' : 'Submit'}
+                                                    </Button>
+                                                    <Button
+                                                        type="reset"
+                                                        className='cursor-pointer'
+                                                        onClick={(e) => {
+                                                            e.preventDefault()
+                                                            signUpForm.reset()
+                                                        }}
                                                     >
                                                         Reset
                                                     </Button>
-                                                    <Button
-                                                        className="cursor-pointer"
-                                                        type="submit"
-                                                        form="login-form"
-                                                        disabled={logInUser.isPending} // Disable while loading
-                                                    >
-                                                        {logInUser.isPending ? "Logining in..." : "Submit"}
-                                                    </Button>
-                                                </Field>
-                                            </FieldGroup>
-                                        </form>
-                                    </div>
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                        {/* Signup Form */}
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <Button variant="outline" className='cursor-pointer'>Sign up</Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <div className="flex flex-col items-center gap-2">
-                                    <div
-                                        className="flex size-11 shrink-0 items-center justify-center rounded-full"
-                                        aria-hidden="true"
-                                    >
-                                        <img
-                                            src="./duck.gif"
-                                            alt="logo"
-                                            className="h-8 w-8 rounded-full"
+                                                </div>
+                                            )}
                                         />
-                                    </div>
-                                    <DialogHeader>
-                                        <DialogTitle className="sm:text-center">Create an Account</DialogTitle>
-                                        <DialogDescription className="sm:text-center">
-                                            Add your credentials to create your account.
-                                        </DialogDescription>
-                                    </DialogHeader>
+                                    </FieldGroup>
+                                </form>
+                            </div>
+                            {/* Error message */}
+                            {createAccount.isError && (
+                                <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
+                                    <pre>{JSON.stringify(createAccount.error, null, 2)}</pre>
                                 </div>
-                                <div className='flex flex-col justify-center items-center gap-9'>
-                                    {/* Signup form */}
-                                    <div className="w-full p-10">
-                                        <form
-                                            id="signup-form"
-                                            onSubmit={(e) => {
-                                                e.preventDefault()
-                                                signUpForm.handleSubmit()
-                                            }}
-                                        >
-                                            <FieldGroup>
-                                                <signUpForm.Field
-                                                    name="u_qid"
-                                                    children={(field) => {
-                                                        const isInvalid =
-                                                            field.state.meta.isTouched && !field.state.meta.isValid
-                                                        return (
-                                                            <Field data-invalid={isInvalid}>
-                                                                <FieldLabel htmlFor={field.name}>QID</FieldLabel>
-                                                                <Input
-                                                                    id={field.name}
-                                                                    name={field.name}
-                                                                    value={field.state.value}
-                                                                    onBlur={field.handleBlur}
-                                                                    onChange={(e) => field.handleChange(e.target.value)}
-                                                                    aria-invalid={isInvalid}
-                                                                    required
-                                                                />
-                                                                <FieldDescription>
-                                                                    Create your identity 😎.
-                                                                </FieldDescription>
-                                                                {isInvalid && (
-                                                                    <FieldError errors={field.state.meta.errors} />
-                                                                )}
-                                                            </Field>
-                                                        )
-                                                    }}
-                                                />
-                                                {/* <FieldSeparator /> */}
-                                                <signUpForm.Field
-                                                    name="u_mail"
-                                                    children={(field) => {
-                                                        const isInvalid =
-                                                            field.state.meta.isTouched && !field.state.meta.isValid
-                                                        return (
-                                                            <Field data-invalid={isInvalid}>
-                                                                <FieldLabel htmlFor={field.name}>Mail</FieldLabel>
-                                                                <Input
-                                                                    id={field.name}
-                                                                    name={field.name}
-                                                                    value={field.state.value}
-                                                                    onBlur={field.handleBlur}
-                                                                    onChange={(e) => field.handleChange(e.target.value)}
-                                                                    aria-invalid={isInvalid}
-                                                                    required
-                                                                />
-                                                                <FieldDescription>
-                                                                    Enter your mail.
-                                                                </FieldDescription>
-                                                                {isInvalid && (
-                                                                    <FieldError errors={field.state.meta.errors} />
-                                                                )}
-                                                            </Field>
-                                                        )
-                                                    }}
-                                                />
-                                                <signUpForm.Field
-                                                    name="u_pass"
-                                                    children={(field) => {
-                                                        const isInvalid =
-                                                            field.state.meta.isTouched && !field.state.meta.isValid
-                                                        return (
-                                                            <Field data-invalid={isInvalid}>
-                                                                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                                                                <Input
-                                                                    id={field.name}
-                                                                    name={field.name}
-                                                                    value={field.state.value}
-                                                                    onBlur={field.handleBlur}
-                                                                    onChange={(e) => field.handleChange(e.target.value)}
-                                                                    aria-invalid={isInvalid}
-                                                                    required
-                                                                    type="password"
-                                                                />
-                                                                <FieldDescription>
-                                                                    Enter your password.
-                                                                </FieldDescription>
-                                                                {isInvalid && (
-                                                                    <FieldError errors={field.state.meta.errors} />
-                                                                )}
-                                                            </Field>
-                                                        )
-                                                    }}
-                                                />
-                                                <signUpForm.Subscribe
-                                                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                                                    children={([canSubmit, isSubmitting]) => (
-                                                        <div className='flex gap-3'>
-                                                            <Button
-                                                                type="submit"
-                                                                variant="outline"
-                                                                className='cursor-pointer'
-                                                                disabled={!canSubmit || createAccount.isPending}
-                                                            >
-                                                                {isSubmitting ? '...' : 'Submit'}
-                                                            </Button>
-                                                            <Button
-                                                                type="reset"
-                                                                className='cursor-pointer'
-                                                                onClick={(e) => {
-                                                                    e.preventDefault()
-                                                                    signUpForm.reset()
-                                                                }}
-                                                            >
-                                                                Reset
-                                                            </Button>
-                                                        </div>
-                                                    )}
-                                                />
-                                            </FieldGroup>
-                                        </form>
-                                    </div>
-                                    {/* Error message */}
-                                    {createAccount.isError && (
-                                        <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded">
-                                            <pre>{JSON.stringify(createAccount.error, null, 2)}</pre>
-                                        </div>
-                                    )}
-                                </div>
-                            </DialogContent>
-                        </Dialog>
-                    </div>
-                </main>
-            </Vortex>
+                            )}
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            </div>
         </div>
     )
 }
+
