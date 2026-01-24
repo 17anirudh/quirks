@@ -83,7 +83,7 @@ const navigations: navType[] = [
     },
     {
         display: "Chats",
-        path: '/chats/home',
+        path: '/chats',
         icon: <MessageCircle height={27} />,
         value: 'chats'
     },

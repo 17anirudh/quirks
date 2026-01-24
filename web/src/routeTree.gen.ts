@@ -17,14 +17,12 @@ import { Route as ProtectedHomeRouteImport } from './routes/_protected/home'
 import { Route as ProtectedProfileRouteRouteImport } from './routes/_protected/profile/route'
 import { Route as ProtectedPostsRouteRouteImport } from './routes/_protected/posts/route'
 import { Route as ProtectedChatsRouteRouteImport } from './routes/_protected/chats/route'
-import { Route as ProtectedMessagesIndexRouteImport } from './routes/_protected/messages/index'
 import { Route as ProtectedChatsIndexRouteImport } from './routes/_protected/chats/index'
 import { Route as ProtectedProfileSettingsRouteImport } from './routes/_protected/profile/settings'
 import { Route as ProtectedProfileHomeRouteImport } from './routes/_protected/profile/home'
 import { Route as ProtectedProfileCreateRouteImport } from './routes/_protected/profile/create'
 import { Route as ProtectedPostsHomeRouteImport } from './routes/_protected/posts/home'
-import { Route as ProtectedMessagesChatIdRouteImport } from './routes/_protected/messages/$chatId'
-import { Route as ProtectedChatsHomeRouteImport } from './routes/_protected/chats/home'
+import { Route as ProtectedChatsChatIdRouteImport } from './routes/_protected/chats/$chatId'
 
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
@@ -65,11 +63,6 @@ const ProtectedChatsRouteRoute = ProtectedChatsRouteRouteImport.update({
   path: '/chats',
   getParentRoute: () => ProtectedRouteRoute,
 } as any)
-const ProtectedMessagesIndexRoute = ProtectedMessagesIndexRouteImport.update({
-  id: '/messages/',
-  path: '/messages/',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
 const ProtectedChatsIndexRoute = ProtectedChatsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -96,14 +89,9 @@ const ProtectedPostsHomeRoute = ProtectedPostsHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => ProtectedPostsRouteRoute,
 } as any)
-const ProtectedMessagesChatIdRoute = ProtectedMessagesChatIdRouteImport.update({
-  id: '/messages/$chatId',
-  path: '/messages/$chatId',
-  getParentRoute: () => ProtectedRouteRoute,
-} as any)
-const ProtectedChatsHomeRoute = ProtectedChatsHomeRouteImport.update({
-  id: '/home',
-  path: '/home',
+const ProtectedChatsChatIdRoute = ProtectedChatsChatIdRouteImport.update({
+  id: '/$chatId',
+  path: '/$chatId',
   getParentRoute: () => ProtectedChatsRouteRoute,
 } as any)
 
@@ -115,14 +103,12 @@ export interface FileRoutesByFullPath {
   '/home': typeof ProtectedHomeRoute
   '/p/$pid': typeof PPidRoute
   '/u/$qid': typeof UQidRoute
-  '/chats/home': typeof ProtectedChatsHomeRoute
-  '/messages/$chatId': typeof ProtectedMessagesChatIdRoute
+  '/chats/$chatId': typeof ProtectedChatsChatIdRoute
   '/posts/home': typeof ProtectedPostsHomeRoute
   '/profile/create': typeof ProtectedProfileCreateRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
   '/chats/': typeof ProtectedChatsIndexRoute
-  '/messages': typeof ProtectedMessagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,14 +117,12 @@ export interface FileRoutesByTo {
   '/home': typeof ProtectedHomeRoute
   '/p/$pid': typeof PPidRoute
   '/u/$qid': typeof UQidRoute
-  '/chats/home': typeof ProtectedChatsHomeRoute
-  '/messages/$chatId': typeof ProtectedMessagesChatIdRoute
+  '/chats/$chatId': typeof ProtectedChatsChatIdRoute
   '/posts/home': typeof ProtectedPostsHomeRoute
   '/profile/create': typeof ProtectedProfileCreateRoute
   '/profile/home': typeof ProtectedProfileHomeRoute
   '/profile/settings': typeof ProtectedProfileSettingsRoute
   '/chats': typeof ProtectedChatsIndexRoute
-  '/messages': typeof ProtectedMessagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -150,14 +134,12 @@ export interface FileRoutesById {
   '/_protected/home': typeof ProtectedHomeRoute
   '/p/$pid': typeof PPidRoute
   '/u/$qid': typeof UQidRoute
-  '/_protected/chats/home': typeof ProtectedChatsHomeRoute
-  '/_protected/messages/$chatId': typeof ProtectedMessagesChatIdRoute
+  '/_protected/chats/$chatId': typeof ProtectedChatsChatIdRoute
   '/_protected/posts/home': typeof ProtectedPostsHomeRoute
   '/_protected/profile/create': typeof ProtectedProfileCreateRoute
   '/_protected/profile/home': typeof ProtectedProfileHomeRoute
   '/_protected/profile/settings': typeof ProtectedProfileSettingsRoute
   '/_protected/chats/': typeof ProtectedChatsIndexRoute
-  '/_protected/messages/': typeof ProtectedMessagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -169,14 +151,12 @@ export interface FileRouteTypes {
     | '/home'
     | '/p/$pid'
     | '/u/$qid'
-    | '/chats/home'
-    | '/messages/$chatId'
+    | '/chats/$chatId'
     | '/posts/home'
     | '/profile/create'
     | '/profile/home'
     | '/profile/settings'
     | '/chats/'
-    | '/messages'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -185,14 +165,12 @@ export interface FileRouteTypes {
     | '/home'
     | '/p/$pid'
     | '/u/$qid'
-    | '/chats/home'
-    | '/messages/$chatId'
+    | '/chats/$chatId'
     | '/posts/home'
     | '/profile/create'
     | '/profile/home'
     | '/profile/settings'
     | '/chats'
-    | '/messages'
   id:
     | '__root__'
     | '/'
@@ -203,14 +181,12 @@ export interface FileRouteTypes {
     | '/_protected/home'
     | '/p/$pid'
     | '/u/$qid'
-    | '/_protected/chats/home'
-    | '/_protected/messages/$chatId'
+    | '/_protected/chats/$chatId'
     | '/_protected/posts/home'
     | '/_protected/profile/create'
     | '/_protected/profile/home'
     | '/_protected/profile/settings'
     | '/_protected/chats/'
-    | '/_protected/messages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -278,13 +254,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedChatsRouteRouteImport
       parentRoute: typeof ProtectedRouteRoute
     }
-    '/_protected/messages/': {
-      id: '/_protected/messages/'
-      path: '/messages'
-      fullPath: '/messages'
-      preLoaderRoute: typeof ProtectedMessagesIndexRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
     '/_protected/chats/': {
       id: '/_protected/chats/'
       path: '/'
@@ -320,30 +289,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedPostsHomeRouteImport
       parentRoute: typeof ProtectedPostsRouteRoute
     }
-    '/_protected/messages/$chatId': {
-      id: '/_protected/messages/$chatId'
-      path: '/messages/$chatId'
-      fullPath: '/messages/$chatId'
-      preLoaderRoute: typeof ProtectedMessagesChatIdRouteImport
-      parentRoute: typeof ProtectedRouteRoute
-    }
-    '/_protected/chats/home': {
-      id: '/_protected/chats/home'
-      path: '/home'
-      fullPath: '/chats/home'
-      preLoaderRoute: typeof ProtectedChatsHomeRouteImport
+    '/_protected/chats/$chatId': {
+      id: '/_protected/chats/$chatId'
+      path: '/$chatId'
+      fullPath: '/chats/$chatId'
+      preLoaderRoute: typeof ProtectedChatsChatIdRouteImport
       parentRoute: typeof ProtectedChatsRouteRoute
     }
   }
 }
 
 interface ProtectedChatsRouteRouteChildren {
-  ProtectedChatsHomeRoute: typeof ProtectedChatsHomeRoute
+  ProtectedChatsChatIdRoute: typeof ProtectedChatsChatIdRoute
   ProtectedChatsIndexRoute: typeof ProtectedChatsIndexRoute
 }
 
 const ProtectedChatsRouteRouteChildren: ProtectedChatsRouteRouteChildren = {
-  ProtectedChatsHomeRoute: ProtectedChatsHomeRoute,
+  ProtectedChatsChatIdRoute: ProtectedChatsChatIdRoute,
   ProtectedChatsIndexRoute: ProtectedChatsIndexRoute,
 }
 
@@ -383,8 +345,6 @@ interface ProtectedRouteRouteChildren {
   ProtectedPostsRouteRoute: typeof ProtectedPostsRouteRouteWithChildren
   ProtectedProfileRouteRoute: typeof ProtectedProfileRouteRouteWithChildren
   ProtectedHomeRoute: typeof ProtectedHomeRoute
-  ProtectedMessagesChatIdRoute: typeof ProtectedMessagesChatIdRoute
-  ProtectedMessagesIndexRoute: typeof ProtectedMessagesIndexRoute
 }
 
 const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
@@ -392,8 +352,6 @@ const ProtectedRouteRouteChildren: ProtectedRouteRouteChildren = {
   ProtectedPostsRouteRoute: ProtectedPostsRouteRouteWithChildren,
   ProtectedProfileRouteRoute: ProtectedProfileRouteRouteWithChildren,
   ProtectedHomeRoute: ProtectedHomeRoute,
-  ProtectedMessagesChatIdRoute: ProtectedMessagesChatIdRoute,
-  ProtectedMessagesIndexRoute: ProtectedMessagesIndexRoute,
 }
 
 const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(

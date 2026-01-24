@@ -8,27 +8,26 @@ import { Input } from '@/lib/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar'
 import { useAuth } from '@/hooks/auth-provider'
 import type { Message, UserProfile } from '@/types'
+import Loader from '@/components/loader'
 
-export const Route = createFileRoute('/_protected/messages/$chatId')({
+export const Route = createFileRoute('/_protected/chats/$chatId')({
     component: ChatRoom,
 })
 
 function ChatRoom() {
-    const { chatId } = useParams({ from: '/_protected/messages/$chatId' })
+    const { chatId } = useParams({ from: '/_protected/chats/$chatId' })
     const { qid } = useAuth()
     const [input, setInput] = useState('')
     const [localMessages, setLocalMessages] = useState<Message[]>([])
     const scrollRef = useRef<HTMLDivElement>(null)
     const wsRef = useRef<WebSocket | null>(null)
 
-    // Scroll to bottom helper
     const scrollToBottom = () => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight
         }
     }
 
-    // 1. Fetch Chat History & Partner Info
     const { data: partner, isLoading: isPartnerLoading } = useQuery({
         queryKey: ['conversation_partner', chatId],
         queryFn: async () => {
@@ -43,7 +42,6 @@ function ChatRoom() {
                 .single()
 
             if (error) throw error;
-            // Handle array or object return
             const p = data?.profile;
             if (Array.isArray(p)) return p[0] as UserProfile;
             return p as UserProfile;
@@ -69,7 +67,6 @@ function ChatRoom() {
         scrollToBottom()
     }, [history, localMessages])
 
-    // WebSocket Connection
     useEffect(() => {
         if (!chatId) return
 
@@ -97,13 +94,11 @@ function ChatRoom() {
         }
     }, [chatId, qid])
 
-
     const sendMessage = () => {
         if (!input.trim() || !wsRef.current || !qid) return
 
         const content = input.trim()
 
-        // Optimistic Update
         const tempMsg: Message = {
             content,
             m_sender_qid: qid,
@@ -113,7 +108,6 @@ function ChatRoom() {
         setLocalMessages(prev => [...prev, tempMsg])
         setInput('')
 
-        // Send
         wsRef.current.send(JSON.stringify({
             content,
             sender_qid: qid
@@ -122,7 +116,7 @@ function ChatRoom() {
         scrollToBottom()
     }
 
-    if (isPartnerLoading || isHistoryLoading) return <div className="flex h-full items-center justify-center"><Loader2 className="animate-spin" /></div>
+    if (isPartnerLoading || isHistoryLoading) return <Loader />
 
     const allMessages = [...(history || []), ...localMessages]
 
@@ -132,16 +126,15 @@ function ChatRoom() {
             <div className="hidden md:flex w-1/3 lg:w-1/4 border-r flex-col">
                 <div className="border-b p-4 font-bold text-xl flex justify-between items-center">
                     Messages
-                    <Link to="/messages" className="text-xs text-muted-foreground uppercase">Index</Link>
+                    <Link to="/chats" className="text-xs text-muted-foreground uppercase">Index</Link>
                 </div>
                 <ConversationListSideBar currentChatId={chatId} />
             </div>
 
             {/* Chat Area */}
             <div className="flex-1 flex flex-col w-full">
-                {/* Header */}
                 <div className="flex items-center gap-3 border-b p-2">
-                    <Link to="/messages" className="md:hidden p-2">
+                    <Link to="/chats" className="md:hidden p-2">
                         <ArrowLeft />
                     </Link>
                     <Avatar className="h-10 w-10">
@@ -151,7 +144,6 @@ function ChatRoom() {
                     <div className="font-semibold">{partner?.u_name || partner?.u_qid || 'User'}</div>
                 </div>
 
-                {/* Messages */}
                 <div
                     ref={scrollRef}
                     className="flex-1 overflow-y-auto p-4 flex flex-col gap-2"
@@ -182,7 +174,6 @@ function ChatRoom() {
                     })}
                 </div>
 
-                {/* Input */}
                 <div className="border-t p-4 flex gap-2">
                     <Input
                         value={input}
@@ -200,11 +191,7 @@ function ChatRoom() {
     )
 }
 
-// Simple Sidebar Component to reuse/render
 function ConversationListSideBar({ currentChatId }: { currentChatId?: string }) {
-    // Import Conversation type in this file or cast? 
-    // We already imported UserProfile, but Conversation is not used explicitly here as type arg to useQuery generic.
-    // Let's use any for now or better, import Conversation from types
     const { data: conversations } = useQuery({
         queryKey: ['conversations'],
         queryFn: async () => {
@@ -223,7 +210,7 @@ function ConversationListSideBar({ currentChatId }: { currentChatId?: string }) 
             {conversations?.map((conv) => (
                 <Link
                     key={conv.conv_id}
-                    to={`/messages/$chatId`}
+                    to={`/chats/$chatId`}
                     params={{ chatId: conv.conv_id }}
                     className={`flex items-center gap-3 border-b p-4 hover:bg-muted/50 transition-colors ${currentChatId === conv.conv_id ? 'bg-muted' : ''}`}
                 >

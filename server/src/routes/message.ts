@@ -118,12 +118,19 @@ export const messages = new Elysia({ prefix: '/message' })
             return { error: "Invalid User" };
         }
         const myQid = userData.user.user_metadata.u_qid;
+        console.log(`[LIST] Fetching conversations for user: ${myQid}`);
 
         // Get my conversations
-        const { data: myMemberships } = await CLIENT
+        const { data: myMemberships, error: membershipError } = await CLIENT
             .from('conversation_member')
             .select('conv_mem_conv_ref_id')
             .eq('conv_mem_qid', myQid);
+
+        if (membershipError) {
+            console.error(`[LIST] Error fetching memberships for ${myQid}:`, membershipError);
+        }
+
+        console.log(`[LIST] Found ${myMemberships?.length || 0} conversations for ${myQid}`);
 
         if (!myMemberships || myMemberships.length === 0) {
             return { conversations: [] };
@@ -147,7 +154,7 @@ export const messages = new Elysia({ prefix: '/message' })
                 .maybeSingle();
 
             if (memberError) {
-                console.error("Error fetching member for conv", convId, memberError);
+                console.error(`[LIST] Error fetching member for conv ${convId}:`, memberError);
                 continue;
             }
 
@@ -161,7 +168,7 @@ export const messages = new Elysia({ prefix: '/message' })
                 .maybeSingle();
 
             if (msgError) {
-                console.error("Error fetching last msg for conv", convId, msgError);
+                console.error(`[LIST] Error fetching last msg for conv ${convId}:`, msgError);
             }
 
             if (members && members.profile) {
@@ -181,6 +188,8 @@ export const messages = new Elysia({ prefix: '/message' })
                             last_message: lastMsg
                         });
                     }
+                } else {
+                    console.warn(`[LIST] Could not fetch member data for conv ${convId}`);
                 }
             }
         }
@@ -192,6 +201,7 @@ export const messages = new Elysia({ prefix: '/message' })
             return dateB - dateA;
         });
 
+        console.log(`[LIST] Returning ${conversations.length} conversations to ${myQid}`);
         return { conversations };
     })
 

@@ -93,7 +93,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
             return await res.json();
         },
         onSuccess: (data: { conv_id: string }) => {
-            navigate({ to: '/messages/$chatId', params: { chatId: data.conv_id } });
+            navigate({ to: '/chats/$chatId', params: { chatId: data.conv_id } });
         },
         onError: (err) => {
             toast.error(err.message);
