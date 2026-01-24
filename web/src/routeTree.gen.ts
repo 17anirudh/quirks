@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as ProtectedRouteRouteImport } from './routes/_protected/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UQidRouteImport } from './routes/u.$qid'
@@ -24,6 +25,11 @@ import { Route as ProtectedProfileCreateRouteImport } from './routes/_protected/
 import { Route as ProtectedPostsHomeRouteImport } from './routes/_protected/posts/home'
 import { Route as ProtectedChatsChatIdRouteImport } from './routes/_protected/chats/$chatId'
 
+const CreditsRoute = CreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProtectedRouteRoute = ProtectedRouteRouteImport.update({
   id: '/_protected',
   getParentRoute: () => rootRouteImport,
@@ -97,6 +103,7 @@ const ProtectedChatsChatIdRoute = ProtectedChatsChatIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/credits': typeof CreditsRoute
   '/chats': typeof ProtectedChatsRouteRouteWithChildren
   '/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/credits': typeof CreditsRoute
   '/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/profile': typeof ProtectedProfileRouteRouteWithChildren
   '/home': typeof ProtectedHomeRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_protected': typeof ProtectedRouteRouteWithChildren
+  '/credits': typeof CreditsRoute
   '/_protected/chats': typeof ProtectedChatsRouteRouteWithChildren
   '/_protected/posts': typeof ProtectedPostsRouteRouteWithChildren
   '/_protected/profile': typeof ProtectedProfileRouteRouteWithChildren
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/credits'
     | '/chats'
     | '/posts'
     | '/profile'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/credits'
     | '/posts'
     | '/profile'
     | '/home'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_protected'
+    | '/credits'
     | '/_protected/chats'
     | '/_protected/posts'
     | '/_protected/profile'
@@ -192,12 +204,20 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProtectedRouteRoute: typeof ProtectedRouteRouteWithChildren
+  CreditsRoute: typeof CreditsRoute
   PPidRoute: typeof PPidRoute
   UQidRoute: typeof UQidRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/credits': {
+      id: '/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof CreditsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_protected': {
       id: '/_protected'
       path: ''
@@ -361,6 +381,7 @@ const ProtectedRouteRouteWithChildren = ProtectedRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProtectedRouteRoute: ProtectedRouteRouteWithChildren,
+  CreditsRoute: CreditsRoute,
   PPidRoute: PPidRoute,
   UQidRoute: UQidRoute,
 }

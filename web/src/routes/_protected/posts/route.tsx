@@ -42,9 +42,9 @@ function RouteComponent() {
     <div className='flex flex-col gap-5 items-center pt-2 h-full w-full overflow-hidden'>
       {/* Header and Timer stay fixed at the top because the parent is h-screen and hidden overflow */}
       <header className='w-9/12 flex-none'>
-        <div className="text-xs text-muted-foreground">
+        {/* <div className="text-xs text-muted-foreground">
           DEBUG: Route={location.pathname} | Running={isRunning.toString()} | Blocked={isBlocked.toString()} | Secs={remainingSeconds}
-        </div>
+        </div> */}
         <form onSubmit={(e) => userSearch(e)} className='flex gap-2 border-4 w-full'>
           <Input type='text' placeholder='Search' name='qid' />
           <Button type='submit' className='cursor-pointer'><SearchIcon /></Button>

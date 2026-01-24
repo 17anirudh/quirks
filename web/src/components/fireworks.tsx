@@ -38,7 +38,7 @@ export function ConfettiFireworks({ children }: props) {
 
   return (
     <div className="relative">
-      <Button onClick={handleClick} variant="ghost" className='flex gap-5 justify-center items-center'>
+      <Button onClick={handleClick} variant="ghost" className='flex gap-5 justify-center items-center hover:bg-transparent'>
         {children}
       </Button>
     </div>

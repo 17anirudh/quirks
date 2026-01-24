@@ -1,0 +1,92 @@
+You are working inside an existing, non-demo production project.
+Do NOT assume missing infrastructure. Integrate with what exists.
+
+MANDATORY CONTEXT FILES (read before coding, do not modify unless asked):
+- server/src/Supabase/config.ts        // Server-side Supabase client (source of truth)
+- server/src/routes/message.ts         // ALL messaging routes & WebSocket logic live here
+- server/src/routes/index.ts           // Import message routes here
+- server/src/index.ts                  // Use .use() to register message routes
+- web/src/hooks/auth-provider.tsx      // Global auth context (u_qid)
+- web/src/hooks/root-provider.tsx      // Global TanStack Query provider
+- web/src/lib/ui/message-bubble.tsx    // Message UI reference (do not rewrite)
+- web/src/components/Ctxprofile.tsx    // This is the place where message user option pops up
+
+Context:
+- Supabase JS client is already configured and authenticated
+- Current userId is available as:
+  session.user.user_metadata.u_qid
+- Database tables already exist and are public
+- Private DMs only, text-only messages
+
+Hard Rules (do not violate):
+- Do NOT reinitialize Supabase
+- Do NOT write raw SQL (no SQL strings, no query builders)
+- Do NOT create new global providers or contexts
+- Do NOT duplicate auth or query logic
+- ALL database access must use the existing Supabase JS client
+- ALL backend messaging logic must live in `server/src/routes/message.ts`
+- Avoid Node.js-only APIs; prefer Bun and Web standards
+
+WebSocket Rules:
+- Use native WebSocket (wss://) by default
+- Use Socket.io ONLY if native WebSocket cannot satisfy requirements
+- If Socket.io is used, explain why before implementation
+
+Task:
+Implement a fully functional private DM system:
+- WebSocket-based send/receive
+- Persist EVERY message immediately to the database
+- Fetch paginated message history (20–30 messages)
+- Optimistic UI with server ACK reconciliation
+- Mobile-first WhatsApp-style layout:
+  - Mobile: full-screen chat view
+  - Desktop/Tablet: conversation list + chat split view
+
+Output Requirements:
+- Only new or modified files
+- No demo shortcuts
+- No placeholder logic
+- Code must be production-ready
+
+This is the SQL used to create tables (DON'T TOUCH SQL, use just Supabase client for CRUD)
+-- Conversation table
+create table conversation (
+  conv_id uuid primary key default gen_random_uuid(),
+  conv_type text not null check (conv_type = 'dm'),
+  conv_created_at timestamptz not null default now()
+);
+
+-- Conversation members
+create table conversation_member (
+  conv_mem_id uuid primary key default gen_random_uuid(),
+  conv_mem_conv_ref_id uuid not null
+    references conversation(conv_id) on delete cascade,
+  conv_mem_qid text not null
+    references profile(u_qid) on delete cascade,
+  joined_at timestamptz not null default now(),
+  unique (conv_mem_conv_ref_id, conv_mem_qid)
+);
+
+-- Messages
+create table message (
+  m_id uuid primary key default gen_random_uuid(),
+  m_conv_ref_id uuid not null
+    references conversation(conv_id) on delete cascade,
+  m_sender_qid text not null
+    references profile(u_qid) on delete cascade,
+  content text not null,
+  created_at timestamptz not null default now()
+);
+
+-- Indexes
+create index idx_message_conv_created
+  on message (m_conv_ref_id, created_at);
+
+create index idx_message_sender
+  on message (m_sender_qid);
+
+create index idx_conv_member_user
+  on conversation_member (conv_mem_qid);
+
+create index idx_conv_member_conv
+  on conversation_member (conv_mem_conv_ref_id);

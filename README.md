@@ -15,8 +15,29 @@ BEST Stack
 
 Dependencies:
 
-- [Redis](https://github.com/redis/redis): Used for built-in Pub/Sub messasing model
 - [Shacn](https://github.com/shadcn-ui/ui): ShadCN focuses on enabling developers to build their own component libraries by providing customizable and reusable components.
 - [Tanstack Query](https://github.com/TanStack/query): Framework agnostic powerful asynchronous state management, server-state utilities and data fetching.
 - [Tanstack Form](https://github.com/TanStack/form): Headless, performant, and type-safe form state management
 - [TailwindCSS](https://github.com/tailwindlabs/tailwindcss): A utility-first CSS framework for rapid UI development.
+
+## Gallery
+- Lighthouse reports
+![Lighthouse](assets/lighthouse.png)
+
+- Landing page (header)
+![Landing](assets/landing1.png)
+
+- Landing page (middle)
+![Landing](assets/landing2.png)
+
+- Landing page (footer)
+![Landing](assets/landing3.png)
+
+- Chats implementation
+![Chats](web/public/gifs/chats.gif)
+
+- Timer implementation
+![Timer](web/public/gifs/timer.gif)
+
+- Posts page
+![Posts](web/public/gifs/posts.gif)
