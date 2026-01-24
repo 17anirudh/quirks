@@ -14,7 +14,7 @@ const app = new Elysia({ name: 'Quirks API' })
   }))
   .use(rateLimit({
     duration: 60000,
-    max: 10,
+    max: 100,
     errorResponse: "Slow down buddy"
   }))
   .use(routes.users)

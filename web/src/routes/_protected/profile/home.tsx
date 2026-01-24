@@ -128,7 +128,7 @@ function RouteComponent() {
           <WrenchIcon />
           Settings
         </Link>
-        <Link className='flex flex-wrap gap-2' to='/posts/create'>
+        <Link className='flex flex-wrap gap-2' to='/profile/create'>
           <PlusCircleIcon />
           Create Post
         </Link>

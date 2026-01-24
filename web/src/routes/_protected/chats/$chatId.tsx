@@ -2,13 +2,14 @@ import { createFileRoute, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { SUPABASE_CLIENT } from '@/hooks/utils'
 import { useEffect, useRef, useState } from 'react'
-import { ArrowLeft, Send, Loader2 } from 'lucide-react'
+import { ArrowLeft, Send } from 'lucide-react'
 import { Button } from '@/lib/components/ui/button'
 import { Input } from '@/lib/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar'
 import { useAuth } from '@/hooks/auth-provider'
 import type { Message, UserProfile } from '@/types'
 import Loader from '@/components/loader'
+import { ChatMessage } from '@/lib/components/message-bubble'
 
 export const Route = createFileRoute('/_protected/chats/$chatId')({
     component: ChatRoom,
@@ -67,38 +68,89 @@ function ChatRoom() {
         scrollToBottom()
     }, [history, localMessages])
 
+    // CRITICAL: Clear local messages when switching chats
     useEffect(() => {
-        if (!chatId) return
+        console.log(`[FRONTEND STATE] Chat changed to ${chatId}, clearing local messages`);
+        setLocalMessages([]);
+    }, [chatId])
+
+    // WebSocket Connection
+    useEffect(() => {
+        if (!chatId) {
+            console.log('[FRONTEND WS] No chatId, skipping connection');
+            return;
+        }
+
+        // CRITICAL: Clear the ref immediately to prevent race condition
+        // where sendMessage might use the old WebSocket during transition
+        console.log('[FRONTEND WS] Clearing old WebSocket ref before creating new connection');
+        wsRef.current = null;
 
         const wsUrl = import.meta.env.VITE_BACKEND_URL.replace('http', 'ws') + `/message/chat/${chatId}`
+        console.log(`[FRONTEND WS] Connecting to: ${wsUrl}`);
+        console.log(`[FRONTEND WS] Chat ID: ${chatId}`);
+        console.log(`[FRONTEND WS] User QID: ${qid}`);
+
         const ws = new WebSocket(wsUrl)
-        wsRef.current = ws
 
         ws.onopen = () => {
-            console.log("Connected to chat", chatId)
+            console.log(`[FRONTEND WS] Connected to chat ${chatId}, setting wsRef`);
+            // Only set the ref once connection is established
+            wsRef.current = ws;
         }
 
         ws.onmessage = (event) => {
             try {
                 const msg = JSON.parse(event.data)
+                console.log(`[FRONTEND WS] Received message in chat ${chatId}:`, msg);
+
+                // CRITICAL: Verify the message is for this chat
+                if (msg.room_id && msg.room_id !== chatId) {
+                    console.error(`[FRONTEND WS] MESSAGE LEAK DETECTED! Message for room ${msg.room_id} received in chat ${chatId}`);
+                    return;
+                }
+
                 if (msg.sender_qid !== qid) {
+                    console.log(`[FRONTEND WS] Adding message from ${msg.sender_qid} to local state`);
                     setLocalMessages(prev => [...prev, msg])
+                } else {
+                    console.log(`[FRONTEND WS] Ignoring own message (optimistic UI already displayed)`);
                 }
             } catch (e) {
-                console.error("WS Parse error", e)
+                console.error(`[FRONTEND WS] Parse error in chat ${chatId}:`, e)
             }
         }
 
+        ws.onerror = (error) => {
+            console.error(`[FRONTEND WS] Error in chat ${chatId}:`, error);
+        }
+
+        ws.onclose = () => {
+            console.log(`[FRONTEND WS] Connection closed for chat ${chatId}`);
+        }
+
         return () => {
+            console.log(`[FRONTEND WS] CLEANUP: Closing connection for chat ${chatId}`);
+            if (wsRef.current === ws) {
+                console.log(`[FRONTEND WS] Clearing wsRef as it matches current connection`);
+                wsRef.current = null;
+            }
             ws.close()
         }
     }, [chatId, qid])
 
     const sendMessage = () => {
-        if (!input.trim() || !wsRef.current || !qid) return
+        if (!input.trim() || !wsRef.current || !qid) {
+            console.log('[FRONTEND SEND] Cannot send: missing input, ws, or qid');
+            return;
+        }
 
         const content = input.trim()
 
+        console.log(`[FRONTEND SEND] Sending message to chat ${chatId} from ${qid}`);
+        console.log(`[FRONTEND SEND] Content: "${content}"`);
+
+        // Optimistic Update
         const tempMsg: Message = {
             content,
             m_sender_qid: qid,
@@ -108,10 +160,15 @@ function ChatRoom() {
         setLocalMessages(prev => [...prev, tempMsg])
         setInput('')
 
-        wsRef.current.send(JSON.stringify({
+        // Send via WebSocket
+        const payload = {
             content,
             sender_qid: qid
-        }))
+        };
+
+        console.log(`[FRONTEND SEND] WebSocket payload:`, payload);
+        wsRef.current.send(JSON.stringify(payload))
+        console.log(`[FRONTEND SEND] Message sent successfully`);
 
         scrollToBottom()
     }
@@ -146,32 +203,48 @@ function ChatRoom() {
 
                 <div
                     ref={scrollRef}
-                    className="flex-1 overflow-y-auto p-4 flex flex-col gap-2"
+                    className="flex-1 overflow-y-auto p-4 flex flex-col gap-3"
                 >
-                    {allMessages.map((msg, i) => {
-                        const isMe = msg.m_sender_qid === qid
-                        return (
-                            <div
-                                key={i}
-                                className={`flex w-full ${isMe ? 'justify-end' : 'justify-start'}`}
-                            >
-                                <div
-                                    className={`
-                                        max-w-[70%] rounded-lg p-3 text-sm
-                                        ${isMe
-                                            ? 'bg-primary text-primary-foreground rounded-br-none'
-                                            : 'bg-muted text-foreground rounded-bl-none'
-                                        }
-                                    `}
-                                >
-                                    {msg.content}
-                                    <div className={`text-[10px] opacity-70 mt-1 ${isMe ? 'text-right' : 'text-left'}`}>
-                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    })}
+                    {(() => {
+                        // Group consecutive messages from the same sender
+                        const groupedMessages: Array<{
+                            sender: string;
+                            messages: string[];
+                            timestamps: string[];
+                        }> = [];
+
+                        allMessages.forEach((msg) => {
+                            const lastGroup = groupedMessages[groupedMessages.length - 1];
+                            if (lastGroup && lastGroup.sender === msg.m_sender_qid) {
+                                lastGroup.messages.push(msg.content);
+                                lastGroup.timestamps.push(msg.created_at);
+                            } else {
+                                groupedMessages.push({
+                                    sender: msg.m_sender_qid,
+                                    messages: [msg.content],
+                                    timestamps: [msg.created_at],
+                                });
+                            }
+                        });
+
+                        return groupedMessages.map((group, groupIndex) => {
+                            const isMe = group.sender === qid;
+                            const lastTimestamp = group.timestamps[group.timestamps.length - 1];
+
+                            return (
+                                <ChatMessage
+                                    key={groupIndex}
+                                    messages={group.messages}
+                                    variant={isMe ? "sent" : "received"}
+                                    timestamp={new Date(lastTimestamp).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                    showTimestamp={true}
+                                />
+                            );
+                        });
+                    })()}
                 </div>
 
                 <div className="border-t p-4 flex gap-2">

@@ -39,7 +39,6 @@ export const Route = createFileRoute('/_protected')({
             throw redirect({ to: '/', replace: true })
         }
         const qid = session.user.user_metadata.u_qid
-        console.log(qid)
         return await context.queryClient.ensureQueryData({
             queryKey: ['me'],
             queryFn: async () => {

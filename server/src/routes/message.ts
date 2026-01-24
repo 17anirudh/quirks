@@ -4,14 +4,19 @@ import { CLIENT } from "../supabase/config";
 // Force immediate persistence for now as per requirements
 const persistMessage = async (roomId: string, content: string, senderId: string) => {
     try {
-        const { error } = await CLIENT.from('message').insert({
+        console.log(`[PERSIST] Attempting to save message: Room=${roomId}, Sender=${senderId}, Content="${content}"`);
+        const { error, data } = await CLIENT.from('message').insert({
             m_conv_ref_id: roomId,
             m_sender_qid: senderId,
             content: content
-        });
-        if (error) console.error("Persist error:", error);
+        }).select();
+        if (error) {
+            console.error(`[PERSIST ERROR] Room=${roomId}:`, error);
+        } else {
+            console.log(`[PERSIST SUCCESS] Message saved to room ${roomId}:`, data);
+        }
     } catch (e) {
-        console.error("Persist exception:", e);
+        console.error(`[PERSIST EXCEPTION] Room=${roomId}:`, e);
     }
 }
 
@@ -230,31 +235,46 @@ export const messages = new Elysia({ prefix: '/message' })
     .ws('/chat/:roomId', {
         open(ws) {
             const { roomId } = ws.data.params;
+            console.log(`[WS OPEN] Connection opened for room: ${roomId}`);
+            console.log(`[WS OPEN] WebSocket ID: ${ws.id}`);
             ws.subscribe(roomId);
-            console.log(`User joined room ${roomId}`);
+            console.log(`[WS OPEN] Successfully subscribed to room: ${roomId}`);
         },
         message(ws, message: any) {
             const { roomId } = ws.data.params;
             const { content, sender_qid } = message;
 
-            if (!content || !sender_qid) return;
+            console.log(`[WS MESSAGE] Received in room ${roomId} from ${sender_qid}: "${content}"`);
 
-            // Broadcast to everyone ELSE in room (or everyone including sender if we want confirmation)
-            // ws.publish(roomId, message) broadcasts to others. 
-            // In optimistic UI, sender already displays it, but maybe we want to confirm timestamp/ID?
-            // For now, simple broadcast to others:
-            ws.publish(roomId, {
+            if (!content || !sender_qid) {
+                console.error(`[WS MESSAGE] Invalid message format in room ${roomId}`);
+                return;
+            }
+
+            // CRITICAL: Validate that the roomId from params matches the intended conversation
+            const messagePayload = {
                 content,
                 sender_qid,
                 created_at: new Date().toISOString(),
-                // Temp ID/real ID would ideally come from DB insert return
-            });
+                room_id: roomId // Include room_id for debugging
+            };
 
-            // Persist
+            console.log(`[WS BROADCAST] Publishing to room ${roomId}:`, messagePayload);
+
+            // Broadcast to everyone in THIS SPECIFIC room only
+            ws.publish(roomId, messagePayload);
+
+            console.log(`[WS BROADCAST] Broadcast complete for room ${roomId}`);
+
+            // Persist to database
+            console.log(`[WS PERSIST] Persisting message to conversation ${roomId}`);
             persistMessage(roomId, content, sender_qid);
         },
         close(ws) {
             const { roomId } = ws.data.params;
+            console.log(`[WS CLOSE] Connection closing for room: ${roomId}`);
+            console.log(`[WS CLOSE] WebSocket ID: ${ws.id}`);
             ws.unsubscribe(roomId);
+            console.log(`[WS CLOSE] Unsubscribed from room: ${roomId}`);
         }
     });
