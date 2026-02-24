@@ -9,7 +9,6 @@ import { NotFound } from '@/components/404'
 import { ErrorComponent } from '@/components/400'
 import { useAuth } from '@/hooks/auth-provider'
 import Loader from '@/components/loader'
-import { Suspense } from 'react'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -26,9 +25,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           {isLoading ? (
             <Loader />
           ) : (
-            <Suspense fallback={<Loader />}>
-              <Outlet />
-            </Suspense>
+            <Outlet />
           )}
         </ThemeProvider>
         <TanStackDevtools
