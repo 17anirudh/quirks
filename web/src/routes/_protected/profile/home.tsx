@@ -61,11 +61,6 @@ export const Route = createFileRoute('/_protected/profile/home')({
 function RouteComponent() {
   const ctx = Route.useLoaderData() as queryResponse
   const queryClient = Route.useRouteContext().queryClient
-  // return (
-  //   <div className="w-full p-4 flex flex-col gap-5 justify-center items-center">
-  //     <pre className='w-9/12 text-pretty p-4 break-words overflow-hidden'>{JSON.stringify(ctx, null, 2)}</pre>
-  //   </div>
-  // )
   async function copyLink(): Promise<void> {
     if (typeof window === 'undefined') return;
     const url = `${window.location.origin}/u/${ctx.user.u_qid}`;
@@ -119,7 +114,7 @@ function RouteComponent() {
     }
   })
   return (
-    <div className="w-full p-4 flex flex-col gap-5 justify-center items-center">
+    <div className="w-full p-4 flex flex-col gap-5 justify-center items-center flex-1 relative">
       {/* Profile Card */}
       <ProfileCard information={ctx} />
       {/* Auth User specific */}

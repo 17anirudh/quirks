@@ -1,4 +1,4 @@
-import { SmileIcon, MessageCircleMore, EarthIcon } from "lucide-react";
+import { SmileIcon, MessageCircleMore, EarthIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/lib/components/ui/button";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
@@ -8,6 +8,17 @@ import {
     HoverCardTrigger,
 } from "@/lib/components/ui/hover-card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/lib/components/ui/avatar"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+    DialogClose
+} from '@/lib/components/ui/dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 type props = {
     post: {
@@ -42,6 +53,27 @@ function formatDayMonthName(isoDate: string): string {
 export default function PostCard({ post }: props) {
 
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const { mutate: deletePost, isPending: isDeleting } = useMutation({
+        mutationFn: async () => {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/post/${post.p_id}`, {
+                method: 'DELETE',
+            })
+            if (!res.ok) {
+                const error = await res.json()
+                throw new Error(error.error || 'Failed to delete post')
+            }
+            return await res.json()
+        },
+        onSuccess: () => {
+            toast.success('Post deleted successfully')
+            queryClient.invalidateQueries({ queryKey: ['me'] })
+        },
+        onError: (error) => {
+            toast.error(error.message)
+        }
+    })
 
     async function copyLink(): Promise<void> {
         if (typeof window === 'undefined') return;
@@ -125,6 +157,38 @@ export default function PostCard({ post }: props) {
                 >
                     <EarthIcon className="text-black dark:text-white hover:text-blue-500" />
                 </Button>
+                {/* Delete */}
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <Button
+                            className="flex gap-2 flex-wrap w-12 h-12 text-black dark:text-white hover:text-red-500 ml-auto"
+                            variant="link"
+                            disabled={isDeleting}
+                        >
+                            <Trash2Icon className="text-black dark:text-white hover:text-red-500" />
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Delete Post</DialogTitle>
+                            <DialogDescription>
+                                Are you sure you want to delete this post? This action cannot be undone.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter className="flex gap-2 justify-end">
+                            <DialogClose asChild>
+                                <Button variant="outline">Cancel</Button>
+                            </DialogClose>
+                            <Button
+                                variant="destructive"
+                                onClick={() => deletePost()}
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'Deleting...' : 'Delete'}
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </div>
         </div>
     )

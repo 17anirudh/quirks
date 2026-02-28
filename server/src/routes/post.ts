@@ -149,3 +149,21 @@ export const post = new Elysia({ prefix: '/post' })
             })
         }
     )
+    .delete('/:pid', async ({ params, set }) => {
+        const { pid } = params
+        const { error } = await CLIENT
+            .from('post')
+            .delete()
+            .eq('p_id', pid)
+
+        if (error) {
+            set.status = 500
+            return { error: error.message }
+        }
+
+        return { success: true }
+    }, {
+        params: t.Object({
+            pid: t.String()
+        })
+    })

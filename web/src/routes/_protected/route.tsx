@@ -99,7 +99,7 @@ const navigations: navType[] = [
 function RouteComponent() {
     return (
         <div className="flex flex-col h-dvh w-screen overflow-hidden">
-            <main className="flex-1 relative overflow-hidden">
+            <main className="flex-1 relative overflow-y-auto">
                 <TimerProvider>
                     <Outlet />
                 </TimerProvider>
