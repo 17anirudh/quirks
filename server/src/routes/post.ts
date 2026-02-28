@@ -10,7 +10,6 @@ export const post = new Elysia({ prefix: '/post' })
             set.status = 400
             return { error: 'Qid or post text required' }
         }
-        console.log(p_author_pfp)
         const random_number = crypto.randomUUID();
         if (p_image) {
             const ext = p_image.name.split(".").pop() || 'bin';
@@ -57,13 +56,13 @@ export const post = new Elysia({ prefix: '/post' })
             return { success: true }
         }
         else {
-            const { data, error: dbError } = await CLIENT.from("post")
+            const { error: dbError } = await CLIENT.from("post")
                 .insert({
                     p_text: p_text,
                     p_author_qid: qid,
                     p_id: random_number,
-                    p_author_pfp: p_author_pfp
-                    // created_at: new Date().toISOString()
+                    p_author_pfp: p_author_pfp ?? null,
+                    p_created_at: new Date().toISOString()
                 })
                 .maybeSingle()
             if (dbError) {
@@ -78,7 +77,7 @@ export const post = new Elysia({ prefix: '/post' })
             body: t.Object({
                 p_text: t.String(),
                 p_image: t.Optional(t.File()),
-                p_author_pfp: t.String()
+                p_author_pfp: t.Optional(t.String())
             }),
             params: t.Object({
                 qid: t.String({
@@ -113,26 +112,40 @@ export const post = new Elysia({ prefix: '/post' })
             })
         }
     )
-
-    .get('/feed', async ({ query, set }) => {
-        const offset = parseInt(query.offset as string) || 0; // Default to 0
-        const limit = parseInt(query.limit as string) || 10; // Default to 10
-
-        if (isNaN(offset) || isNaN(limit) || offset < 0 || limit <= 0) {
-            set.status = 400;
-            return { error: 'Invalid offset or limit' };
-        }
-
-        const { data: posts, error: postsError } = await CLIENT
+    .get('/feed/:qid', async ({ params, query, set }) => {
+        const { cursor, limit = 30 } = query;
+        let pQuery = CLIENT
             .from('post')
             .select('*')
             .order('p_created_at', { ascending: false })
-            .range(offset, offset + limit - 1); // Paginate with range
+            .limit(limit);
 
-        if (postsError) {
-            set.status = 500;
-            return { error: postsError?.message || 'Failed to fetch posts' };
+        if (cursor) {
+            pQuery = pQuery.lt('p_created_at', cursor);
         }
 
-        return posts;
-    });
+        const { data: posts, error } = await pQuery;
+
+        if (error) {
+            set.status = 500;
+            return { error: error.message };
+        }
+
+        let nextCursor: string | null = null;
+        if (posts && posts.length === limit) {
+            nextCursor = posts[posts.length - 1].p_created_at;
+        }
+
+        return {
+            items: posts || [],
+            nextCursor
+        };
+    },
+        {
+            params: t.Object({ qid: t.String() }),
+            query: t.Object({
+                cursor: t.Optional(t.String()),
+                limit: t.Optional(t.Numeric())
+            })
+        }
+    )

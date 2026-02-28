@@ -23,7 +23,7 @@ type queryResponse = {
             p_text: string | null,
             p_likes_count: number | null,
             p_comments_count: number | null,
-            created_at: string | null,
+            p_created_at: string | null,
             p_url: string | null
             p_author_pfp: string | null
         }
@@ -99,7 +99,7 @@ const navigations: navType[] = [
 function RouteComponent() {
     return (
         <div className="flex flex-col h-dvh w-screen overflow-hidden">
-            <main className="flex-1 overflow-hidden relative flex flex-col">
+            <main className="flex-1 relative overflow-hidden">
                 <TimerProvider>
                     <Outlet />
                 </TimerProvider>

@@ -80,7 +80,7 @@ export const users = new Elysia({ prefix: '/user' })
             .from('post')
             .select('*')
             .eq('p_author_qid', id)
-            .order('created_at', { ascending: false })
+            .order('p_created_at', { ascending: false })
             .limit(20)
 
         if (postError) {
@@ -146,7 +146,7 @@ export const users = new Elysia({ prefix: '/user' })
             .from('post')
             .select('*')
             .eq('p_author_qid', search)
-            .order('created_at', { ascending: false })
+            .order('p_created_at', { ascending: false })
             .limit(20)
 
         if (postError) {
