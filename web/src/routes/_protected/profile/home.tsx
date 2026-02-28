@@ -195,7 +195,7 @@ function RouteComponent() {
       {/* Posts */}
       <div className='w-full flex flex-col gap-2 justify-center items-center'>
         {ctx.post.map((post) => (
-          <PostCard post={post} />
+          <PostCard post={post} user={true} />
         ))}
       </div>
     </div>

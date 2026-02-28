@@ -1,10 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { SUPABASE_CLIENT } from '@/hooks/utils'
-import { Loader2, MessageSquare, RefreshCw } from 'lucide-react'
+import { MessageSquare, RefreshCw } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar'
 import { Button } from '@/lib/components/ui/button'
-import type { Conversation } from '@/types'
 import Loader from '@/components/loader'
 
 export const Route = createFileRoute('/_protected/chats/')({

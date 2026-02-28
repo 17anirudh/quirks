@@ -143,7 +143,8 @@ function RouteComponent() {
     }
   }
   return (
-    <div className='flex flex-col gap-2 w-full h-full justify-center items-center'>
+
+    <div className="w-full p-4 flex flex-col gap-5 justify-center items-center flex-1 relative">
       <div className="flex flex-col gap-2 border-2 p-5 w-11/12 sm:w-8/12 mb-10">
         <div className="flex flex-wrap gap-3">
           {/* Profile photo */}

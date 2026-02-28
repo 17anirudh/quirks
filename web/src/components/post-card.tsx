@@ -31,6 +31,7 @@ type props = {
         p_url: string | null
         p_author_pfp: string | null
     }
+    user?: boolean
 }
 
 const MONTHS = [
@@ -50,7 +51,7 @@ function formatDayMonthName(isoDate: string): string {
     return `${day} ${monthName}`;
 }
 
-export default function PostCard({ post }: props) {
+export default function PostCard({ post, user }: props) {
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -158,37 +159,39 @@ export default function PostCard({ post }: props) {
                     <EarthIcon className="text-black dark:text-white hover:text-blue-500" />
                 </Button>
                 {/* Delete */}
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button
-                            className="flex gap-2 flex-wrap w-12 h-12 text-black dark:text-white hover:text-red-500 ml-auto"
-                            variant="link"
-                            disabled={isDeleting}
-                        >
-                            <Trash2Icon className="text-black dark:text-white hover:text-red-500" />
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Delete Post</DialogTitle>
-                            <DialogDescription>
-                                Are you sure you want to delete this post? This action cannot be undone.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <DialogFooter className="flex gap-2 justify-end">
-                            <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DialogClose>
+                {user && (
+                    <Dialog>
+                        <DialogTrigger asChild>
                             <Button
-                                variant="destructive"
-                                onClick={() => deletePost()}
+                                className="flex gap-2 flex-wrap w-12 h-12 text-black dark:text-white hover:text-red-500 ml-auto"
+                                variant="link"
                                 disabled={isDeleting}
                             >
-                                {isDeleting ? 'Deleting...' : 'Delete'}
+                                <Trash2Icon className="text-black dark:text-white hover:text-red-500" />
                             </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Delete Post</DialogTitle>
+                                <DialogDescription>
+                                    Are you sure you want to delete this post? This action cannot be undone.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter className="flex gap-2 justify-end">
+                                <DialogClose asChild>
+                                    <Button variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button
+                                    variant="destructive"
+                                    onClick={() => deletePost()}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? 'Deleting...' : 'Delete'}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
+                )}
             </div>
         </div>
     )
