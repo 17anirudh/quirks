@@ -46,6 +46,7 @@
     "react-virtuoso": "^4.18.1",
     "rough-notation": "^0.5.1",
     "simplex-noise": "^4.0.3",
+    "socket.io-client": "^4.8.3",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.0.6",
