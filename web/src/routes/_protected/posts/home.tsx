@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useGlobalTimer } from '@/hooks/time-provider';
 import { Button } from '@/lib/components/ui/button';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -54,15 +54,27 @@ function RouteComponent() {
   return (
     <div className="p-4 relative h-full flex flex-col items-center overflow-hidden">
       {isBlocked && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md">
-          <div className="p-6 border-2 bg-card text-center rounded-lg shadow-lg">
-            <h2 className="text-xl font-bold mb-4">Cooldown Active</h2>
-            <Button
-              onClick={resetTimer}
-              className="bg-primary text-primary-foreground px-4 py-2 rounded"
-            >
-              Reset Timer
-            </Button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md p-6 text-center">
+          <div className="p-8 border-2 bg-card rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold tracking-tight">Feed Locked</h2>
+              <p className="text-muted-foreground">Your session has ended. Complete a Showdown to unlock for 2 minutes.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button
+                asChild
+                className="w-full bg-primary py-6 text-lg font-semibold"
+              >
+                <Link to="/home">Go to Showdown</Link>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={resetTimer}
+                className="text-muted-foreground text-xs"
+              >
+                (Debug) Reset Timer
+              </Button>
+            </div>
           </div>
         </div>
       )}

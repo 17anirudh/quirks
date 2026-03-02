@@ -6,8 +6,10 @@ type TimerContextType = {
     remainingSeconds: number;
     duration: number;
     isBlocked: boolean;
+    unlockRemaining: number;
     setCooldown: (minutes: number) => void;
     resetTimer: () => void;
+    startUnlockCooldown: (minutes: number) => void;
 };
 
 const TimerContext = createContext<TimerContextType | undefined>(undefined);
@@ -31,9 +33,13 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
         return saved === 'true';
     });
 
+    const [unlockRemaining, setUnlockRemaining] = useState(() => {
+        const saved = localStorage.getItem('timer-unlock-remaining');
+        const parsed = saved ? parseInt(saved, 10) : 0;
+        return (parsed && !isNaN(parsed)) ? parsed : 0;
+    });
+
     const location = useLocation();
-    // Path check for persistence logic
-    // _protected is likely a pathless layout, so it doesn't appear in the URL
     const isPostsRoute = location.pathname.startsWith('/posts/home');
 
     // Persistence effects
@@ -50,20 +56,17 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
     }, [isBlocked]);
 
     useEffect(() => {
-        // Only tick if on the right route, not blocked
-        // We moved remainingSeconds check inside the setter to avoid dependency cycle
-        const shouldTick = !isBlocked && isPostsRoute;
+        localStorage.setItem('timer-unlock-remaining', unlockRemaining.toString());
+    }, [unlockRemaining]);
 
-        console.log(`[TimerDebug] Check: blocked=${isBlocked}, route=${isPostsRoute} (${location.pathname}), tick=${shouldTick}`);
+    useEffect(() => {
+        // Only tick if on the right route, not blocked
+        const shouldTick = !isBlocked && isPostsRoute;
 
         if (!shouldTick) return;
 
         const interval = window.setInterval(() => {
             setRemainingSeconds((prev) => {
-                if (prev <= 0) {
-                    // Should have been blocked already, but just in case
-                    return 0;
-                }
                 if (prev <= 1) {
                     setIsBlocked(true);
                     return 0;
@@ -73,7 +76,24 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
         }, 1000);
 
         return () => window.clearInterval(interval);
-    }, [isBlocked, isPostsRoute, location.pathname]); // location.pathname added for debug clarity, though isPostsRoute depends on it
+    }, [isBlocked, isPostsRoute]);
+
+    useEffect(() => {
+        if (unlockRemaining <= 0) return;
+
+        const interval = window.setInterval(() => {
+            setUnlockRemaining((prev) => {
+                if (prev <= 1) {
+                    setIsBlocked(false);
+                    setRemainingSeconds(duration); // Reset usage timer after unlock
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => window.clearInterval(interval);
+    }, [unlockRemaining, duration]);
 
 
     const setCooldown = (minutes: number) => {
@@ -88,8 +108,12 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
         setIsBlocked(false);
     };
 
+    const startUnlockCooldown = (minutes: number) => {
+        setUnlockRemaining(minutes * 60);
+    };
+
     return (
-        <TimerContext.Provider value={{ remainingSeconds, duration, isBlocked, setCooldown, resetTimer }}>
+        <TimerContext.Provider value={{ remainingSeconds, duration, isBlocked, unlockRemaining, setCooldown, resetTimer, startUnlockCooldown }}>
             {children}
         </TimerContext.Provider>
     );
