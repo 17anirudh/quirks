@@ -21,6 +21,7 @@ export const useShowdown = (showdownId: string | null) => {
         wsRef.current = ws;
 
         ws.onopen = () => {
+            console.log("[WS] Connected to", showdownId);
             setState('waiting');
             ws.send(JSON.stringify({ type: 'join', qid }));
         };
@@ -32,6 +33,14 @@ export const useShowdown = (showdownId: string | null) => {
                     case 'partner-connected':
                     case 'partner-joined':
                         if (data.qid !== qid) setPartnerJoined(true);
+                        break;
+                    case 'partner-quit':
+                        // Only reset if it's a valid quit from the other partner
+                        if (data.qid && data.qid !== qid) {
+                            toast.error("Partner left the showdown");
+                            setState('idle');
+                            setPartnerJoined(false);
+                        }
                         break;
                     case 'answer-synced':
                         if (data.qid !== qid) {
@@ -69,6 +78,13 @@ export const useShowdown = (showdownId: string | null) => {
         }
     }, [qid]);
 
+    const quit = useCallback(() => {
+        if (wsRef.current?.readyState === WebSocket.OPEN) {
+            wsRef.current.send(JSON.stringify({ type: 'quit', qid }));
+            wsRef.current.close();
+        }
+    }, [qid]);
+
     const validate = useCallback((a1: number, a2: number) => {
         if (wsRef.current?.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify({ type: 'validate-showdown', a1, a2 }));
@@ -82,6 +98,7 @@ export const useShowdown = (showdownId: string | null) => {
         partnerTyping,
         syncAnswer,
         validate,
+        quit,
         resetState: () => {
             setState('idle');
             setError(null);

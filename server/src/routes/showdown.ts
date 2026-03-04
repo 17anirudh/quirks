@@ -115,17 +115,31 @@ export const showdown = new Elysia({ prefix: '/showdown' })
             const { showdownId } = ws.data.params;
             ws.subscribe(`showdown:${showdownId}`);
             console.log(`[WS] Connection opened for room: ${showdownId}`);
-            // Notify others that someone is here
             ws.publish(`showdown:${showdownId}`, { type: 'partner-connected' });
         },
         async message(ws, message) {
             const { showdownId } = ws.data.params;
-            const data = message as any; // Cast to any to handle incoming fields flexibly
-
-            console.log(`[WS MSG] Room ${showdownId}:`, data.type);
+            const data = message as any;
 
             if (data.type === 'join') {
+                (ws.data as any).qid = data.qid;
                 ws.publish(`showdown:${showdownId}`, { type: 'partner-joined', qid: data.qid });
+
+                // Update status to 'full' if both are in
+                const { data: showdownData } = await CLIENT
+                    .from('showdown')
+                    .select('status')
+                    .eq('id', showdownId)
+                    .single();
+
+                if (showdownData?.status === 'created') {
+                    await CLIENT.from('showdown').update({ status: 'full' }).eq('id', showdownId);
+                }
+                return;
+            }
+
+            if (data.type === 'quit') {
+                ws.publish(`showdown:${showdownId}`, { type: 'partner-quit', qid: data.qid });
                 return;
             }
 
@@ -168,7 +182,13 @@ export const showdown = new Elysia({ prefix: '/showdown' })
         },
         close(ws) {
             const { showdownId } = ws.data.params;
+            const qid = (ws.data as any).qid;
+
+            if (qid) {
+                ws.publish(`showdown:${showdownId}`, { type: 'partner-quit', qid });
+            }
+
             ws.unsubscribe(`showdown:${showdownId}`);
-            console.log(`[WS] Connection closed: ${showdownId}`);
+            console.log(`[WS] Connection closed: ${showdownId} ${qid ? 'by ' + qid : '(pre-join)'}`);
         }
     });

@@ -110,6 +110,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
 
     const startUnlockCooldown = (minutes: number) => {
         setUnlockRemaining(minutes * 60);
+        setIsBlocked(true); // Ensure it's blocked during the countdown
     };
 
     return (
