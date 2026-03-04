@@ -5,15 +5,21 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { Virtuoso } from 'react-virtuoso';
 import PostCard from '@/components/post-card';
 import Loader from '@/components/loader';
-import { Loader2Icon } from 'lucide-react';
+import { Loader2Icon, ShieldCheckIcon, LockIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/auth-provider';
 
 export const Route = createFileRoute('/_protected/posts/home')({
   component: RouteComponent,
 })
 
+function formatTime(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 function RouteComponent() {
-  const { isBlocked, resetTimer } = useGlobalTimer();
+  const { isBlocked, unlockRemaining, resetTimer } = useGlobalTimer();
   const { qid } = useAuth();
 
   const {
@@ -51,14 +57,20 @@ function RouteComponent() {
 
   const allPosts = data?.pages.flatMap((page) => page.items) ?? [];
 
+  // Unlocked by showdown — ticking countdown pill
+  const isUnlocked = !isBlocked && unlockRemaining > 0;
+
   return (
     <div className="p-4 relative h-full flex flex-col items-center overflow-hidden">
+
+      {/* Feed locked overlay */}
       {isBlocked && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md p-6 text-center">
           <div className="p-8 border-2 bg-card rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
-            <div className="space-y-2">
+            <div className="flex flex-col items-center gap-3">
+              <LockIcon className="w-10 h-10 text-muted-foreground" />
               <h2 className="text-2xl font-bold tracking-tight">Feed Locked</h2>
-              <p className="text-muted-foreground">Your session has ended. Complete a Showdown to unlock for 2 minutes.</p>
+              <p className="text-muted-foreground text-sm">Your session has ended. Complete a Showdown to unlock for 2 minutes.</p>
             </div>
             <div className="flex flex-col gap-2">
               <Button
@@ -76,6 +88,15 @@ function RouteComponent() {
               </Button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Unlocked countdown pill — sticky top bar */}
+      {isUnlocked && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md p-6 text-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+          <ShieldCheckIcon className="w-4 h-4 shrink-0" />
+          <span className="text-sm font-medium flex-1">Feed unlocked by Showdown</span>
+          <span className="font-mono text-sm tabular-nums">{formatTime(unlockRemaining)}</span>
         </div>
       )}
 

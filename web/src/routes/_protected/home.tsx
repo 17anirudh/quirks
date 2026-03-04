@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/auth-provider'
 import { useGlobalTimer } from '@/hooks/time-provider'
 import { useShowdown } from '@/hooks/use-showdown'
@@ -35,31 +35,34 @@ function RouteComponent() {
   const [partnerAnswer, setPartnerAnswer] = useState('')
   const [quizData, setQuizData] = useState<any>(null)
 
-  // Polling for invites
-  useEffect(() => {
-    // CRITICAL: Stop polling if we are already in a showdown or have a pending invite
+  // --- Invite polling ---
+  // Extracted so we can call it immediately on mount AND on interval
+  const checkInvites = useCallback(async () => {
+    // Stop polling if already in a showdown, or we have a pending invite, or not idle
     if (!qid || showdownId || pendingInvite || state !== 'idle') return
-
-    const checkInvites = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/invites/${qid}`)
-        if (res.ok) {
-          const data = await res.json()
-          if (data && data.length > 0) {
-            const invite = data[0]
-            if (!ignoredInvites.has(invite.id)) {
-              setPendingInvite(invite)
-            }
+    try {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/invites/${qid}`)
+      if (res.ok) {
+        const data = await res.json()
+        if (data && data.length > 0) {
+          const invite = data[0]
+          if (!ignoredInvites.has(invite.id)) {
+            setPendingInvite(invite)
           }
         }
-      } catch (e) {
-        console.error("Invite check fail", e)
       }
+    } catch (e) {
+      console.error("Invite check fail", e)
     }
-
-    const interval = setInterval(checkInvites, 8000)
-    return () => clearInterval(interval)
   }, [qid, showdownId, pendingInvite, ignoredInvites, state])
+
+  useEffect(() => {
+    // Fire immediately on mount, then every 10s
+    // (10s is safe for Supabase free tier: ~90KB/user/hour for this tiny payload)
+    checkInvites()
+    const interval = setInterval(checkInvites, 10_000)
+    return () => clearInterval(interval)
+  }, [checkInvites])
 
   // Sync partner typing to the local partnerAnswer field
   useEffect(() => {
@@ -94,26 +97,62 @@ function RouteComponent() {
     setPendingInvite(null)
   }
 
+  const handleCloseDialog = (open: boolean) => {
+    if (!open) {
+      if (state !== 'success' && state !== 'idle') {
+        if (window.confirm("Quit Showdown? Session will end for both.")) {
+          quit()
+          if (showdownId) {
+            fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/abandon/${showdownId}`, { method: 'POST' })
+          }
+          setShowdownId(null)
+          setQuizData(null)
+          setMyAnswer('')
+          setPartnerAnswer('')
+          resetState()
+        }
+      } else {
+        setShowdownId(null)
+        setQuizData(null)
+        setMyAnswer('')
+        setPartnerAnswer('')
+        resetState()
+      }
+    }
+  }
+
+  // Handle success state
   useEffect(() => {
     if (state === 'success') {
       sideCannons()
       toast.success("Success! Feed unlocked for 2 mins")
-      startUnlockCooldown(2)
+      if (isBlocked) startUnlockCooldown(2)
 
       setTimeout(() => {
         setShowdownId(null)
         setQuizData(null)
+        setMyAnswer('')
+        setPartnerAnswer('')
         resetState()
         navigate({ to: '/posts/home' })
       }, 2000)
     }
   }, [state, navigate, resetState, startUnlockCooldown])
 
-  // Removed aggressive reset effect to prevent race condition
-
   const isCreator = quizData?.creater_qid === qid
   const myQuestion = isCreator ? quizData?.q1 : quizData?.q2
   const partnerQuestion = isCreator ? quizData?.q2 : quizData?.q1
+
+  // Validate sends: a1 = creator's answer, a2 = joiner's answer (matches server schema)
+  const handleValidate = () => {
+    const creatorAns = isCreator ? Number(myAnswer) : Number(partnerAnswer)
+    const joinerAns = isCreator ? Number(partnerAnswer) : Number(myAnswer)
+    validate(creatorAns, joinerAns)
+  }
+
+  // Allow submit if the user has typed their own answer.
+  // Partner answer sync is bonus — the server validates from the DB, not from the client.
+  const canValidate = myAnswer.trim() !== '' && !isNaN(Number(myAnswer))
 
   return (
     <div className='p-8 space-y-8 max-w-xl mx-auto'>
@@ -127,6 +166,7 @@ function RouteComponent() {
               placeholder='Friend QID'
               value={inviteQid}
               onChange={e => setInviteQid(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && handleStartShowdown()}
             />
             <Button onClick={handleStartShowdown}>Invite</Button>
           </div>
@@ -138,80 +178,89 @@ function RouteComponent() {
         </div>
       )}
 
-      {pendingInvite && (
+      {/* Only show incoming invites — never show the user's own outgoing invite */}
+      {pendingInvite && pendingInvite.creater_qid !== qid && (
         <div className='border-2 border-primary p-4 rounded-xl bg-primary/5 flex justify-between items-center'>
           <div>
             <p className='font-bold'>Invite from {pendingInvite.creater_qid}</p>
-            <p className='text-xs'>Solve puzzles to unlock feed.</p>
+            <p className='text-xs'>Solve puzzles together to unlock the feed.</p>
           </div>
           <div className='flex gap-2'>
             <Button size='sm' onClick={handleAcceptInvite}>Accept</Button>
             <Button size='sm' variant='outline' onClick={() => {
-              ignoredInvites.add(pendingInvite.id);
-              setPendingInvite(null);
+              ignoredInvites.add(pendingInvite.id)
+              setPendingInvite(null)
             }}>Decline</Button>
           </div>
         </div>
       )}
 
-      <Dialog open={!!showdownId} onOpenChange={open => {
-        if (!open) {
-          if (state !== 'success' && state !== 'idle') {
-            if (window.confirm("Quit Showdown? Session will end for both.")) {
-              quit()
-              if (showdownId) fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/abandon/${showdownId}`, { method: 'POST' });
-              setShowdownId(null);
-              setQuizData(null);
-              resetState();
-            }
-          } else {
-            setShowdownId(null);
-            setQuizData(null);
-            resetState();
-          }
-        }
-      }}>
+      <Dialog open={!!showdownId} onOpenChange={handleCloseDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Showdown: {partnerJoined ? "Partner Joined" : "Waiting for partner..."}</DialogTitle>
+            <DialogTitle>
+              {state === 'success'
+                ? '🎉 Feed Unlocked!'
+                : partnerJoined
+                  ? 'Showdown — Partner Ready'
+                  : 'Showdown — Waiting for partner...'}
+            </DialogTitle>
           </DialogHeader>
 
           {quizData ? (
-            <div className='space-y-4 py-4'>
+            <div className='relative space-y-4 py-4'>
+              {/* Waiting overlay — blocks the quiz until partner connects */}
+              {!partnerJoined && state !== 'success' && (
+                <div className='absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm gap-2'>
+                  <div className='h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin' />
+                  <p className='text-sm font-medium'>Waiting for partner to join…</p>
+                  <p className='text-xs text-muted-foreground'>Share your QID with them to get started</p>
+                </div>
+              )}
+
               <div className='space-y-2 border p-3 rounded'>
-                <p className='font-bold'>Your Question: {myQuestion}</p>
+                <p className='font-bold text-sm'>Your Question</p>
+                <p className='text-xl font-mono'>{myQuestion}</p>
                 <Input
                   type='number'
-                  placeholder='Your Answer'
+                  placeholder='Your answer'
                   value={myAnswer}
                   onChange={e => {
-                    setMyAnswer(e.target.value);
-                    syncAnswer(isCreator ? 1 : 2, Number(e.target.value));
+                    setMyAnswer(e.target.value)
+                    syncAnswer(isCreator ? 1 : 2, Number(e.target.value))
                   }}
+                  disabled={!partnerJoined || state === 'success'}
                 />
               </div>
 
-              <div className='space-y-2 border p-3 rounded'>
-                <p className='font-bold'>Partner Answer (Syncs automatically):</p>
+              <div className='space-y-2 border p-3 rounded opacity-75'>
+                <p className='font-bold text-sm'>Partner&apos;s Question</p>
+                <p className='text-xl font-mono'>{partnerQuestion}</p>
                 <Input
                   type='number'
-                  placeholder='Wait for partner...'
+                  placeholder='Waiting for partner to type…'
                   value={partnerAnswer}
                   readOnly
-                  className="bg-muted"
+                  className="bg-muted cursor-default"
                 />
-                <p className='text-[10px]'>Question: {partnerQuestion}</p>
               </div>
+
+              {state === 'failure' && (
+                <p className='text-sm text-destructive text-center'>Wrong answers — check your math and try again.</p>
+              )}
             </div>
           ) : (
             <div className="py-8 text-center text-muted-foreground">Initializing quiz...</div>
           )}
 
           <DialogFooter>
-            <Button className='w-full' disabled={!myAnswer || !partnerAnswer} onClick={() => validate(
-              isCreator ? Number(myAnswer) : Number(partnerAnswer),
-              isCreator ? Number(partnerAnswer) : Number(myAnswer)
-            )}>Validate Showdown</Button>
+            <Button
+              className='w-full'
+              disabled={!partnerJoined || !canValidate || state === 'success'}
+              onClick={handleValidate}
+            >
+              Validate Showdown
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

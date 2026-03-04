@@ -80,13 +80,13 @@ export const showdown = new Elysia({ prefix: '/showdown' })
         })
     })
     .get('/invites/:qid', async ({ params: { qid } }) => {
-        const sixtySecondsAgo = new Date(Date.now() - 60 * 1000).toISOString();
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
         const { data, error } = await CLIENT
             .from('showdown')
             .select('*')
             .eq('joiner_qid', qid)
             .eq('status', 'created')
-            .gt('created_at', sixtySecondsAgo)
+            .gt('created_at', fiveMinutesAgo)
             .order('created_at', { ascending: false })
             .limit(1);
 
@@ -115,7 +115,9 @@ export const showdown = new Elysia({ prefix: '/showdown' })
             const { showdownId } = ws.data.params;
             ws.subscribe(`showdown:${showdownId}`);
             console.log(`[WS] Connection opened for room: ${showdownId}`);
-            ws.publish(`showdown:${showdownId}`, { type: 'partner-connected' });
+            // Ack to the connecting client only — do NOT publish to the room yet.
+            // The room will be notified when this client sends a 'join' message with their qid.
+            ws.send({ type: 'waiting' });
         },
         async message(ws, message) {
             const { showdownId } = ws.data.params;
@@ -125,15 +127,21 @@ export const showdown = new Elysia({ prefix: '/showdown' })
                 (ws.data as any).qid = data.qid;
                 ws.publish(`showdown:${showdownId}`, { type: 'partner-joined', qid: data.qid });
 
-                // Update status to 'full' if both are in
+                // Only mark 'full' when the *joiner* connects — not the creator.
+                // If we mark 'full' on the creator's join, the invite becomes invisible
+                // to the joiner's poll (which filters by status='created').
                 const { data: showdownData } = await CLIENT
                     .from('showdown')
-                    .select('status')
+                    .select('status, joiner_qid, creater_qid')
                     .eq('id', showdownId)
                     .single();
 
-                if (showdownData?.status === 'created') {
+                if (showdownData?.status === 'created' && showdownData?.joiner_qid === data.qid) {
                     await CLIENT.from('showdown').update({ status: 'full' }).eq('id', showdownId);
+                    // The creator was already in the room before this joiner subscribed,
+                    // so the creator's earlier 'partner-joined' publish went to an empty room.
+                    // Tell the joiner directly that the creator is already present.
+                    ws.send({ type: 'partner-joined', qid: showdownData.creater_qid });
                 }
                 return;
             }

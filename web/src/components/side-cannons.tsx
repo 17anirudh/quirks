@@ -5,7 +5,10 @@ export function sideCannons() {
     const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"]
 
     const frame = () => {
-        if (Date.now() > end) return
+        if (Date.now() > end) {
+            confetti.reset() // clear all in-flight particles immediately
+            return
+        }
 
         confetti({
             particleCount: 2,

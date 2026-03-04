@@ -60,8 +60,8 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
     }, [unlockRemaining]);
 
     useEffect(() => {
-        // Only tick if on the right route, not blocked
-        const shouldTick = !isBlocked && isPostsRoute;
+        // Only tick if on the right route, not blocked, and NOT in the grace period
+        const shouldTick = !isBlocked && isPostsRoute && unlockRemaining === 0;
 
         if (!shouldTick) return;
 
@@ -76,7 +76,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
         }, 1000);
 
         return () => window.clearInterval(interval);
-    }, [isBlocked, isPostsRoute]);
+    }, [isBlocked, isPostsRoute, unlockRemaining]);
 
     useEffect(() => {
         if (unlockRemaining <= 0) return;
@@ -110,7 +110,7 @@ export const TimerProvider = ({ children }: { children: ReactNode }) => {
 
     const startUnlockCooldown = (minutes: number) => {
         setUnlockRemaining(minutes * 60);
-        setIsBlocked(true); // Ensure it's blocked during the countdown
+        setIsBlocked(false); // Unlock the feed immediately for the grace period
     };
 
     return (

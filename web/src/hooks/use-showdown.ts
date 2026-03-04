@@ -21,8 +21,8 @@ export const useShowdown = (showdownId: string | null) => {
         wsRef.current = ws;
 
         ws.onopen = () => {
-            console.log("[WS] Connected to", showdownId);
             setState('waiting');
+            // Announce presence to the room immediately after opening
             ws.send(JSON.stringify({ type: 'join', qid }));
         };
 
@@ -30,31 +30,42 @@ export const useShowdown = (showdownId: string | null) => {
             try {
                 const data = JSON.parse(event.data);
                 switch (data.type) {
-                    case 'partner-connected':
-                    case 'partner-joined':
-                        if (data.qid !== qid) setPartnerJoined(true);
+                    // 'waiting' is the server ack that our WS connection is alive — no action needed
+                    case 'waiting':
                         break;
+
+                    // Only trust 'partner-joined' (carries qid) to set partnerJoined flag.
+                    // This prevents a stranger connecting to the same roomId from triggering it.
+                    case 'partner-joined':
+                        if (data.qid && data.qid !== qid) {
+                            setPartnerJoined(true);
+                        }
+                        break;
+
                     case 'partner-quit':
-                        // Only reset if it's a valid quit from the other partner
                         if (data.qid && data.qid !== qid) {
                             toast.error("Partner left the showdown");
                             setState('idle');
                             setPartnerJoined(false);
                         }
                         break;
+
                     case 'answer-synced':
                         if (data.qid !== qid) {
                             setPartnerTyping({ qIndex: data.qIndex, answer: data.answer });
                         }
                         break;
+
                     case 'showdown-success':
                         setState('success');
                         break;
+
                     case 'showdown-failure':
                         setError(data.message);
                         setState('failure');
-                        toast.error(data.message);
+                        toast.error(data.message ?? 'Wrong answers — try again');
                         break;
+
                     case 'error':
                         setError(data.message);
                         break;
@@ -99,6 +110,7 @@ export const useShowdown = (showdownId: string | null) => {
         syncAnswer,
         validate,
         quit,
+        // resetState does NOT fire sideCannons — the success path in home.tsx does that explicitly
         resetState: () => {
             setState('idle');
             setError(null);
