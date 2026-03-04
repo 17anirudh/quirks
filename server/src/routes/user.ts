@@ -254,3 +254,69 @@ export const users = new Elysia({ prefix: '/user' })
             })
         }
     )
+    // Update bio
+    .patch('/update-bio/:qid', async ({ params, body, set }) => {
+        const { qid } = params
+        const { bio } = body
+        const { data, error } = await CLIENT
+            .from('profile')
+            .update({ u_bio: bio })
+            .eq('u_qid', qid)
+            .select()
+            .maybeSingle()
+        if (error) {
+            set.status = 500
+            return { error: error.message }
+        }
+        set.status = 200
+        return { user: data }
+    },
+        {
+            params: t.Object({
+                qid: t.String({ minLength: 4, maxLength: 200 })
+            }),
+            body: t.Object({
+                bio: t.String({ minLength: 1, maxLength: 200 })
+            })
+        }
+    )
+
+    // Get friends
+    .get('/friends/:qid', async ({ params, set }) => {
+        const { qid } = params;
+        const { data: relationData, error: relationError } = await CLIENT
+            .from('friendship')
+            .select('*')
+            .eq('fs_status', 'friends')
+            .or(`sent_qid.eq.${qid},receive_qid.eq.${qid}`)
+            .limit(20)
+
+        if (relationError) {
+            set.status = 500;
+            return { error: relationError.message || "Database Error" }
+        }
+        const array = [];
+        for (const relation of relationData) {
+            const { data: pfp, error: pfpError } = await CLIENT
+                .from("profile")
+                .select("u_pfp")
+                .eq("u_qid", relation.sent_qid === qid ? relation.receive_qid : relation.sent_qid)
+                .maybeSingle()
+            if (pfpError) {
+                set.status = 500;
+                return { error: pfpError.message || "Database Error" }
+            }
+            array.push({
+                qid: relation.sent_qid === qid ? relation.receive_qid : relation.sent_qid,
+                pfp: pfp?.u_pfp
+            })
+        }
+        set.status = 200;
+        return { friends: array }
+    },
+        {
+            params: t.Object({
+                qid: t.String({ minLength: 4, maxLength: 200 })
+            })
+        }
+    )

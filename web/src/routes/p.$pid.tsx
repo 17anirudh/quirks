@@ -8,7 +8,7 @@ type postType = {
   p_text: string | null,
   p_likes_count: number | null,
   p_comments_count: number | null,
-  created_at: string | null,
+  p_created_at: string | null,
   p_url: string | null,
   p_author_pfp: string | null
 }

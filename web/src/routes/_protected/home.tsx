@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/auth-provider'
 import { useGlobalTimer } from '@/hooks/time-provider'
@@ -14,6 +14,7 @@ import {
 } from '@/lib/components/ui/dialog'
 import { toast } from 'sonner'
 import { sideCannons } from '@/components/side-cannons'
+import { useMutation } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_protected/home')({
   component: RouteComponent,
@@ -35,10 +36,24 @@ function RouteComponent() {
   const [partnerAnswer, setPartnerAnswer] = useState('')
   const [quizData, setQuizData] = useState<any>(null)
 
-  // --- Invite polling ---
-  // Extracted so we can call it immediately on mount AND on interval
+  const { isPending: isLoading, data: friends, mutate: loadFriends } = useMutation({
+    mutationKey: ['my-friends'],
+    mutationFn: async () => {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/friends/${qid}`)
+      if (!res.ok) throw new Error("Fail")
+      const data = await res.json()
+      return data
+    },
+    onSuccess: () => {
+      toast.success("Friends loaded")
+
+    },
+    onError: () => {
+      toast.error("Failed to load friends")
+    }
+  })
+
   const checkInvites = useCallback(async () => {
-    // Stop polling if already in a showdown, or we have a pending invite, or not idle
     if (!qid || showdownId || pendingInvite || state !== 'idle') return
     try {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/invites/${qid}`)
@@ -57,14 +72,11 @@ function RouteComponent() {
   }, [qid, showdownId, pendingInvite, ignoredInvites, state])
 
   useEffect(() => {
-    // Fire immediately on mount, then every 10s
-    // (10s is safe for Supabase free tier: ~90KB/user/hour for this tiny payload)
     checkInvites()
     const interval = setInterval(checkInvites, 10_000)
     return () => clearInterval(interval)
   }, [checkInvites])
 
-  // Sync partner typing to the local partnerAnswer field
   useEffect(() => {
     if (partnerTyping) {
       setPartnerAnswer(partnerTyping.answer.toString())
@@ -156,7 +168,7 @@ function RouteComponent() {
 
   return (
     <div className='p-8 space-y-8 max-w-xl mx-auto'>
-      <h1 className='text-2xl font-bold'>Showdown Initiation</h1>
+
 
       {isBlocked ? (
         <div className='border p-4 rounded-xl space-y-4 shadow-sm bg-card'>
@@ -172,9 +184,22 @@ function RouteComponent() {
           </div>
         </div>
       ) : (
-        <div className='border p-6 rounded-xl bg-muted/50 text-center space-y-2'>
-          <p className='font-medium'>Your feed is active!</p>
-          <p className='text-xs text-muted-foreground'>Showdown invites can only be sent when your feed is locked.</p>
+        <div className='max-w-xl mx-auto'>
+          <h1 className='text-2xl font-bold'>Hello there <span className='hover:scale-105 transition-all duration-300 cursor-pointer'>{qid}</span></h1>
+          <p>Try texting your friends :D</p>
+          <Button onClick={() => loadFriends()}>Friends</Button>
+          <div className='flex gap-2 flex-wrap'>
+            {isLoading ? (
+              <p>Loading friends...</p>
+            ) : (
+              friends?.friends.map((friend: any) => (
+                <Link to='/u/$qid' params={{ qid: friend.qid }} key={friend.qid} className='border p-4 rounded-xl space-y-4 shadow-sm bg-card flex flex-col items-center'>
+                  <img src={friend.pfp ?? "/pfp.webp"} alt={friend.pfp ?? "pfp"} className='w-12 h-12 rounded-full' />
+                  <p className='font-bold'>{friend.qid}</p>
+                </Link>
+              ))
+            )}
+          </div>
         </div>
       )}
 

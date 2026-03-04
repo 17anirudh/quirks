@@ -5,7 +5,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { Virtuoso } from 'react-virtuoso';
 import PostCard from '@/components/post-card';
 import Loader from '@/components/loader';
-import { Loader2Icon, ShieldCheckIcon, LockIcon } from 'lucide-react';
+import { Loader2Icon, PyramidIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/auth-provider';
 
 export const Route = createFileRoute('/_protected/posts/home')({
@@ -19,7 +19,7 @@ function formatTime(seconds: number) {
 }
 
 function RouteComponent() {
-  const { isBlocked, unlockRemaining, resetTimer } = useGlobalTimer();
+  const { isBlocked, unlockRemaining } = useGlobalTimer();
   const { qid } = useAuth();
 
   const {
@@ -68,23 +68,17 @@ function RouteComponent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md p-6 text-center">
           <div className="p-8 border-2 bg-card rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
             <div className="flex flex-col items-center gap-3">
-              <LockIcon className="w-10 h-10 text-muted-foreground" />
+              <img src='/angry.gif' width={100} height={100} />
               <h2 className="text-2xl font-bold tracking-tight">Feed Locked</h2>
-              <p className="text-muted-foreground text-sm">Your session has ended. Complete a Showdown to unlock for 2 minutes.</p>
+              <p className="text-muted-foreground text-sm">Oops too much watch time. Enter a Showdown to unlock.</p>
+              <p className="text-muted-foreground text-sm">Don't worry, rest of the app, works :D</p>
             </div>
             <div className="flex flex-col gap-2">
               <Button
                 asChild
                 className="w-full bg-primary py-6 text-lg font-semibold"
               >
-                <Link to="/home">Go to Showdown</Link>
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={resetTimer}
-                className="text-muted-foreground text-xs"
-              >
-                (Debug) Reset Timer
+                <Link to="/home"><PyramidIcon />Enter Showdown</Link>
               </Button>
             </div>
           </div>
@@ -93,10 +87,12 @@ function RouteComponent() {
 
       {/* Unlocked countdown pill — sticky top bar */}
       {isUnlocked && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md p-6 text-center bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
-          <ShieldCheckIcon className="w-4 h-4 shrink-0" />
-          <span className="text-sm font-medium flex-1">Feed unlocked by Showdown</span>
-          <span className="font-mono text-sm tabular-nums">{formatTime(unlockRemaining)}</span>
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-md p-6 text-center">
+          <div className="p-8 border-2 bg-card rounded-2xl shadow-2xl max-w-sm w-full space-y-6 flex flex-col items-center">
+            <img src='/drink.gif' width={100} height={100} />
+            <p className="text-sm font-medium flex-1">Hydrate and breath, your feed will unlock in</p>
+            <p className="font-mono text-2xl font-semibold tracking-tight text-white">{formatTime(unlockRemaining)}</p>
+          </div>
         </div>
       )}
 
