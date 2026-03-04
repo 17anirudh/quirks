@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/auth-provider'
 import { useGlobalTimer } from '@/hooks/time-provider'
 import { useShowdown } from '@/hooks/use-showdown'
@@ -14,7 +14,7 @@ import {
 } from '@/lib/components/ui/dialog'
 import { toast } from 'sonner'
 import { sideCannons } from '@/components/side-cannons'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_protected/home')({
   component: RouteComponent,
@@ -30,77 +30,86 @@ function RouteComponent() {
   const [pendingInvite, setPendingInvite] = useState<any>(null)
   const [ignoredInvites] = useState(new Set<string>())
 
+  // Showdown hook manages WS state
   const { state, partnerJoined, partnerTyping, syncAnswer, validate, quit, resetState } = useShowdown(showdownId)
 
   const [myAnswer, setMyAnswer] = useState('')
   const [partnerAnswer, setPartnerAnswer] = useState('')
   const [quizData, setQuizData] = useState<any>(null)
 
-  const { isPending: isLoading, data: friends, mutate: loadFriends } = useMutation({
+  // --- TanStack Queries & Mutations ---
+
+  // 1. Fetch friends (Mutation because it's triggered by a button click in this context)
+  const { isPending: isLoadingFriends, data: friendsData, mutate: loadFriends } = useMutation({
     mutationKey: ['my-friends'],
     mutationFn: async () => {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/friends/${qid}`)
-      if (!res.ok) throw new Error("Fail")
-      const data = await res.json()
-      return data
+      if (!res.ok) throw new Error("Failed to fetch friends")
+      return res.json()
     },
-    onSuccess: () => {
-      toast.success("Friends loaded")
+    onError: () => toast.error("Failed to load friends")
+  })
 
+  // 2. Poll for invites
+  const { data: invites } = useQuery({
+    queryKey: ['showdown-invites', qid],
+    queryFn: async () => {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/invites/${qid}`)
+      if (!res.ok) throw new Error("Failed to poll invites")
+      return res.json()
     },
-    onError: () => {
-      toast.error("Failed to load friends")
+    enabled: !!qid && !showdownId && !pendingInvite && state === 'idle',
+    refetchInterval: 10_000,
+  })
+
+  // Handle new invites from the poll
+  useEffect(() => {
+    if (invites && invites.length > 0) {
+      const invite = invites[0]
+      if (!ignoredInvites.has(invite.id)) {
+        setPendingInvite(invite)
+      }
+    }
+  }, [invites, ignoredInvites])
+
+  // 3. Start a new showdown
+  const createShowdownMutation = useMutation({
+    mutationFn: async (targetQid: string) => {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creater_qid: qid, joiner_qid: targetQid })
+      })
+      if (!res.ok) throw new Error("Failed to create showdown")
+      return res.json()
+    },
+    onSuccess: (data) => {
+      setQuizData(data)
+      setShowdownId(data.id)
+    },
+    onError: () => toast.error("Error starting showdown")
+  })
+
+  // 4. Abandon showdown
+  const abandonShowdownMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/abandon/${id}`, { method: 'POST' })
     }
   })
 
-  const checkInvites = useCallback(async () => {
-    if (!qid || showdownId || pendingInvite || state !== 'idle') return
-    try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/invites/${qid}`)
-      if (res.ok) {
-        const data = await res.json()
-        if (data && data.length > 0) {
-          const invite = data[0]
-          if (!ignoredInvites.has(invite.id)) {
-            setPendingInvite(invite)
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Invite check fail", e)
-    }
-  }, [qid, showdownId, pendingInvite, ignoredInvites, state])
+  const handleStartShowdown = () => {
+    if (!inviteQid) return toast.error("Enter QID")
+    if (inviteQid === qid) return toast.error("Cannot challenge yourself")
+    createShowdownMutation.mutate(inviteQid)
+  }
 
-  useEffect(() => {
-    checkInvites()
-    const interval = setInterval(checkInvites, 10_000)
-    return () => clearInterval(interval)
-  }, [checkInvites])
+  // --- Handlers & Effects ---
 
   useEffect(() => {
     if (partnerTyping) {
       setPartnerAnswer(partnerTyping.answer.toString())
     }
   }, [partnerTyping])
-
-  const handleStartShowdown = async () => {
-    if (!inviteQid) return toast.error("Enter QID")
-    if (inviteQid === qid) return toast.error("Cannot challenge yourself")
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creater_qid: qid, joiner_qid: inviteQid })
-      })
-      if (!res.ok) throw new Error("Fail")
-      const data = await res.json()
-      setQuizData(data)
-      setShowdownId(data.id)
-    } catch (err: any) {
-      toast.error("Error starting showdown")
-    }
-  }
 
   const handleAcceptInvite = () => {
     if (!pendingInvite) return
@@ -114,9 +123,8 @@ function RouteComponent() {
       if (state !== 'success' && state !== 'idle') {
         if (window.confirm("Quit Showdown? Session will end for both.")) {
           quit()
-          if (showdownId) {
-            fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/abandon/${showdownId}`, { method: 'POST' })
-          }
+          if (showdownId) abandonShowdownMutation.mutate(showdownId)
+
           setShowdownId(null)
           setQuizData(null)
           setMyAnswer('')
@@ -133,7 +141,6 @@ function RouteComponent() {
     }
   }
 
-  // Handle success state
   useEffect(() => {
     if (state === 'success') {
       sideCannons()
@@ -149,27 +156,22 @@ function RouteComponent() {
         navigate({ to: '/posts/home' })
       }, 2000)
     }
-  }, [state, navigate, resetState, startUnlockCooldown])
+  }, [state, navigate, resetState, startUnlockCooldown, isBlocked])
 
   const isCreator = quizData?.creater_qid === qid
   const myQuestion = isCreator ? quizData?.q1 : quizData?.q2
   const partnerQuestion = isCreator ? quizData?.q2 : quizData?.q1
 
-  // Validate sends: a1 = creator's answer, a2 = joiner's answer (matches server schema)
   const handleValidate = () => {
     const creatorAns = isCreator ? Number(myAnswer) : Number(partnerAnswer)
     const joinerAns = isCreator ? Number(partnerAnswer) : Number(myAnswer)
     validate(creatorAns, joinerAns)
   }
 
-  // Allow submit if the user has typed their own answer.
-  // Partner answer sync is bonus — the server validates from the DB, not from the client.
   const canValidate = myAnswer.trim() !== '' && !isNaN(Number(myAnswer))
 
   return (
     <div className='p-8 space-y-8 max-w-xl mx-auto'>
-
-
       {isBlocked ? (
         <div className='border p-4 rounded-xl space-y-4 shadow-sm bg-card'>
           <p className='text-sm text-muted-foreground'>Invite a friend to unlock your feed by solving puzzles together.</p>
@@ -180,37 +182,57 @@ function RouteComponent() {
               onChange={e => setInviteQid(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleStartShowdown()}
             />
-            <Button onClick={handleStartShowdown}>Invite</Button>
+            <Button onClick={handleStartShowdown} disabled={createShowdownMutation.isPending}>
+              {createShowdownMutation.isPending ? 'Inviting...' : 'Invite'}
+            </Button>
           </div>
         </div>
       ) : (
         <div className='max-w-xl mx-auto'>
-          <h1 className='text-2xl font-bold'>Hello there <span className='hover:scale-105 transition-all duration-300 cursor-pointer'>{qid}</span></h1>
-          <p>Try texting your friends :D</p>
-          <Button onClick={() => loadFriends()}>Friends</Button>
-          <div className='flex gap-2 flex-wrap'>
-            {isLoading ? (
-              <p>Loading friends...</p>
-            ) : (
-              friends?.friends.map((friend: any) => (
-                <Link to='/u/$qid' params={{ qid: friend.qid }} key={friend.qid} className='border p-4 rounded-xl space-y-4 shadow-sm bg-card flex flex-col items-center'>
-                  <img src={friend.pfp ?? "/pfp.webp"} alt={friend.pfp ?? "pfp"} className='w-12 h-12 rounded-full' />
-                  <p className='font-bold'>{friend.qid}</p>
-                </Link>
-              ))
-            )}
+          <h1 className='text-2xl font-bold font-heading'>Hello there <span className='hover:scale-105 transition-all duration-300 cursor-pointer text-primary'>{qid}</span></h1>
+          <p className='text-muted-foreground mb-6'>Try texting your friends :D</p>
+
+          <div className='space-y-4'>
+            <Button onClick={() => loadFriends()} disabled={isLoadingFriends}>
+              {isLoadingFriends ? 'Loading...' : 'Show Friends'}
+            </Button>
+
+            <div className='flex gap-3 flex-wrap'>
+              {friendsData?.friends && friendsData.friends.length > 0 ? (
+                friendsData.friends.map((friend: any) => (
+                  <Link
+                    to='/u/$qid'
+                    params={{ qid: friend.qid }}
+                    key={friend.qid}
+                    className='group border p-4 rounded-2xl shadow-sm bg-card flex flex-col items-center gap-2 hover:border-primary/50 transition-colors duration-200'
+                  >
+                    <div className='relative'>
+                      <img
+                        src={friend.pfp ?? "/pfp.webp"}
+                        alt={friend.qid}
+                        className='w-14 h-14 rounded-full object-cover border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-200'
+                      />
+                      <div className='absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background' />
+                    </div>
+                    <p className='font-bold text-sm'>{friend.qid}</p>
+                  </Link>
+                ))
+              ) : !isLoadingFriends && friendsData ? (
+                <p className='text-sm text-muted-foreground'>No friends found yet.</p>
+              ) : null}
+            </div>
           </div>
         </div>
       )}
 
-      {/* Only show incoming invites — never show the user's own outgoing invite */}
+      {/* Incoming Invite Card */}
       {pendingInvite && pendingInvite.creater_qid !== qid && (
-        <div className='border-2 border-primary p-4 rounded-xl bg-primary/5 flex justify-between items-center'>
-          <div>
-            <p className='font-bold'>Invite from {pendingInvite.creater_qid}</p>
-            <p className='text-xs'>Solve puzzles together to unlock the feed.</p>
+        <div className='border-2 border-primary/50 p-6 rounded-2xl bg-primary/5 flex justify-between items-center shadow-lg animate-in fade-in slide-in-from-bottom-4'>
+          <div className='space-y-1'>
+            <p className='font-bold text-lg'>Invite from {pendingInvite.creater_qid}</p>
+            <p className='text-xs text-muted-foreground'>Solve puzzles together to unlock the feed.</p>
           </div>
-          <div className='flex gap-2'>
+          <div className='flex gap-3'>
             <Button size='sm' onClick={handleAcceptInvite}>Accept</Button>
             <Button size='sm' variant='outline' onClick={() => {
               ignoredInvites.add(pendingInvite.id)
@@ -221,9 +243,9 @@ function RouteComponent() {
       )}
 
       <Dialog open={!!showdownId} onOpenChange={handleCloseDialog}>
-        <DialogContent>
+        <DialogContent className='sm:max-w-md'>
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className='text-xl'>
               {state === 'success'
                 ? '🎉 Feed Unlocked!'
                 : partnerJoined
@@ -233,19 +255,18 @@ function RouteComponent() {
           </DialogHeader>
 
           {quizData ? (
-            <div className='relative space-y-4 py-4'>
-              {/* Waiting overlay — blocks the quiz until partner connects */}
+            <div className='relative space-y-5 py-4'>
               {!partnerJoined && state !== 'success' && (
-                <div className='absolute inset-0 z-10 flex flex-col items-center justify-center rounded-lg bg-background/80 backdrop-blur-sm gap-2'>
-                  <div className='h-5 w-5 rounded-full border-2 border-primary border-t-transparent animate-spin' />
-                  <p className='text-sm font-medium'>Waiting for partner to join…</p>
-                  <p className='text-xs text-muted-foreground'>Share your QID with them to get started</p>
+                <div className='absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-background/80 backdrop-blur-sm gap-3'>
+                  <div className='h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin' />
+                  <p className='text-sm font-semibold'>Waiting for partner to join…</p>
+                  <p className='text-xs text-muted-foreground px-6 text-center italic'>Share your QID with them to get started</p>
                 </div>
               )}
 
-              <div className='space-y-2 border p-3 rounded'>
-                <p className='font-bold text-sm'>Your Question</p>
-                <p className='text-xl font-mono'>{myQuestion}</p>
+              <div className='space-y-3 p-4 border rounded-2xl bg-muted/30'>
+                <p className='font-bold text-xs uppercase tracking-wider text-muted-foreground'>Your Question</p>
+                <p className='text-2xl font-mono text-center py-2'>{myQuestion}</p>
                 <Input
                   type='number'
                   placeholder='Your answer'
@@ -255,36 +276,40 @@ function RouteComponent() {
                     syncAnswer(isCreator ? 1 : 2, Number(e.target.value))
                   }}
                   disabled={!partnerJoined || state === 'success'}
+                  className='text-center text-lg h-12 rounded-xl focus-visible:ring-primary'
                 />
               </div>
 
-              <div className='space-y-2 border p-3 rounded opacity-75'>
-                <p className='font-bold text-sm'>Partner&apos;s Question</p>
-                <p className='text-xl font-mono'>{partnerQuestion}</p>
+              <div className='space-y-3 p-4 border rounded-2xl bg-muted/10 opacity-80'>
+                <p className='font-bold text-xs uppercase tracking-wider text-muted-foreground'>Partner Question</p>
+                <p className='text-2xl font-mono text-center py-2'>{partnerQuestion}</p>
                 <Input
                   type='number'
-                  placeholder='Waiting for partner to type…'
+                  placeholder='Waiting for partner…'
                   value={partnerAnswer}
                   readOnly
-                  className="bg-muted cursor-default"
+                  className="bg-muted text-center text-lg h-12 rounded-xl cursor-default"
                 />
               </div>
 
               {state === 'failure' && (
-                <p className='text-sm text-destructive text-center'>Wrong answers — check your math and try again.</p>
+                <p className='text-sm text-destructive font-semibold text-center animate-bounce'>Wrong answers — check your math and try again.</p>
               )}
             </div>
           ) : (
-            <div className="py-8 text-center text-muted-foreground">Initializing quiz...</div>
+            <div className="py-12 text-center flex flex-col items-center gap-4">
+              <div className='h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin' />
+              <p className='text-muted-foreground font-medium'>Initializing quiz...</p>
+            </div>
           )}
 
           <DialogFooter>
             <Button
-              className='w-full'
+              className='w-full py-6 text-lg font-bold rounded-xl'
               disabled={!partnerJoined || !canValidate || state === 'success'}
               onClick={handleValidate}
             >
-              Validate Showdown
+              {state === 'success' ? 'Unlocked!' : 'Validate Showdown'}
             </Button>
           </DialogFooter>
         </DialogContent>
