@@ -3,10 +3,7 @@
 Social Applications are meant to network and meet people rather, it has become algorithm optimized content driven application. Quirks is built as an alternative to make people-driven social app with forced cooldown and encouraged (not forced) conversations.
 
 ## Video
-
-<video src="assets/quirks-update.mp4" autoplay loop muted>
-  Your browser does not support the video tag.
-</video>
+![Video](assets/quirks-update.mp4)
 
 ## Tech Stack
 
