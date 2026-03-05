@@ -6,6 +6,6 @@ if (!process.env.SUPABASE_URL || !process.env.SUPABASE_KEY) {
 }
 
 export const CLIENT = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY,
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_KEY!,
 );

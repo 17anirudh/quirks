@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^1.4.1",
-    "@elysiajs/html": "^1.4.0",
     "@supabase/supabase-js": "^2.90.1",
     "@tqman/nice-logger": "^1.1.1",
     "elysia": "latest",

@@ -102,9 +102,4 @@ function RouteComponent() {
       ))}
     </div>
   )
-  // return (
-  //   <div className='h-dvh w-screen flex justify-center items-center'>
-  //     <pre className='w-9/12 text-pretty break-words'>{JSON.stringify(data, null, 2)}</pre>
-  //   </div>
-  // )
 }

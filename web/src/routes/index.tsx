@@ -73,7 +73,7 @@ export const Route = createFileRoute('/')({
     component: AppComponent,
 })
 
-function AppComponent() {
+export function AppComponent() {
     const navigate = useNavigate()
     const client = Route.useRouteContext().queryClient
     const logInUser = useMutation({

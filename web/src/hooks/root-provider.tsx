@@ -14,7 +14,6 @@ export function getContext() {
         placeholderData: keepPreviousData,
         refetchOnReconnect: false,
         refetchOnWindowFocus: false,
-
       }
     }
   })
