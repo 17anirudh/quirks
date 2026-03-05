@@ -12,12 +12,6 @@ Social Applications are meant to network and meet people rather, it has become a
 - Landing page (header)
 ![Landing](assets/landing1.png)
 
-- Landing page (middle)
-![Landing](assets/landing2.png)
-
-- Landing page (footer)
-![Landing](assets/landing3.png)
-
 ## Tech Stack
 
 BEST Stack

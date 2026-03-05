@@ -5,7 +5,14 @@ import * as routes from "./routes/index";
 import { logger } from "@tqman/nice-logger"
 
 export const app = new Elysia({ name: 'Quirks API' })
-  .use(cors({ origin: "http://localhost:3000" }))
+  .use(cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:4173",
+      "https://quirks.vercel.app",
+      "https://quirks.vercel.app/"
+    ]
+  }))
   .use(logger({
     mode: 'live',
     withTimestamp: true
