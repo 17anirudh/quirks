@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from '@/lib/components/ui/dialog';
 import { useMutation } from '@tanstack/react-query'
+import ShareProfile from '@/components/share-profile'
 
 type queryResponse = {
   user: {
@@ -127,13 +128,7 @@ function RouteComponent() {
           <PlusCircleIcon />
           Create Post
         </Link>
-        <Button
-          className="flex gap-2 flex-wrap cursor-pointer bg-transparent text-foreground hover:bg-transparent hover:text-foreground"
-          onClick={copyLink}
-        >
-          <EarthIcon />
-          Share Profile
-        </Button>
+        <ShareProfile pfp={ctx.user.u_pfp} qid={ctx.user.u_qid} />
         {/* Pending Requests */}
         <Dialog>
           <DialogTrigger asChild>

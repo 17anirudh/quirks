@@ -68,7 +68,7 @@ function RouteComponent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-md p-6 text-center">
           <div className="p-8 border-2 bg-card rounded-2xl shadow-2xl max-w-sm w-full space-y-6">
             <div className="flex flex-col items-center gap-3">
-              <img src='/angry.gif' width={100} height={100} />
+              <img src='/bhAAi.webp' width={100} height={100} />
               <h2 className="text-2xl font-bold tracking-tight">Feed Locked</h2>
               <p className="text-muted-foreground text-sm">Oops too much watch time. Enter a Showdown to unlock.</p>
               <p className="text-muted-foreground text-sm">Don't worry, rest of the app, works :D</p>

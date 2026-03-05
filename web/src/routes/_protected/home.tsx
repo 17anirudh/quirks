@@ -87,7 +87,7 @@ function RouteComponent() {
       setQuizData(data)
       setShowdownId(data.id)
     },
-    onError: () => toast.error("Error starting showdown")
+    onError: () => toast.error("Check is user exists")
   })
 
   // 4. Abandon showdown
