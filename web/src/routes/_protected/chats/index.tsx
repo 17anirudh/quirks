@@ -1,10 +1,11 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { SUPABASE_CLIENT } from '@/hooks/utils'
 import { MessageSquare, RefreshCw } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar'
 import { Button } from '@/lib/components/ui/button'
 import Loader from '@/components/loader'
+import { Keys } from '@/context/keys'
+import { loadConversations } from '@/api/api'
 
 export const Route = createFileRoute('/_protected/chats/')({
     component: MessagesLayout,
@@ -14,26 +15,8 @@ export const Route = createFileRoute('/_protected/chats/')({
 
 function MessagesLayout() {
     const { data: conversations, isLoading, error, refetch } = useQuery({
-        queryKey: ['conversations'],
-        queryFn: async () => {
-            const { data: { session } } = await SUPABASE_CLIENT.auth.getSession();
-            if (!session) throw new Error("Unauthorized");
-
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/message/list`, {
-                headers: {
-                    'Authorization': `Bearer ${session.access_token}`
-                }
-            });
-
-            if (!res.ok) {
-                const errorText = await res.text();
-                console.error('[FRONTEND] Failed to fetch conversations:', res.status, errorText);
-                throw new Error("Failed to fetch conversations");
-            }
-            const data = await res.json();
-            console.log('[FRONTEND] Fetched conversations:', data.conversations?.length || 0);
-            return data.conversations as Conversation[];
-        },
+        queryKey: Keys.conversation,
+        queryFn: async () => loadConversations(),
         refetchInterval: 5000, // Auto-refetch every 5 seconds
     });
 

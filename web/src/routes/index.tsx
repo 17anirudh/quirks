@@ -2,7 +2,7 @@ import { createFileRoute, Link, redirect, useNavigate } from '@tanstack/react-ro
 import { ConfettiFireworks } from '@/components/fireworks'
 import { useMutation } from '@tanstack/react-query'
 import { useForm } from '@tanstack/react-form'
-import { SUPABASE_CLIENT } from '@/hooks/utils'
+import { SUPABASE_CLIENT } from '@/context/utils'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { Button } from '@/lib/components/ui/button';
@@ -24,9 +24,9 @@ import {
 import { Input } from "@/lib/components/ui/input"
 import { profileSchema } from '@/services/user';
 import Loader from '@/components/loader'
-import { CursorHighlight } from '@/components/ui/cursor-highlight'
+import { CursorHighlight } from '@/components/cursor-highlight'
 import { ConstructionIcon } from '@/lib/components/ui/construction'
-import Carousel from '@/components/ui/carousel'
+import Carousel from '@/lib/components/ui/carousel'
 
 // Schemas
 const createAccountSchema = profileSchema.pick({
@@ -930,4 +930,3 @@ export function AppComponent() {
         </div>
     );
 }
-

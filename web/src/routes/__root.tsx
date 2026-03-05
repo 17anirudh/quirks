@@ -1,13 +1,13 @@
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import TanStackQueryDevtools from '@/hooks/root-provider'
+import TanStackQueryDevtools from '@/context/root-provider'
 import type { QueryClient } from '@tanstack/react-query'
-import { ThemeProvider } from "@/hooks/theme-provider"
+import { ThemeProvider } from "@/context/theme-provider"
 import { Toaster } from '@/lib/components/ui/sonner'
 import { NotFound } from '@/components/404'
 import { ErrorComponent } from '@/components/400'
-import { useAuth } from '@/hooks/auth-provider'
+import { useAuth } from '@/context/auth-provider'
 import Loader from '@/components/loader'
 
 interface MyRouterContext {

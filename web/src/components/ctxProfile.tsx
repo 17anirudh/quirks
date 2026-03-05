@@ -15,7 +15,7 @@ import { DialogTrigger } from '@radix-ui/react-dialog'
 import { useMutation, type QueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
-import { SUPABASE_CLIENT } from '@/hooks/utils'
+import { SUPABASE_CLIENT } from '@/context/utils'
 
 type props = {
     relation?: any | null
@@ -100,7 +100,6 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         }
     })
 
-    // No relationship exists - show "Initiate" button
     if (!relation) {
         return (
             <DropdownMenu modal={true}>
@@ -109,7 +108,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                         {isSending ? <LoaderIcon className='animate-spin' /> : <>Initiate <HandIcon /></>}
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent className='flex flex-wrap gap-3'>
                     <Button className='w-fit p-4' onClick={() => sendRequest()}>Send Friend Request</Button>
                     <Button className='w-fit p-4' onClick={() => initChat()}>Message</Button>
                 </DropdownMenuContent>
@@ -117,7 +116,6 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         )
     }
 
-    // Pending state
     if (relation.fs_status === 'pending') {
         const isSender = relation.sent_qid === viewer
 
@@ -129,7 +127,7 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
                     </Button>
                 </DropdownMenuTrigger>
                 {isSender && (
-                    <DropdownMenuContent>
+                    <DropdownMenuContent className='flex flex-wrap gap-3'>
                         <Dialog>
                             <DialogTrigger asChild>
                                 <Button className='w-fit p-4' disabled={isRemoving}>
@@ -160,7 +158,6 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
         )
     }
 
-    // Friends status - show unfriend option
     if (relation.fs_status === 'friends') {
         return (
             <DropdownMenu modal={true}>
@@ -198,6 +195,4 @@ export default function CtxProfile({ relation, viewer, targetQid, queryClient }:
             </DropdownMenu>
         )
     }
-
-    return null
 }

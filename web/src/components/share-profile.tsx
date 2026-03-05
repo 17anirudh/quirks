@@ -13,7 +13,7 @@ import {
     QRCodeSkeleton
 } from "@/lib/components/ui/qr-code";
 import { toast } from 'sonner';
-import { sideCannons } from './side-cannons';
+import { sideCannons } from './fireworks';
 
 type Props = {
     pfp: string | null;

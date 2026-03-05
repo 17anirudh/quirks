@@ -2,12 +2,10 @@ import { Slot as SlotPrimitive } from "radix-ui";
 import * as React from "react";
 import { useComposedRefs } from "motion/react";
 import { cn } from "@/lib/utils";
-import { useLazyRef } from "@/hooks/use-lazy-ref";
+import { useLazyRef } from "@/context/use-lazy-ref";
 
 const ROOT_NAME = "QRCode";
 const CANVAS_NAME = "QRCodeCanvas";
-const SVG_NAME = "QRCodeSvg";
-const IMAGE_NAME = "QRCodeImage";
 const SKELETON_NAME = "QRCodeSkeleton";
 
 type QRCodeLevel = "L" | "M" | "Q" | "H";
@@ -320,127 +318,6 @@ function QRCodeCanvas(props: QRCodeCanvasProps) {
   );
 }
 
-interface QRCodeSvgProps extends React.ComponentProps<"div"> {
-  asChild?: boolean;
-}
-
-function QRCodeSvg(props: QRCodeSvgProps) {
-  const { asChild, className, style, ...svgProps } = props;
-
-  const context = useQRCodeContext(SVG_NAME);
-  const svgString = useStore((state) => state.svgString);
-
-  if (!svgString) return null;
-
-  const SvgPrimitive = asChild ? SlotPrimitive.Slot : "div";
-
-  return (
-    <SvgPrimitive
-      data-slot="qr-code-svg"
-      {...svgProps}
-      className={cn(
-        "relative max-h-(--qr-code-size) max-w-(--qr-code-size)",
-        className,
-      )}
-      style={{ width: context.size, height: context.size, ...style }}
-      dangerouslySetInnerHTML={{ __html: svgString }}
-    />
-  );
-}
-
-interface QRCodeImageProps extends React.ComponentProps<"img"> {
-  asChild?: boolean;
-}
-
-function QRCodeImage(props: QRCodeImageProps) {
-  const { alt = "QR Code", asChild, className, ...imageProps } = props;
-
-  const context = useQRCodeContext(IMAGE_NAME);
-  const dataUrl = useStore((state) => state.dataUrl);
-
-  if (!dataUrl) return null;
-
-  const ImagePrimitive = asChild ? SlotPrimitive.Slot : "img";
-
-  return (
-    <ImagePrimitive
-      data-slot="qr-code-image"
-      {...imageProps}
-      src={dataUrl}
-      alt={alt}
-      width={context.size}
-      height={context.size}
-      className={cn(
-        "relative max-h-(--qr-code-size) max-w-(--qr-code-size)",
-        className,
-      )}
-    />
-  );
-}
-
-interface QRCodeDownloadProps extends React.ComponentProps<"button"> {
-  filename?: string;
-  format?: "png" | "svg";
-  asChild?: boolean;
-}
-
-function QRCodeDownload(props: QRCodeDownloadProps) {
-  const {
-    filename = "qrcode",
-    format = "png",
-    asChild,
-    className,
-    children,
-    ...buttonProps
-  } = props;
-
-  const dataUrl = useStore((state) => state.dataUrl);
-  const svgString = useStore((state) => state.svgString);
-
-  const onClick = React.useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      buttonProps.onClick?.(event);
-      if (event.defaultPrevented) return;
-
-      const link = document.createElement("a");
-
-      if (format === "png" && dataUrl) {
-        link.href = dataUrl;
-        link.download = `${filename}.png`;
-      } else if (format === "svg" && svgString) {
-        const blob = new Blob([svgString], { type: "image/svg+xml" });
-        link.href = URL.createObjectURL(blob);
-        link.download = `${filename}.svg`;
-      } else {
-        return;
-      }
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      if (format === "svg" && svgString) {
-        URL.revokeObjectURL(link.href);
-      }
-    },
-    [dataUrl, svgString, filename, format, buttonProps.onClick],
-  );
-
-  const ButtonPrimitive = asChild ? SlotPrimitive.Slot : "button";
-
-  return (
-    <ButtonPrimitive
-      type="button"
-      data-slot="qr-code-download"
-      {...buttonProps}
-      className={cn("max-w-(--qr-code-size)", className)}
-      onClick={onClick}
-    >
-      {children ?? `Download ${format.toUpperCase()}`}
-    </ButtonPrimitive>
-  );
-}
-
 interface QRCodeOverlayProps extends React.ComponentProps<"div"> {
   asChild?: boolean;
 }
@@ -500,13 +377,6 @@ function QRCodeSkeleton(props: QRCodeSkeletonProps) {
 export {
   QRCode,
   QRCodeCanvas,
-  QRCodeSvg,
-  QRCodeImage,
   QRCodeOverlay,
   QRCodeSkeleton,
-  QRCodeDownload,
-  //
-  useStore as useQRCode,
-  //
-  type QRCodeProps,
 };

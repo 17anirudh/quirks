@@ -7,8 +7,8 @@ import {
   TimerDisplay,
   TimerIcon,
   TimerRoot,
-} from '@/lib/components/timer';
-import { useGlobalTimer } from '@/hooks/time-provider';
+} from '@/components/timer';
+import { useGlobalTimer } from '@/context/time-provider';
 import { SearchIcon } from 'lucide-react';
 
 export const Route = createFileRoute('/_protected/posts')({

@@ -7,30 +7,7 @@ import {
     UserCircle2Icon,
 } from 'lucide-react'
 import Loader from '@/components/loader'
-import { TimerProvider } from '@/hooks/time-provider'
-
-type queryResponse = {
-    user: {
-        u_qid: string | null,
-        u_bio: string | null,
-        u_pfp: string | null,
-        u_name: string | null
-    },
-    post: [
-        {
-            p_id: string | null,
-            p_author_qid: string | null,
-            p_text: string | null,
-            p_likes_count: number | null,
-            p_comments_count: number | null,
-            p_created_at: string | null,
-            p_url: string | null
-            p_author_pfp: string | null
-        }
-    ],
-    relation: Array<any | null>,
-    pending: Array<any | null>
-}
+import { TimerProvider } from '@/context/time-provider'
 
 export const Route = createFileRoute('/_protected')({
     loader: async ({ context }) => {
@@ -39,22 +16,7 @@ export const Route = createFileRoute('/_protected')({
             throw redirect({ to: '/', replace: true })
         }
         const qid = session.user.user_metadata.u_qid
-        return await context.queryClient.ensureQueryData({
-            queryKey: ['me'],
-            queryFn: async () => {
-                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/user/me`, {
-                    headers: {
-                        id: qid
-                    }
-                })
-
-                if (!res.ok) {
-                    throw new Error('Failed to fetch profile')
-                }
-
-                return await res.json() as queryResponse
-            }
-        })
+        return qid;
     },
     pendingComponent: () => <Loader />,
     component: RouteComponent,
@@ -94,9 +56,7 @@ const navigations: navType[] = [
     }
 ]
 
-
-
-export function RouteComponent() {
+function RouteComponent() {
     return (
         <div className="flex flex-col h-dvh w-screen overflow-hidden">
             <main className="flex-1 relative overflow-y-auto">

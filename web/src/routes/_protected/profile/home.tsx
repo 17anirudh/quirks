@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 import Loader from '@/components/loader'
-import { PlusCircleIcon, WrenchIcon, EarthIcon, BellIcon, BellDotIcon, XIcon, CheckIcon } from 'lucide-react'
+import { PlusCircleIcon, WrenchIcon, BellIcon, BellDotIcon, XIcon, CheckIcon } from 'lucide-react'
 import PostCard from '@/components/post-card'
 import ProfileCard from '@/components/profile-card'
 import { toast } from 'sonner'
@@ -13,70 +13,31 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/lib/components/ui/dialog';
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import ShareProfile from '@/components/share-profile'
+import { queryMe } from '@/api/api'
 
-type queryResponse = {
-  user: {
-    u_qid: string | null,
-    u_bio: string | null,
-    u_pfp: string | null,
-    u_name: string | null
-  },
-  post: {
-    p_id: string | null,
-    p_author_qid: string | null,
-    p_text: string | null,
-    p_likes_count: number | null,
-    p_comments_count: number | null,
-    p_created_at: string | null,
-    p_url: string | null
-    p_author_pfp: string | null
-  }[],
-  relation: {
-    fs_id: string | null,
-    sent_qid: string | null,
-    receive_qid: string | null,
-    fs_status: string | null,
-    fs_created_at: string | null
-  }[],
-  pending: {
-    fs_id: string | null,
-    sent_qid: string | null,
-    receive_qid: string | null,
-    fs_status: string | null,
-    fs_created_at: string | null
-  }[]
-}
 
 export const Route = createFileRoute('/_protected/profile/home')({
-  loader: async ({ context }) => {
-    const data = await context.queryClient.getQueryData(['me'])
-    return data
-  },
   pendingComponent: () => <Loader />,
   component: RouteComponent,
   pendingMinMs: 0
 })
 
 function RouteComponent() {
-  const ctx = Route.useLoaderData() as queryResponse
-  const queryClient = Route.useRouteContext().queryClient
-  async function copyLink(): Promise<void> {
-    if (typeof window === 'undefined') return;
-    const url = `${window.location.origin}/u/${ctx.user.u_qid}`;
-    if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(url);
-      toast.success(`Link copied to clipboard 🔗`)
-      return;
-    }
-  }
+  const queryClient = useQueryClient()
+  const qid = Route.useRouteContext().auth.qid;
+  const { data: ctx, isPending } = useQuery({
+    queryKey: ['me'],
+    queryFn: () => queryMe(qid!)
+  })
+
   const { mutate: acceptRequest, isPending: isAccepting } = useMutation({
     mutationFn: async (fs_id: string) => {
       const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/friendship/accept`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fs_id, receiver_qid: ctx.user.u_qid })
+        body: JSON.stringify({ fs_id, receiver_qid: ctx?.user.u_qid })
       })
       if (!res.ok) {
         const error = await res.json()
@@ -114,10 +75,21 @@ function RouteComponent() {
       toast.error(error.message)
     }
   })
+
+  if (isPending || !ctx) {
+    return <Loader />
+  }
+
+  const pending = ctx.pending ?? []
   return (
     <div className="w-full p-4 flex flex-col gap-5 justify-center items-center flex-1 relative">
       {/* Profile Card */}
-      <ProfileCard information={ctx} />
+      <ProfileCard information={{
+        user: ctx.user,
+        post: ctx.post,
+        relation: ctx.relation,
+        pending: pending
+      }} />
       {/* Auth User specific */}
       <div className='flex gap-2 flex-wrap justify-center items-center'>
         <Link className='flex flex-wrap gap-2' to='/profile/settings'>
@@ -133,7 +105,7 @@ function RouteComponent() {
         <Dialog>
           <DialogTrigger asChild>
             <Button className='flex gap-2 flex-wrap cursor-pointer bg-transparent text-foreground hover:bg-transparent hover:text-foreground'>
-              {ctx.pending?.length > 0 ? <BellDotIcon /> : <BellIcon />}
+              {pending.length > 0 ? <BellDotIcon /> : <BellIcon />}
               Notifications
             </Button>
           </DialogTrigger>
@@ -141,15 +113,15 @@ function RouteComponent() {
             <DialogHeader>
               <DialogTitle>Notifications</DialogTitle>
               <DialogDescription>
-                You have {ctx.pending.length} pending notification{ctx.pending.length !== 1 ? 's' : ''}.
+                You have {pending.length} pending notification{pending.length !== 1 ? 's' : ''}.
               </DialogDescription>
             </DialogHeader>
 
             <div className='flex flex-col gap-4 mt-4 max-h-96 overflow-y-auto'>
-              {ctx.pending.length === 0 ? (
+              {pending.length === 0 ? (
                 <p className='text-center text-muted-foreground py-8'>No pending notifications</p>
               ) : (
-                ctx.pending.map((request) => (
+                pending.map((request) => (
                   <div
                     key={request.fs_id}
                     className='flex items-center justify-between gap-4 p-4 border rounded-lg'

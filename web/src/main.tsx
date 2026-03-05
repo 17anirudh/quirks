@@ -1,9 +1,9 @@
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import * as TanStackQueryProvider from './hooks/root-provider.tsx'
+import * as TanStackQueryProvider from './context/root-provider.tsx'
 import { routeTree } from './routeTree.gen'
 import './styles.css'
-import { useAuth, AuthProvider } from './hooks/auth-provider.tsx'
+import { useAuth, AuthProvider } from './context/auth-provider.tsx'
 import reportWebVitals from './reportWebVitals.ts'
 
 const TanStackQueryProviderContext = TanStackQueryProvider.getContext()

@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState, useEffect } from 'react'
-import { useAuth } from '@/hooks/auth-provider'
-import { useGlobalTimer } from '@/hooks/time-provider'
-import { useShowdown } from '@/hooks/use-showdown'
+import { useAuth } from '@/context/auth-provider'
+import { useGlobalTimer } from '@/context/time-provider'
+import { useShowdown } from '@/context/use-showdown'
 import { Button } from '@/lib/components/ui/button'
 import { Input } from '@/lib/components/ui/input'
 import {
@@ -13,8 +13,10 @@ import {
   DialogFooter
 } from '@/lib/components/ui/dialog'
 import { toast } from 'sonner'
-import { sideCannons } from '@/components/side-cannons'
+import { sideCannons } from '@/components/fireworks'
 import { useMutation, useQuery } from '@tanstack/react-query'
+import { Keys } from '@/context/keys'
+import { createShowdown, queryShowdownInvites } from '@/api/api'
 
 export const Route = createFileRoute('/_protected/home')({
   component: RouteComponent,
@@ -24,22 +26,15 @@ function RouteComponent() {
   const navigate = useNavigate()
   const { qid } = useAuth()
   const { isBlocked, startUnlockCooldown } = useGlobalTimer()
-
   const [showdownId, setShowdownId] = useState<string | null>(null)
   const [inviteQid, setInviteQid] = useState('')
   const [pendingInvite, setPendingInvite] = useState<any>(null)
   const [ignoredInvites] = useState(new Set<string>())
-
-  // Showdown hook manages WS state
   const { state, partnerJoined, partnerTyping, syncAnswer, validate, quit, resetState } = useShowdown(showdownId)
-
   const [myAnswer, setMyAnswer] = useState('')
   const [partnerAnswer, setPartnerAnswer] = useState('')
   const [quizData, setQuizData] = useState<any>(null)
 
-  // --- TanStack Queries & Mutations ---
-
-  // 1. Fetch friends (Mutation because it's triggered by a button click in this context)
   const { isPending: isLoadingFriends, data: friendsData, mutate: loadFriends } = useMutation({
     mutationKey: ['my-friends'],
     mutationFn: async () => {
@@ -50,14 +45,9 @@ function RouteComponent() {
     onError: () => toast.error("Failed to load friends")
   })
 
-  // 2. Poll for invites
   const { data: invites } = useQuery({
-    queryKey: ['showdown-invites', qid],
-    queryFn: async () => {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/invites/${qid}`)
-      if (!res.ok) throw new Error("Failed to poll invites")
-      return res.json()
-    },
+    queryKey: Keys.showdownInvites(qid!),
+    queryFn: async () => queryShowdownInvites(qid!),
     enabled: !!qid && !showdownId && !pendingInvite && state === 'idle',
     refetchInterval: 10_000,
   })
@@ -74,15 +64,7 @@ function RouteComponent() {
 
   // 3. Start a new showdown
   const createShowdownMutation = useMutation({
-    mutationFn: async (targetQid: string) => {
-      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/showdown/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creater_qid: qid, joiner_qid: targetQid })
-      })
-      if (!res.ok) throw new Error("Failed to create showdown")
-      return res.json()
-    },
+    mutationFn: async (targetQid: string) => createShowdown(targetQid, qid!),
     onSuccess: (data) => {
       setQuizData(data)
       setShowdownId(data.id)

@@ -23,8 +23,8 @@ import {
 import { Label } from '@/lib/components/ui/label'
 import { Input } from '@/lib/components/ui/input'
 import PfpForm from '@/components/pfpForm'
-import { useSignOut } from '@/hooks/auth-provider'
-import { useGlobalTimer } from '@/hooks/time-provider'
+import { useSignOut } from '@/context/auth-provider'
+import { useGlobalTimer } from '@/context/time-provider'
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 

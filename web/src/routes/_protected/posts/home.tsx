@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { useGlobalTimer } from '@/hooks/time-provider';
+import { useGlobalTimer } from '@/context/time-provider';
 import { Button } from '@/lib/components/ui/button';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { Virtuoso } from 'react-virtuoso';
 import PostCard from '@/components/post-card';
 import Loader from '@/components/loader';
 import { Loader2Icon, PyramidIcon } from 'lucide-react';
-import { useAuth } from '@/hooks/auth-provider';
+import { useAuth } from '@/context/auth-provider';
 
 export const Route = createFileRoute('/_protected/posts/home')({
   component: RouteComponent,

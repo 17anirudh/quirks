@@ -1,15 +1,16 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
-import { SUPABASE_CLIENT } from '@/hooks/utils'
+import { SUPABASE_CLIENT } from '@/context/utils'
 import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, Send } from 'lucide-react'
 import { Button } from '@/lib/components/ui/button'
 import { Input } from '@/lib/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/lib/components/ui/avatar'
-import { useAuth } from '@/hooks/auth-provider'
-import type { Message, UserProfile } from '@/types'
+import { useAuth } from '@/context/auth-provider'
 import Loader from '@/components/loader'
-import { ChatMessage } from '@/lib/components/message-bubble'
+import { ChatMessage } from '@/components/message-bubble'
+import { loadHistory, queryConversationPartner } from '@/api/api'
+import { Keys } from '@/context/keys'
 
 export const Route = createFileRoute('/_protected/chats/$chatId')({
     component: ChatRoom,
@@ -19,7 +20,7 @@ function ChatRoom() {
     const { chatId } = useParams({ from: '/_protected/chats/$chatId' })
     const { qid } = useAuth()
     const [input, setInput] = useState('')
-    const [localMessages, setLocalMessages] = useState<Message[]>([])
+    const [localMessages, setLocalMessages] = useState<any[]>([])
     const scrollRef = useRef<HTMLDivElement>(null)
     const wsRef = useRef<WebSocket | null>(null)
 
@@ -30,38 +31,14 @@ function ChatRoom() {
     }
 
     const { data: partner, isLoading: isPartnerLoading } = useQuery({
-        queryKey: ['conversation_partner', chatId],
-        queryFn: async () => {
-            const { data: { session } } = await SUPABASE_CLIENT.auth.getSession();
-            if (!session) throw new Error("Unauthorized");
-
-            const { data, error } = await SUPABASE_CLIENT
-                .from('conversation_member')
-                .select('conv_mem_qid, profile:conv_mem_qid(u_name, u_pfp, u_qid)')
-                .eq('conv_mem_conv_ref_id', chatId)
-                .neq('conv_mem_qid', qid)
-                .single()
-
-            if (error) throw error;
-            const p = data?.profile;
-            if (Array.isArray(p)) return p[0] as UserProfile;
-            return p as UserProfile;
-        },
+        queryKey: Keys.conversationPartner(chatId),
+        queryFn: async () => queryConversationPartner(chatId, qid!),
         enabled: !!qid
     })
 
     const { data: history, isLoading: isHistoryLoading } = useQuery({
         queryKey: ['messages', chatId],
-        queryFn: async () => {
-            const { data: { session } } = await SUPABASE_CLIENT.auth.getSession();
-            if (!session) throw new Error("Unauthorized");
-
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/message/${chatId}`, {
-                headers: { 'Authorization': `Bearer ${session.access_token}` }
-            });
-            const data = await res.json();
-            return data.messages as Message[];
-        }
+        queryFn: async () => loadHistory(chatId)
     });
 
     useEffect(() => {
@@ -151,7 +128,7 @@ function ChatRoom() {
         console.log(`[FRONTEND SEND] Content: "${content}"`);
 
         // Optimistic Update
-        const tempMsg: Message = {
+        const tempMsg: any = {
             content,
             m_sender_qid: qid,
             created_at: new Date().toISOString()
