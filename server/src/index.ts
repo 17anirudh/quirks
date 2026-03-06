@@ -4,6 +4,8 @@ import { rateLimit } from "elysia-rate-limit";
 import * as routes from "./routes/index";
 import { logger } from "@tqman/nice-logger"
 
+const port = process.env.PORT || 5000
+
 export const app = new Elysia({ name: 'Quirks API' })
   .use(cors({
     origin: [
@@ -33,6 +35,6 @@ export const app = new Elysia({ name: 'Quirks API' })
       deps: "@tqman/nice-logger, @elysiajs/cors, @elysiajs/rate-limit, @supabase/supabase-js, zod and uWebSockets"
     }
   })
-  .listen(5000);
+  .listen(port);
 
 console.log(`🦊 Backend beast is running on ${app.server?.url}`)

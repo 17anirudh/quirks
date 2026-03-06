@@ -1,0 +1,13 @@
+FROM oven/bun:canary-alpine
+
+WORKDIR /
+
+COPY package.json bun.lock ./
+
+RUN bun install --frozen-lockfile
+
+COPY . .
+
+EXPOSE 5000
+
+CMD ["bun", "run", "dev"]
