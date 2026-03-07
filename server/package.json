@@ -1,5 +1,5 @@
 {
-  "name": "quirks-server",
+  "name": "Quriks API",
   "private": true,
   "version": "1.0.50",
   "scripts": {
@@ -10,9 +10,8 @@
     "@elysiajs/cors": "^1.4.1",
     "@supabase/supabase-js": "^2.90.1",
     "@tqman/nice-logger": "^1.1.1",
-    "elysia": "latest",
-    "elysia-rate-limit": "^4.4.2",
-    "zod": "^4.3.5"
+    "elysia": "^1.4.27",
+    "elysia-rate-limit": "^4.4.2"
   },
   "devDependencies": {
     "bun-types": "latest"

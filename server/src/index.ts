@@ -16,8 +16,8 @@ export const app = new Elysia({ name: 'Quirks API' })
     ]
   }))
   .use(logger({
-    mode: 'live',
-    withTimestamp: true
+    mode: 'combined',
+    withTimestamp: true,
   }))
   .use(rateLimit({
     duration: 60000,
@@ -33,6 +33,11 @@ export const app = new Elysia({ name: 'Quirks API' })
     return {
       message: "Build using Elysia.js, Bun.js, TypeScript",
       deps: "@tqman/nice-logger, @elysiajs/cors, @elysiajs/rate-limit, @supabase/supabase-js, zod and uWebSockets"
+    }
+  })
+  .get('/awake', () => {
+    return {
+      message: 0
     }
   })
   .listen(port);

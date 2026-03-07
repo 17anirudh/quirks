@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia"
 import { CLIENT } from "../supabase/config"
-import z from "zod"
 
 export const post = new Elysia({ prefix: '/post' })
     .post('/create/:qid', async ({ params, body, set }) => {
@@ -107,8 +106,8 @@ export const post = new Elysia({ prefix: '/post' })
         return { ...postData, user: user ?? null };
     },
         {
-            params: z.object({
-                pid: z.uuid()
+            params: t.Object({
+                pid: t.String()
             })
         }
     )

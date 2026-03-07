@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia"
 import { CLIENT } from "../supabase/config"
-import z from "zod";
 
 interface Quiz {
     q1: string;
@@ -26,26 +25,6 @@ function generateQuiz(): Quiz {
         a2: op2 === '+' ? n[2] + n[3] : n[2] - n[3]
     };
 }
-
-const showdownSchema = z.object({
-    id: z.uuid(),
-    creater_qid: z
-        .string()
-        .min(4, "your qid must be atleat 4 characters")
-        .max(200, "your qid must be below 200 characters"),
-    joiner_qid: z
-        .string()
-        .min(4, "your qid must be atleat 4 characters")
-        .max(200, "your qid must be below 200 characters"),
-    q1: z.string(),
-    a1: z.number(),
-    q2: z.string(),
-    a2: z.number(),
-    status: z.enum(['created', 'full', 'completed']),
-    created_at: z.date().default(() => new Date())
-})
-
-export type Showdown = z.infer<typeof showdownSchema>;
 
 type WSMessage =
     | { type: 'join'; qid: string }

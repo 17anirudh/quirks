@@ -26,7 +26,6 @@ import { profileSchema } from '@/services/user';
 import Loader from '@/components/loader'
 import { CursorHighlight } from '@/components/cursor-highlight'
 import { ConstructionIcon } from '@/lib/components/ui/construction'
-import Carousel from '@/lib/components/ui/carousel'
 
 // Schemas
 const createAccountSchema = profileSchema.pick({
@@ -43,24 +42,6 @@ const logInUserSchema = createAccountSchema.pick({
     u_mail: true,
     u_pass: true
 })
-
-const slideData: {
-    title: string;
-    src: string;
-}[] = [
-        {
-            title: "Chats",
-            src: "/gifs/chats.gif",
-        },
-        {
-            title: "Posts",
-            src: "/gifs/posts.gif",
-        },
-        {
-            title: "Timer",
-            src: "/gifs/timer.gif",
-        }
-    ]
 
 export const Route = createFileRoute('/')({
     loader: async ({ context }) => {
@@ -764,13 +745,13 @@ export function AppComponent() {
 
                     {/* Text Container */}
                     <div id='philosophy-1-text' className='flex flex-1 flex-col gap-5'>
-                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap break-words">
+                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap wrap-break-word">
                             Social Media
                         </h2>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             In a shift from the isolated physical tribes of the ancient world to the digital global village, social media was celebrated as the ultimate bridge that dissolved borders, allowing a single voice to be heard by millions and fostering a level of human empathy and collective intelligence never before possible in history.
                         </p>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             Breaking the silence of the "anonymous masses" of the industrial age, these platforms were praised for giving every person a digital canvas to broadcast their unique quirks and talents, transforming the internet into a decentralized library of human identity where every "misfit" could finally find their kindred spirits.
                         </p>
                     </div>
@@ -782,13 +763,13 @@ export function AppComponent() {
                 <section id='philosophy-2' className='flex flex-row items-center gap-10 w-full p-5'>
                     {/* Text Container */}
                     <div id='philosophy-2-text' className='flex flex-1 flex-col gap-5'>
-                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap break-words">
+                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap wrap-break-word">
                             Social Media Today
                         </h2>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             We used to love Social Media. In the late 90s and early 2000s, it felt like a miracle—a quiet bridge built just so we could finally find each other, share a thought, and feel a little less alone in the dark. It was a game-changer because it was built for us.
                         </p>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             But now? The bridge has become a marketplace. It’s a goldmine for advertisers and a battlefield for monopolies, where aggressive algorithms push past the limits of what is ethical just to keep us staring. It’s become a dark place, and I find myself wondering... what went wrong? Why did connection turn into competition? Why does the screen feel so heavy with negativity? We’re addicted to the very thing that makes us feel empty—consuming, producing, and curating until there’s nothing real left. Is it the algorithm? Or is it just that we’ve forgotten how to look at each other without a lens in the way?
                         </p>
                     </div>
@@ -820,16 +801,16 @@ export function AppComponent() {
 
                     {/* Text Container */}
                     <div id='philosophy-3-text' className='flex flex-1 flex-col gap-5'>
-                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap break-words">
+                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap wrap-break-word">
                             People's Quirks
                         </h2>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             Unique traits are often recorded without consent and distributed to "cringe" communities, where personal eccentricities are weaponized as entertainment, leading to intense public humiliation and the fear of becoming a permanent meme.
                         </p>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             To avoid becoming targets of dogpiling, individuals often suppress their authentic quirks—a process known as "masking"—which leads to severe mental exhaustion, loss of identity, and the constant stress of monitoring one's own behavior to fit narrow digital norms.
                         </p>
-                        <p className='text-muted-foreground text-xl text-wrap break-words'>
+                        <p className='text-muted-foreground text-xl text-wrap wrap-break-word'>
                             Recommendation engines often categorize non-conforming behavior as "low-quality" or "violating" based on mass reports from toxic users; this can lead to shadowbanning or account suspension, effectively deplatforming individuals for simply being different and cutting off their access to supportive communities.
                         </p>
                     </div>
@@ -841,16 +822,16 @@ export function AppComponent() {
                 <section id="philosophy-4" className='flex flex-row items-center gap-10 w-full p-5'>
                     {/* Text Container */}
                     <div id='philosophy-4-text' className='flex flex-1 flex-col gap-5'>
-                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap break-words">
+                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap wrap-break-word">
                             Infinite Scrolling
                         </h2>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             The constant need to scroll, to keep up with the never-ending stream of content, has become a symbol of modern life. It's a never-ending race to keep up with the never-ending stream of content, a constant reminder of the constant need to scroll, to keep up with the never-ending stream of content.
                         </p>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             It's become such a habit that we do it unconsiously, without even realizing the impact it has on our mental health. The constant need to scroll, to keep up with the never-ending stream of content, has become a symbol of modern life.
                         </p>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             Bored? Open the app. Need to relax? Open the app. Need to unwind? Open the app. Need to distract? Open the app. Need to escape? Open the app.
                         </p>
                     </div>
@@ -881,13 +862,13 @@ export function AppComponent() {
 
                     {/* Text Container */}
                     <div id='philosophy-5-text' className='flex flex-1 flex-col gap-5'>
-                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap break-words">
+                        <h2 className="scroll-m-20 text-3xl font-semibold tracking-tight text-wrap wrap-break-word">
                             Our solution
                         </h2>
-                        <p className="text-muted-foreground text-xl text-wrap break-words">
+                        <p className="text-muted-foreground text-xl text-wrap wrap-break-word">
                             Our parents were right, but let's be honest we have to say online or we will be under the rock, so the soultion is simple and old school. It's not gatekeeped, it's just risky and ethical.
                         </p>
-                        <ul className="text-muted-foreground text-xl text-wrap break-words list-item list-none">
+                        <ul className="text-muted-foreground text-xl text-wrap wrap-break-word list-item list-none">
                             <li>
                                 <span className='underline'>No Ads, yes no ads whatsoever:</span>
                                 We don't want those trackers to make our app heavy, social media is to connect not to advertise
@@ -916,9 +897,6 @@ export function AppComponent() {
                     <div className='flex flex-row-reverse gap-5 justify-center items-center'>
                         <p>Honest starts, constantly working on it to improve your experience 🦆🦆</p>
                         <img src="/duck.gif" className='h-18' alt='mascot' />
-                    </div>
-                    <div className="relative overflow-hidden w-full h-full py-20">
-                        <Carousel slides={slideData} />
                     </div>
                     <div className='h-45' />
                     <Button variant="ghost" className="text-lg font-semibold">

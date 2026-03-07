@@ -1,5 +1,4 @@
 import { Elysia, t } from 'elysia'
-import { z } from 'zod'
 import { CLIENT } from '../supabase/config'
 
 // POST: friendship/request = send request
@@ -76,9 +75,12 @@ export const friendship = new Elysia({ prefix: '/friendship' })
         return { success: true }
     },
         {
-            body: z.object({
-                fs_id: z.uuid(),
-                receiver_qid: z.string().min(4).max(200)
+            body: t.Object({
+                fs_id: t.String(),
+                receiver_qid: t.String({
+                    minLength: 4,
+                    maxLength: 200
+                })
             })
         }
     )
@@ -100,8 +102,8 @@ export const friendship = new Elysia({ prefix: '/friendship' })
         return { success: true }
     },
         {
-            body: z.object({
-                fs_id: z.uuid()
+            body: t.Object({
+                fs_id: t.String()
             })
         }
     )
