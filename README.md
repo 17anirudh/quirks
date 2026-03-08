@@ -3,14 +3,14 @@
 Social Applications are meant to network and meet people rather, it has become algorithm optimized content driven application. Quirks is built as an alternative to make people-driven social app with forced cooldown and encouraged (not forced) conversations.
 
 ## Video
-[ani-cli-demo.webm](https://github.com/user-attachments/assets/fe23b51b-cb55-4f63-a5b1-3c477212405e)
+[quirks.webm](https://github.com/user-attachments/assets/fe23b51b-cb55-4f63-a5b1-3c477212405e)
 
 ## Gallery
-- Lighthouse reports (5-3-2026)
-![Lighthouse](assets/lighthouse.png)
+- Lighthouse (Navigation - Desktop) reports (8-3-2026)
+![Lighthouse](assets/Lighthouse.png)
 
-- Landing page (header)
-![Landing](assets/landing1.png)
+- Landing Page (Desktop)
+![Landing](assets/Landing.png)
 
 ## Tech Stack
 
@@ -32,10 +32,14 @@ Dependencies:
 - [Nice logger](https://github.com/tanishqmanuja/nice-logger): A lightweight, nice and sweet logger for Elysia.js
 - [uWebSockets](https://github.com/uNetworking/uWebSockets): High performance websocket library built-in for Bun.js and Elysia.js
 
-## Architecture
+## Architecture and Deployment
 
-![Architecture](assets/Quirks%20Architecture.png)
-This project fully relies Bun.js and Supabase.
+1. Architecture: This project fully relies Bun.js and Supabase.
+    ![Architecture](assets/Architecture.png)
+
+2. Deployment: This project is deployed on Vercel and Render using Docker and Git.
+    ![Deployment](assets/Deployment.png)
+
 
 ## Frontend
 
