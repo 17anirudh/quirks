@@ -19,6 +19,7 @@ import {
     DialogClose
 } from '@/lib/components/ui/dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { Image } from "@unpic/react";
 
 type props = {
     post: {
@@ -91,11 +92,12 @@ export default function PostCard({ post, user }: props) {
             <div className="flex flex-wrap gap-3">
                 {/* Profile photo */}
                 <div className="w-18 h-18 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
-                    <img
+                    <Image
                         src={post.p_author_pfp || "/pfp.webp"}
                         alt={post.p_author_qid ? `${post.p_author_qid} profile photo` : "profile picture"}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
+                        layout="fullWidth"
                     />
                 </div>
                 {/* Qid and time */}
@@ -128,16 +130,17 @@ export default function PostCard({ post, user }: props) {
             {/* Post Image */}
             {post.p_url && (
                 <div className="w-10/12 sm:w-8/12 aspect-rectangle border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
-                    <img
+                    <Image
                         src={post.p_url}
                         alt={'post image'}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
+                        layout="fullWidth"
                     />
                 </div>
             )}
             {/* Content */}
-            <p className="leading-7 [&:not(:first-child)]:mt-6 break-words whitespace-normal overflow-hidden w-10/12">
+            <p className="leading-7 not-first:mt-6 wrap-break-words whitespace-normal overflow-hidden w-10/12">
                 {post.p_text}
             </p>
             {/* Interactions */}

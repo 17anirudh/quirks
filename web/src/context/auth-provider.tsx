@@ -9,6 +9,7 @@ import { SUPABASE_CLIENT } from './utils'
 import type { Session } from '@supabase/supabase-js'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { Keys } from './keys'
 
 interface AuthContextValue {
     session: Session | null
@@ -16,14 +17,13 @@ interface AuthContextValue {
     qid: string | null | undefined
     waitForAuth: () => Promise<Session | null>
 }
-const AUTH_QUERY_KEY = ['auth'] as const
 const AuthContext = createContext<AuthContextValue | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const queryClient = useQueryClient()
 
     const authQuery = useQuery({
-        queryKey: AUTH_QUERY_KEY,
+        queryKey: Keys.auth,
         queryFn: async () => {
             const { data: { session }, error } =
                 await SUPABASE_CLIENT.auth.getSession()
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const { data: { subscription } } =
             SUPABASE_CLIENT.auth.onAuthStateChange((_e, session) => {
-                queryClient.setQueryData(AUTH_QUERY_KEY, session)
+                queryClient.setQueryData(Keys.auth, session)
             })
 
         return () => subscription.unsubscribe()
@@ -54,7 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const waitForAuth = () =>
         queryClient.ensureQueryData({
-            queryKey: AUTH_QUERY_KEY,
+            queryKey: Keys.auth,
             queryFn: async () => {
                 const { data: { session }, error } =
                     await SUPABASE_CLIENT.auth.getSession()
@@ -91,11 +91,15 @@ export function useSignOut() {
 
     return useMutation({
         mutationFn: () => SUPABASE_CLIENT.auth.signOut(),
+        onMutate: () => {
+            toast.loading('Signing out...')
+        },
         onSuccess: () => {
-            queryClient.setQueryData(AUTH_QUERY_KEY, null)
+            queryClient.setQueryData(Keys.auth, null)
             queryClient.clear()
+            toast.dismiss();
             navigate({ to: '/', replace: true })
-            toast.info('Signed out successfully')
+            toast.success('Signed out successfully')
         },
         onError: (err) => {
             toast.error('Sign out failed: ' + (err as Error).message)

@@ -6,4 +6,5 @@ export const Keys = {
     showdownInvites: (qid: string) => ['showdown-invites', qid],
     conversationPartner: (chatId: string) => ['conversation_partner', chatId],
     conversation: ['conversations'],
-}
+    auth: ['auth']
+} as const;

@@ -26,6 +26,7 @@ import { profileSchema } from '@/services/user';
 import Loader from '@/components/loader'
 import { CursorHighlight } from '@/components/cursor-highlight'
 import { ConstructionIcon } from '@/lib/components/ui/construction'
+import { Image } from '@unpic/react';
 
 // Schemas
 const createAccountSchema = profileSchema.pick({
@@ -171,10 +172,12 @@ export function AppComponent() {
                                         className="flex size-11 shrink-0 items-center justify-center rounded-full"
                                         aria-hidden="true"
                                     >
-                                        <img
+                                        <Image
                                             src="./duck.gif"
                                             alt="logo"
-                                            className="h-8 w-8 rounded-full"
+                                            className="rounded-full"
+                                            width={32}
+                                            height={32}
                                         />
                                     </div>
                                     <DialogHeader>
@@ -286,10 +289,13 @@ export function AppComponent() {
                                         className="flex size-11 shrink-0 items-center justify-center rounded-full"
                                         aria-hidden="true"
                                     >
-                                        <img
+                                        <Image
                                             src="./duck.gif"
                                             alt="logo"
                                             className="h-8 w-8 rounded-full"
+                                            layout='fixed'
+                                            width={32}
+                                            height={32}
                                         />
                                     </div>
                                     <DialogHeader>
@@ -435,14 +441,15 @@ export function AppComponent() {
             </nav>
 
             <header className="relative w-screen h-[70vh] md:h-[600px] overflow-hidden border-zinc-800">
-                <img
+                <Image
                     src="/landing/mindless crowd.avif"
                     className="absolute inset-0 w-full h-full object-cover"
                     alt="Crowd background"
                     loading='eager'
+                    layout='fullWidth'
                 />
                 <div className="absolute inset-0 bg-zinc-950/40 z-10" />
-                <div className="absolute inset-0 z-20 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
+                <div className="absolute inset-0 z-20 bg-linear-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
 
                 {/* Hero Content - Kept within a max-width container so text doesn't stretch too far */}
                 <div className="relative z-30 h-full max-w-7xl mx-auto flex flex-col items-center justify-end pb-16 px-6 text-center gap-3">
@@ -465,10 +472,13 @@ export function AppComponent() {
                                         className="flex size-11 shrink-0 items-center justify-center rounded-full"
                                         aria-hidden="true"
                                     >
-                                        <img
+                                        <Image
                                             src="./duck.gif"
                                             alt="logo"
                                             className="h-8 w-8 rounded-full"
+                                            layout="fixed"
+                                            width={32}
+                                            height={32}
                                         />
                                     </div>
                                     <DialogHeader>
@@ -580,10 +590,13 @@ export function AppComponent() {
                                         className="flex size-11 shrink-0 items-center justify-center rounded-full"
                                         aria-hidden="true"
                                     >
-                                        <img
+                                        <Image
                                             src="./duck.gif"
                                             alt="logo"
                                             className="h-8 w-8 rounded-full"
+                                            layout="fixed"
+                                            width={32}
+                                            height={32}
                                         />
                                     </div>
                                     <DialogHeader>
@@ -735,11 +748,12 @@ export function AppComponent() {
                 <section id='philosophy-1' className='flex flex-row items-center gap-10 w-full p-5'>
                     {/* Image Container */}
                     <div id='philiosophy-1-image' className='flex-1'>
-                        <img
+                        <Image
                             src="/landing/vector-friends.jpg"
                             loading='lazy'
                             className='w-full aspect-square object-contain'
                             alt='vector friends'
+                            layout='fullWidth'
                         />
                     </div>
 
@@ -776,11 +790,12 @@ export function AppComponent() {
 
                     {/* Image Container */}
                     <div id='philiosophy-2-image' className='flex-1'>
-                        <img
+                        <Image
                             src="/landing/woman-scrolling.avif"
                             loading='lazy'
                             className='w-full aspect-square object-contain'
                             alt='woman scrolling'
+                            layout='fullWidth'
                         />
                     </div>
                 </section>
@@ -791,11 +806,12 @@ export function AppComponent() {
                 <section id="philosophy-3" className='flex flex-row items-center gap-10 w-full p-5'>
                     {/* Image Container */}
                     <div id='philiosophy-3-image' className='flex-1'>
-                        <img
+                        <Image
                             src="/landing/quirks.avif"
                             loading='lazy'
                             className='w-full aspect-square object-contain'
                             alt='woman scrolling'
+                            layout='fullWidth'
                         />
                     </div>
 
@@ -837,11 +853,12 @@ export function AppComponent() {
                     </div>
                     {/* Image Container */}
                     <div id='philiosophy-4-image' className='flex-1'>
-                        <img
+                        <Image
                             src="/landing/woman-texting-2.avif"
                             loading='lazy'
                             className='w-full aspect-square object-contain'
                             alt='woman texting'
+                            layout='fullWidth'
                         />
                     </div>
                 </section>
@@ -852,11 +869,12 @@ export function AppComponent() {
                 <section id="philosophy-5" className='flex flex-row items-center gap-10 w-full p-5'>
                     {/* Image Container */}
                     <div id='philiosophy-5-image' className='flex-1'>
-                        <img
+                        <Image
                             src="/landing/happy usage.jpg"
                             loading='lazy'
                             className='w-full aspect-square object-contain'
                             alt='ethical usage'
+                            layout='fullWidth'
                         />
                     </div>
 
@@ -896,7 +914,7 @@ export function AppComponent() {
                     <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight flex flex-wrap gap-2"> Our progress so far <ConstructionIcon /> </h3>
                     <div className='flex flex-row-reverse gap-5 justify-center items-center'>
                         <p>Honest starts, constantly working on it to improve your experience 🦆🦆</p>
-                        <img src="/duck.gif" className='h-18' alt='mascot' />
+                        <Image src="/duck.gif" alt='mascot' layout='fixed' width={72} height={72} />
                     </div>
                     <div className='h-45' />
                     <Button variant="ghost" className="text-lg font-semibold">

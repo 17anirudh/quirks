@@ -14,6 +14,7 @@ import {
 } from "@/lib/components/ui/qr-code";
 import { toast } from 'sonner';
 import { sideCannons } from './fireworks';
+import { Image } from '@unpic/react';
 
 type Props = {
     pfp: string | null;
@@ -60,7 +61,7 @@ export default function ShareProfile({ pfp, qid }: Props) {
                         <QRCodeSkeleton />
                         <QRCodeCanvas />
                         <QRCodeOverlay className="rounded-full border-2 border-white p-2">
-                            <img
+                            <Image
                                 src={pfp ?? "/pfp.webp"}
                                 alt={qid ?? "profile picture"}
                                 width={40}

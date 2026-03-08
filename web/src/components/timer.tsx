@@ -83,7 +83,7 @@ type TimerDisplayProps = {
 } & VariantProps<typeof timerDisplayVariants> &
     React.HTMLAttributes<HTMLDivElement>
 
-export type UseTimerOptions = {
+type UseTimerOptions = {
     /** Whether the timer should be running */
     loading?: boolean
     /** Callback fired on each tick with elapsed time */
@@ -94,7 +94,7 @@ export type UseTimerOptions = {
     format?: "SS.MS" | "MM:SS" | "HH:MM:SS"
 }
 
-export type UseTimerReturn = {
+type UseTimerReturn = {
     /** Total elapsed seconds */
     elapsedTime: number
     /** Current milliseconds (0-999) */

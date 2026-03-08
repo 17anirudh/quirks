@@ -17,6 +17,7 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { Keys } from '@/context/keys'
 import { createPost, queryMe } from '@/api/api'
 import { useAuth } from '@/context/auth-provider'
+import { Image } from '@unpic/react'
 
 export const Route = createFileRoute('/_protected/profile/create')({
   pendingComponent: () => <Loader />,
@@ -58,7 +59,11 @@ function RouteComponent() {
   const uploadForm = useMutation({
     mutationKey: ['post'],
     mutationFn: async (value: PostSchema) => createPost(value, res!),
+    onMutate: () => {
+      toast.loading('Submiting post')
+    },
     onSuccess: () => {
+      toast.dismiss
       queryClient.invalidateQueries({ queryKey: ['me'] })
       toast.success("Post uploaded")
       form.reset()
@@ -67,11 +72,11 @@ function RouteComponent() {
       if (imageInputRef.current) {
         imageInputRef.current.value = ""
       }
-      navigate({ to: '/profile' })
+      navigate({ to: '/posts/home' })
     },
     onError: (error) => {
       console.error(error.message)
-      toast.error(error instanceof Error ? error.message : "Failed to upload pfp")
+      toast.error(error instanceof Error ? error.message : "Failed to upload post")
       blobURL ?? setBlobURL(null)
       newPfp ?? setNewPfp(null)
       if (imageInputRef.current) {
@@ -101,11 +106,12 @@ function RouteComponent() {
             <div className="flex flex-wrap gap-3">
               {/* Profile photo */}
               <div className="w-18 h-18 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
-                <img
+                <Image
                   src={res?.user.u_pfp || "/pfp.webp"}
                   alt={res?.user.u_qid ? `${res?.user.u_qid} profile photo` : "profile picture"}
                   className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                   loading="lazy"
+                  layout="fullWidth"
                 />
               </div>
               {/* Qid and time */}
@@ -142,7 +148,7 @@ function RouteComponent() {
                           onChange={(e) => field.handleChange(e.target.value)}
                           aria-invalid={isInvalid}
                           placeholder="I'm a software engineer..."
-                          className="leading-7 [&:not(:first-child)]:mt-6 break-words whitespace-normal overflow-hidden w-10/12"
+                          className="leading-7 not-first:mt-6 wrap-break-words whitespace-normal overflow-hidden w-10/12"
                         />
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
@@ -171,10 +177,11 @@ function RouteComponent() {
                         className="w-fit h-fit overflow-hidden cursor-pointer"
                       >
                         {blobURL ? (
-                          <img
+                          <Image
                             src={blobURL}
                             className="w-full h-full object-cover hover:blur-[2px] bg-transparent"
                             draggable={false}
+                            layout="fullWidth"
                           />
                         ) : (
                           <span className="flex items-center gap-2">

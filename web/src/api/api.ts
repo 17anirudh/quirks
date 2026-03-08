@@ -47,6 +47,18 @@ type queryResponse = {
     }[]
 }
 
+type customRes = {
+    status: number,
+    message?: string,
+    data?: any,
+    isSuccess: boolean
+}
+
+type infiniteType = {
+    items: any[];
+    nextCursor: string | null;
+}
+
 export async function queryMe(qid: string): Promise<queryResponse> {
     const res = await fetch(`${url}/user/me`, {
         headers: {
@@ -182,4 +194,74 @@ export async function loadConversations(): Promise<any[]> {
     const data = await res.json();
     console.log('[FRONTEND] Fetched conversations:', data.conversations?.length || 0);
     return data.conversations;
+}
+
+export async function updateBio(qid: string, bio: string): Promise<customRes> {
+    const res = await fetch(`${url}/user/update-bio/${qid}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ bio }),
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    if (!res.ok) {
+        const errorText = await res.text()
+        console.error('Upload failed:', res.status, errorText)
+        return {
+            status: res.status,
+            message: errorText,
+            isSuccess: false
+        }
+    }
+    return {
+        status: res.status,
+        message: "Bio updated successfully",
+        isSuccess: true
+    }
+}
+
+export async function updatePfp(newPfp: File, qid: string): Promise<customRes> {
+    if (!newPfp) throw new Error("No file selected")
+
+    const fd = new FormData()
+    fd.append("file", newPfp, newPfp.name) // ✅ Include filename
+
+    const res = await fetch(`${url}/user/upload-pfp/${qid}`, {
+        method: 'POST',
+        body: fd,
+        credentials: 'include',
+    })
+
+    if (!res.ok) {
+        const errorText = await res.text()
+        return {
+            status: res.status,
+            message: errorText,
+            isSuccess: false
+        }
+    }
+    return {
+        status: res.status,
+        message: "Updated Pfp",
+        isSuccess: true
+    };
+}
+
+export async function fetchFeed(pageParam: string | null, qid: string): Promise<infiniteType> {
+    const uri = new URL(`${url}/post/feed/${qid}`);
+    uri.searchParams.append('limit', '5');
+    if (pageParam) {
+        uri.searchParams.append('cursor', pageParam);
+    }
+
+    const res = await fetch(uri.toString(), {
+        headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (!res.ok) {
+        throw new Error('Failed to fetch feed');
+    }
+
+    return res.json();
 }

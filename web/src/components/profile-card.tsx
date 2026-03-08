@@ -7,6 +7,7 @@ import {
 } from "@/lib/components/ui/dialog"
 import { Link } from "@tanstack/react-router"
 import { Button } from "@/lib/components/ui/button"
+import { Image } from "@unpic/react"
 
 type props = {
     information: {
@@ -51,11 +52,12 @@ export default function ProfileCard({ information }: props) {
             {/* image, posts, Friends */}
             <div className="flex flex-wrap gap-4 justify-center items-center sm:gap-9">
                 <div className="w-28 h-28 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
-                    <img
+                    <Image
                         src={information?.user.u_pfp ?? "/pfp.webp"}
                         alt={information?.user.u_qid ?? "profile picture"}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
+                        layout="fullWidth"
                     />
                 </div>
 
@@ -109,9 +111,9 @@ export default function ProfileCard({ information }: props) {
             </div>
             {/* bio */}
             <article className='w-full flex'>
-                <p className="min-w-0 break-words whitespace-normal overflow-hidden">
+                <p className="min-w-0 wrap-break-words whitespace-normal overflow-hidden">
                     {information?.user.u_bio ? information?.user.u_bio : (
-                        <p className="text-muted text-secondary">Add some bio....</p>
+                        <p className="text-secondary">Add some bio....</p>
                     )}
                 </p>
             </article>

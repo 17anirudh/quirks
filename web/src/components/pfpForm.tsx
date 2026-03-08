@@ -2,6 +2,9 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { Button } from "@/lib/components/ui/button";
 import { type QueryClient, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { updatePfp } from "@/api/api";
+import { Keys } from "@/context/keys";
+import { Image } from "@unpic/react";
 
 type res = {
     u_qid: string | null,
@@ -29,37 +32,15 @@ export default function PfpForm({ client, qid, loading }: props) {
         }
     }
 
-    const uploadPfp = useMutation({
+    const { mutate: uploadPfp, isPending } = useMutation({
         mutationKey: ['pfp'],
-        mutationFn: async () => {
-            if (!newPfp) throw new Error("No file selected")
-
-            const fd = new FormData()
-            fd.append("file", newPfp, newPfp.name) // ✅ Include filename
-
-            console.log('Uploading file:', newPfp.name, newPfp.type, newPfp.size) // Debug
-
-            const res = await fetch(
-                `${import.meta.env.VITE_BACKEND_URL}/user/upload-pfp/${qid}`,
-                {
-                    method: 'POST',
-                    body: fd,
-                    credentials: 'include', // ✅ Include if using cookies/sessions
-                    // DO NOT set Content-Type - browser sets it automatically with boundary
-                }
-            )
-
-            // Better error handling
-            if (!res.ok) {
-                const errorText = await res.text()
-                console.error('Upload failed:', res.status, errorText)
-                throw new Error(`Failed to upload pfp: ${res.status} ${errorText}`)
-            }
-
-            return res.json()
+        mutationFn: async () => updatePfp(newPfp!, qid),
+        onMutate: () => {
+            toast.loading(`Uploading ${newPfp?.name}`);
         },
         onSuccess: () => {
-            client.invalidateQueries({ queryKey: ['me'] })
+            client.invalidateQueries({ queryKey: Keys.me })
+            toast.dismiss();
             toast.success("Pfp uploaded")
             setBlobURL(null)
             setNewPfp(null)
@@ -68,7 +49,6 @@ export default function PfpForm({ client, qid, loading }: props) {
             }
         },
         onError: (error) => {
-            console.error('Upload error:', error)
             toast.error(error instanceof Error ? error.message : "Failed to upload pfp")
         }
     })
@@ -83,6 +63,7 @@ export default function PfpForm({ client, qid, loading }: props) {
                 hidden
                 multiple={false}
                 onChange={handleImageChange}
+                className="bg-transparent"
             />
 
             <Button
@@ -92,21 +73,23 @@ export default function PfpForm({ client, qid, loading }: props) {
                     e.stopPropagation()
                     imageInputRef.current?.click()
                 }}
-                className="w-28 h-28 rounded-full overflow-hidden cursor-pointer"
+                className="w-28 h-28 rounded-full overflow-hidden cursor-pointer bg-transparent"
             >
                 {!blobURL ? (
-                    <img
+                    <Image
                         src={loading.u_pfp ?? "/pfp.webp"}
                         alt="profile picture"
                         className="w-full h-full object-cover pointer-events-none bg-transparent"
                         draggable={false}
+                        layout="fullWidth"
                         title="Click to change PFP"
                     />
                 ) : (
-                    <img
+                    <Image
                         src={blobURL ?? "/pfp.webp"}
                         alt="profile picture"
-                        className="w-full h-full object-cover pointer-events-none"
+                        layout="fullWidth"
+                        className="w-full h-full object-cover pointer-events-none bg-transparent"
                         draggable={false}
                     />
                 )}
@@ -116,11 +99,11 @@ export default function PfpForm({ client, qid, loading }: props) {
                 <Button
                     type="button"
                     variant="outline"
-                    onClick={() => uploadPfp.mutate()}
-                    disabled={uploadPfp.isPending}
-                    className="w-fit cursor-pointer"
+                    onClick={() => uploadPfp()}
+                    disabled={isPending}
+                    className="w-fit cursor-pointer bg-transparent"
                 >
-                    {uploadPfp.isPending ? 'Uploading...' : 'Upload pfp'}
+                    {isPending ? 'Uploading...' : 'Upload pfp'}
                 </Button>
             )}
         </div>

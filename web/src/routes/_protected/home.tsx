@@ -17,6 +17,7 @@ import { sideCannons } from '@/components/fireworks'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Keys } from '@/context/keys'
 import { createShowdown, queryShowdownInvites } from '@/api/api'
+import { Image } from '@unpic/react'
 
 export const Route = createFileRoute('/_protected/home')({
   component: RouteComponent,
@@ -189,10 +190,12 @@ function RouteComponent() {
                     className='group border p-4 rounded-2xl shadow-sm bg-card flex flex-col items-center gap-2 hover:border-primary/50 transition-colors duration-200'
                   >
                     <div className='relative'>
-                      <img
+                      <Image
                         src={friend.pfp ?? "/pfp.webp"}
                         alt={friend.qid}
                         className='w-14 h-14 rounded-full object-cover border-2 border-background shadow-md group-hover:scale-105 transition-transform duration-200'
+                        height={56}
+                        width={56}
                       />
                       <div className='absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-background' />
                     </div>
