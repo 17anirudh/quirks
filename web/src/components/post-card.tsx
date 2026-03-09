@@ -1,4 +1,4 @@
-import { SmileIcon, MessageCircleMore, EarthIcon, Trash2Icon } from "lucide-react";
+import { EarthIcon, Trash2Icon } from "lucide-react";
 import { Button } from "@/lib/components/ui/button";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
@@ -19,7 +19,8 @@ import {
     DialogClose
 } from '@/lib/components/ui/dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Image } from "@unpic/react";
+import { Image } from "@unpic/react/base";
+import { transform } from 'unpic/providers/supabase';
 
 type props = {
     post: {
@@ -98,6 +99,7 @@ export default function PostCard({ post, user }: props) {
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
                         layout="fullWidth"
+                        transformer={transform}
                     />
                 </div>
                 {/* Qid and time */}
@@ -136,6 +138,7 @@ export default function PostCard({ post, user }: props) {
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"
                         layout="fullWidth"
+                        transformer={transform}
                     />
                 </div>
             )}
@@ -144,15 +147,7 @@ export default function PostCard({ post, user }: props) {
                 {post.p_text}
             </p>
             {/* Interactions */}
-            <div className="flex gap-4 flex-wrap mt-3 items-center">
-                {/* Likes */}
-                <span className="flex gap-2 flex-wrap">
-                    <SmileIcon /> {post.p_likes_count}
-                </span>
-                {/* Comments */}
-                <span className="flex gap-2 flex-wrap">
-                    <MessageCircleMore /> {post.p_comments_count}
-                </span>
+            <div className="flex flex-wrap mt-3 items-center justify-center">
                 {/* Share */}
                 <Button
                     className="flex gap-2 flex-wrap w-12 h-12 text-black dark:text-white hover:text-blue-500"
@@ -166,7 +161,7 @@ export default function PostCard({ post, user }: props) {
                     <Dialog>
                         <DialogTrigger asChild>
                             <Button
-                                className="flex gap-2 flex-wrap w-12 h-12 text-black dark:text-white hover:text-red-500 ml-auto"
+                                className="flex gap-2 flex-wrap w-12 h-12 text-black dark:text-white hover:text-red-500"
                                 variant="link"
                                 disabled={isDeleting}
                             >

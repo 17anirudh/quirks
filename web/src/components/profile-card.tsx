@@ -7,7 +7,8 @@ import {
 } from "@/lib/components/ui/dialog"
 import { Link } from "@tanstack/react-router"
 import { Button } from "@/lib/components/ui/button"
-import { Image } from "@unpic/react"
+import { Image } from "@unpic/react/base"
+import { transform } from 'unpic/providers/supabase';
 
 type props = {
     information: {
@@ -45,24 +46,27 @@ type props = {
 }
 
 export default function ProfileCard({ information }: props) {
+    console.log(information!.user.u_pfp);
     return (
         <div className='flex flex-col gap-5 p-5 border items-start w-11/12 h-full'>
             {/* qid */}
-            <h2 id="id" className="text-center scroll-m-20 mb-5 pb-2 text-3xl font-semibold tracking-tight first:mt-0">{`@${information?.user.u_qid}` || ''}</h2>
+            <h2 id="id" className="text-center scroll-m-20 mb-5 pb-2 text-3xl font-semibold tracking-tight first:mt-0">{`@${information!.user.u_qid}` || ''}</h2>
             {/* image, posts, Friends */}
             <div className="flex flex-wrap gap-4 justify-center items-center sm:gap-9">
                 <div className="w-28 h-28 rounded-full border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
                     <Image
-                        src={information?.user.u_pfp ?? "/pfp.webp"}
-                        alt={information?.user.u_qid ?? "profile picture"}
+                        src={information!.user.u_pfp ?? "/pfp.webp"}
+                        alt={information!.user.u_qid ?? "profile picture"}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
-                        loading="lazy"
-                        layout="fullWidth"
+                        width={100}
+                        height={100}
+                        transformer={transform}
+                        layout="constrained"
                     />
                 </div>
 
                 <div className="flex-col gap-5">
-                    <h3 className="capitalize scroll-m-20 text-2xl font-semibold tracking-tight">{information ? information.user.u_name : ''}</h3>
+                    <h3 className="capitalize scroll-m-20 text-2xl font-semibold tracking-tight">{information!.user.u_name}</h3>
                     <div className="flex flex-wrap gap-2">
                         <h4 className="scroll-m-20 text-xl font-light tracking-tight">{information?.post?.length || 0}</h4>
                         <h4 className="scroll-m-20 text-xl font-light tracking-tight">Posts</h4>
