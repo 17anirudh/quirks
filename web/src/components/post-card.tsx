@@ -20,7 +20,7 @@ import {
 } from '@/lib/components/ui/dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Image } from "@unpic/react/base";
-import { transform } from 'unpic/providers/supabase';
+import { transform } from "@/context/img-transform";
 
 type props = {
     post: {
@@ -133,7 +133,7 @@ export default function PostCard({ post, user }: props) {
             {post.p_url && (
                 <div className="w-10/12 sm:w-8/12 aspect-rectangle border border-neutral-300 shadow-sm overflow-hidden bg-neutral-100">
                     <Image
-                        src={post.p_url}
+                        src={post.p_url || "/pfp.webp"}
                         alt={'post image'}
                         className="w-full h-full object-cover object-center transition-transform duration-200 hover:scale-105"
                         loading="lazy"

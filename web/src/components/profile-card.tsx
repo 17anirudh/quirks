@@ -8,7 +8,7 @@ import {
 import { Link } from "@tanstack/react-router"
 import { Button } from "@/lib/components/ui/button"
 import { Image } from "@unpic/react/base"
-import { transform } from 'unpic/providers/supabase';
+import { transform } from "@/context/img-transform";
 
 type props = {
     information: {

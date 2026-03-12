@@ -14,7 +14,8 @@ import {
 } from "@/lib/components/ui/qr-code";
 import { toast } from 'sonner';
 import { sideCannons } from './fireworks';
-import { Image } from '@unpic/react';
+import { Image } from '@unpic/react/base';
+import { transform } from "@/context/img-transform";
 
 type Props = {
     pfp: string | null;
@@ -68,6 +69,7 @@ export default function ShareProfile({ pfp, qid }: Props) {
                                 height={40}
                                 className="object-cover object-center transition-transform duration-200 hover:scale-105"
                                 loading="lazy"
+                                transformer={transform}
                             />
                         </QRCodeOverlay>
                     </QRCode>
